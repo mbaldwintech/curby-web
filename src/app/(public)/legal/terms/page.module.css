@@ -1,0 +1,22 @@
+.crby-markdown body {
+  font-size: 14px;
+}
+
+.crby-markdown h1 {
+  font-size: 24px;
+  font-weight: 800;
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+.crby-markdown h2, .crby-markdown h3, .crby-markdown h4, .crby-markdown h5, .crby-markdown h6 {
+  font-size: 18px;
+  font-weight: 800;
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+.crby-markdown p {
+  margin: 0px 20px;
+  line-height: 1.6;
+}

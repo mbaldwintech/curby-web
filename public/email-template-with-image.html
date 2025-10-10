@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Confirm Your Email - Curby</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #282A29;
+        color: #FFF5DC;
+        line-height: 1.5;
+        margin: 0;
+        padding: 10px; /* Add minimum padding around the content */
+      }
+      .container {
+        max-width: 600px;
+        margin: auto;
+        padding: 24px;
+        background-color: #454645;
+        border-radius: 12px;
+      }
+      .logo {
+        display: block;
+        margin: 0 auto 20px;
+        width: 120px;
+      }
+      h2 {
+        color: #FFF5DC;
+      }
+      .button {
+        display: inline-block;
+        margin-top: 20px;
+        padding: 12px 24px;
+        background-color: #587652;
+        color: #FFF5DC;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: bold;
+      }
+      .url {
+        word-break: break-word;
+        color: #FFC107;
+      }
+      .footer {
+        margin-top: 32px;
+        font-size: 12px;
+        color: #7E7F7E;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <img src="https://hbaiapsdvjjuxlgbogtz.supabase.co/storage/v1/object/public/public-assets//Curby-Logo-Reverse.png" alt="Curby Logo" class="logo" />
+
+      <h2>Welcome to Curby!</h2>
+      <p>Thanks for joining the Curby community! Before you start discovering awesome curbside finds, please confirm your email address below:</p>
+
+      <p>
+        <a href="{{ .ConfirmationURL }}" class="button">Confirm My Email</a>
+      </p>
+
+      <p>If the button doesn’t work, you can also copy and paste this link into your browser:</p>
+      <p class="url">{{ .ConfirmationURL }}</p>
+
+      <div class="footer">
+        <p>If you didn’t sign up for Curby, you can safely ignore this email.</p>
+      </div>
+    </div>
+  </body>
+</html>
