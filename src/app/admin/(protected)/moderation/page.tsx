@@ -19,7 +19,7 @@ import {
 } from '@core/types';
 import { createClient } from '@supa/utils/client';
 import { AlertTriangle, CheckCircle, Clock, Eye, RefreshCcw, Shield, TrendingUp, Users, XCircle } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
 export default function ModerationDashboard() {
@@ -33,11 +33,7 @@ export default function ModerationDashboard() {
   const [moderatorPerformance, setModeratorPerformance] = useState<ModeratorPerformance[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchModerationData();
-  }, []);
-
-  const fetchModerationData = async () => {
+  const fetchModerationData = useCallback(async () => {
     try {
       setLoading(true);
 
@@ -71,7 +67,11 @@ export default function ModerationDashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [supabase]);
+
+  useEffect(() => {
+    fetchModerationData();
+  }, [fetchModerationData]);
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
