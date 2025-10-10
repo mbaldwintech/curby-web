@@ -35,12 +35,14 @@ A modern web application for community-driven sharing of free items. Curby conne
 ## 🛠️ Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/mbaldwintech/curby-web.git
    cd curby-web
    ```
 
 2. **Install dependencies**
+
    ```bash
    npm install
    # or
@@ -52,15 +54,17 @@ A modern web application for community-driven sharing of free items. Curby conne
    ```
 
 3. **Set up environment variables**
-   
+
    Copy the example environment file and configure your variables:
+
    ```bash
    cp .env.example .env.local
    ```
-   
+
    See the [Environment Variables](#-environment-variables) section below for required configuration.
 
 4. **Run the development server**
+
    ```bash
    npm run dev
    # or
@@ -72,7 +76,7 @@ A modern web application for community-driven sharing of free items. Curby conne
    ```
 
 5. **Open your browser**
-   
+
    Navigate to [http://localhost:3000](http://localhost:3000) to see the application.
 
 ## 🔧 Environment Variables

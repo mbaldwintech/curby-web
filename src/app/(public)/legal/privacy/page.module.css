@@ -9,7 +9,11 @@
   margin-bottom: 10px;
 }
 
-.crby-markdown h2, .crby-markdown h3, .crby-markdown h4, .crby-markdown h5, .crby-markdown h6 {
+.crby-markdown h2,
+.crby-markdown h3,
+.crby-markdown h4,
+.crby-markdown h5,
+.crby-markdown h6 {
   font-size: 18px;
   font-weight: 800;
   margin-top: 20px;
