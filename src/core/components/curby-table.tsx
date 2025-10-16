@@ -1,21 +1,22 @@
 'use client';
 
-import { useDebounce } from '@common/hooks';
-import { cn } from '@core/utils';
-import { BaseService, Filter, Filters, OrderBy, Pagination } from '@supa/services';
-import { GenericRecord } from '@supa/types';
-import { IconDotsVertical } from '@tabler/icons-react';
-import { CellContext, ColumnDefTemplate, ColumnFiltersState, SortingState } from '@tanstack/react-table';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Button } from './button';
-import { CustomColumnDef, DataTable } from './data-table';
 import {
+  Button,
+  CustomColumnDef,
+  DataTable,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger
-} from './dropdown-menu';
+} from '@common/components';
+import { useDebounce } from '@common/hooks';
+import { cn } from '@common/utils';
+import { BaseService, Filter, Filters, OrderBy, Pagination } from '@supa/services';
+import { GenericRecord } from '@supa/types';
+import { IconDotsVertical } from '@tabler/icons-react';
+import { CellContext, ColumnDefTemplate, ColumnFiltersState, SortingState } from '@tanstack/react-table';
+import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useState } from 'react';
 
 const convertToFilters = <T,>(filters: Filters<T>): ColumnFiltersState =>
   filters.map((f) => ({
@@ -48,7 +49,7 @@ export interface CurbyTableRowAction<T extends GenericRecord> {
   variant?: 'default' | 'destructive';
   icon?: React.ReactNode;
   getDisabled?: (item: T) => boolean;
-  onClick: (row: GenericRecord) => void;
+  onClick: (row: T) => void;
 }
 
 export const buildColumnDef = <T extends GenericRecord, K extends keyof T & string>(
@@ -77,7 +78,7 @@ export const buildColumnDef = <T extends GenericRecord, K extends keyof T & stri
           { column: key, ascending: true },
           { pageIndex, pageSize }
         );
-        return items.reduce(
+        const res = items.reduce(
           (acc, item) => {
             if (!item[key] || acc.some((i) => i.id === item[key])) {
               return acc;
@@ -87,6 +88,7 @@ export const buildColumnDef = <T extends GenericRecord, K extends keyof T & stri
           },
           [] as { id: string; label: string }[]
         );
+        return res;
       }
     }
   };
@@ -116,17 +118,14 @@ export const buildColumnDef = <T extends GenericRecord, K extends keyof T & stri
   return def;
 };
 
-export const CurbyTable = <T extends GenericRecord>({
-  service,
-  columns,
-  height,
-  maxHeight,
-  onRowClick,
-  rowActionSections,
-  toolbarLeft,
-  toolbarRight
-}: {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export interface CurbyTableRef<T extends GenericRecord> {
+  refresh: () => void;
+}
+
+export interface CurbyTableProps<T extends GenericRecord> {
   service: BaseService<T>;
+  defaultFilters?: Filters<T>;
   columns: CustomColumnDef<T>[];
   height?: string | number;
   maxHeight?: string | number;
@@ -134,7 +133,22 @@ export const CurbyTable = <T extends GenericRecord>({
   rowActionSections?: CurbyTableRowAction<T>[][];
   toolbarLeft?: React.ReactNode;
   toolbarRight?: React.ReactNode;
-}) => {
+}
+
+function CurbyTableInternal<T extends GenericRecord>(
+  {
+    service,
+    defaultFilters,
+    columns,
+    height,
+    maxHeight,
+    onRowClick,
+    rowActionSections,
+    toolbarLeft,
+    toolbarRight
+  }: CurbyTableProps<T>,
+  ref: React.Ref<CurbyTableRef<T>>
+) {
   const [searchText, setSearchText] = useState('');
   const debouncedSearchText = useDebounce(searchText, 300);
   const searchableColumns = useMemo(
@@ -146,6 +160,7 @@ export const CurbyTable = <T extends GenericRecord>({
     [columns]
   );
   const [filters, setFilters] = useState<Filter<T>[]>([]);
+  const memoizedDefaultFilters = useMemo(() => defaultFilters || [], [defaultFilters]);
   const debouncedFilters = useDebounce(filters, 300);
   const [sort, setSort] = useState<OrderBy<T>>({ column: 'createdAt', ascending: false });
   const [pagination, setPagination] = useState<Pagination>({ pageIndex: 0, pageSize: 10 });
@@ -161,7 +176,14 @@ export const CurbyTable = <T extends GenericRecord>({
 
   const refreshCount = useCallback(async () => {
     try {
-      const count = await service.count(debouncedFilters, {
+      let filters: Filters<T> = [];
+      if (memoizedDefaultFilters.length > 0) {
+        filters = [...memoizedDefaultFilters];
+      }
+      if (debouncedFilters.length > 0) {
+        filters = [...filters, ...debouncedFilters];
+      }
+      const count = await service.count(filters, {
         text: debouncedSearchText,
         columns: searchableColumns
       });
@@ -171,7 +193,7 @@ export const CurbyTable = <T extends GenericRecord>({
       setError('Failed to load event count.');
       setCount(0);
     }
-  }, [service, debouncedFilters, debouncedSearchText, searchableColumns]);
+  }, [service, memoizedDefaultFilters, debouncedFilters, debouncedSearchText, searchableColumns]);
 
   useEffect(() => {
     refreshCount();
@@ -181,7 +203,14 @@ export const CurbyTable = <T extends GenericRecord>({
     setLoading(true);
     setError(null);
     try {
-      const data = await service.getAllPaged(debouncedFilters, sort, pagination, {
+      let filters: Filters<T> = [];
+      if (memoizedDefaultFilters.length > 0) {
+        filters = [...memoizedDefaultFilters];
+      }
+      if (debouncedFilters.length > 0) {
+        filters = [...filters, ...debouncedFilters];
+      }
+      const data = await service.getAllPaged(filters, sort, pagination, {
         text: debouncedSearchText,
         columns: searchableColumns
       });
@@ -193,11 +222,17 @@ export const CurbyTable = <T extends GenericRecord>({
     } finally {
       setLoading(false);
     }
-  }, [service, debouncedFilters, sort, pagination, debouncedSearchText, searchableColumns]);
+  }, [service, memoizedDefaultFilters, debouncedFilters, sort, pagination, debouncedSearchText, searchableColumns]);
 
   useEffect(() => {
     getData();
   }, [getData]);
+
+  useImperativeHandle<CurbyTableRef<T>, CurbyTableRef<T>>(ref, (): CurbyTableRef<T> => {
+    return {
+      refresh: getData
+    };
+  });
 
   return (
     <DataTable
@@ -226,7 +261,7 @@ export const CurbyTable = <T extends GenericRecord>({
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="max-w-60">
                     {rowActionSections?.map((section, i) => (
-                      <>
+                      <React.Fragment key={`section-${i}`}>
                         {section.map((action, j) => (
                           <DropdownMenuItem
                             key={`action-${i}-${j}`}
@@ -235,10 +270,10 @@ export const CurbyTable = <T extends GenericRecord>({
                               'whitespace-nowrap'
                             )}
                             disabled={action.getDisabled?.(item) || loading}
-                            onClick={() => {
-                              if (data.length === 1) {
-                                action.onClick(data[0]);
-                              }
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              action.onClick(item);
                             }}
                           >
                             {action.icon && (
@@ -248,7 +283,7 @@ export const CurbyTable = <T extends GenericRecord>({
                           </DropdownMenuItem>
                         ))}
                         {i < rowActionSections.length - 1 && <DropdownMenuSeparator />}
-                      </>
+                      </React.Fragment>
                     ))}
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -293,4 +328,8 @@ export const CurbyTable = <T extends GenericRecord>({
       toolbarRight={toolbarRight}
     />
   );
-};
+}
+
+export const CurbyTable = forwardRef(CurbyTableInternal) as <T extends GenericRecord>(
+  props: CurbyTableProps<T> & { ref?: React.Ref<CurbyTableRef<T>> }
+) => React.JSX.Element;

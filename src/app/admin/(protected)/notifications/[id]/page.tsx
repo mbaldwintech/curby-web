@@ -1,4 +1,4 @@
-import { AdminHeader } from '@core/components/admin-header';
+import { AdminPageContainer } from '@core/components';
 
 interface NotificationDetailsPageProps {
   params: Promise<{ id: string }>;
@@ -7,10 +7,5 @@ interface NotificationDetailsPageProps {
 export default async function NotificationDetailsPage({ params }: NotificationDetailsPageProps) {
   const { id } = await params;
 
-  return (
-    <>
-      <AdminHeader title="Notification Details" />
-      <div className="@container/main flex flex-1 flex-col p-4 md:gap-6 md:p-6">Notification Details {id}</div>
-    </>
-  );
+  return <AdminPageContainer title="Notification Details">Notification Details {id}</AdminPageContainer>;
 }

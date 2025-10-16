@@ -11,5 +11,5 @@ export * from './km-to-miles.util';
 export * from './miles-to-feet.util';
 export * from './miles-to-km.util';
 export * from './run-on-new-thread.util';
-export * from './toast.util';
+export * from './utils';
 export * from './wait.util';

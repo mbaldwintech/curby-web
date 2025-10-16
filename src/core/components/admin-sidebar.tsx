@@ -38,22 +38,20 @@ import {
   Users
 } from 'lucide-react';
 
-import { useProfile } from '@core/hooks';
-import { useAuth } from '@supa/providers';
-import Image from 'next/image';
-import Link from 'next/link';
-import { Avatar, AvatarFallback, AvatarImage } from './avatar';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './collapsible';
 import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuTrigger
-} from './dropdown-menu';
-import {
+  DropdownMenuTrigger,
   Sidebar,
   SidebarContent,
   SidebarFooter,
@@ -68,7 +66,13 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
   useSidebar
-} from './sidebar';
+} from '@common/components';
+import { useAuth } from '@supa/providers';
+import Image from 'next/image';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useState } from 'react';
+import { useProfile } from '../hooks';
 
 export interface AdminSidebarItem {
   title: string;
@@ -340,10 +344,75 @@ const data: AdminSidebarItem[] = [
   }
 ];
 
+const SidebarSection = ({
+  section,
+  isActive
+}: {
+  section: AdminSidebarItem;
+  isActive: (path?: string, exactMatch?: boolean) => boolean;
+}) => {
+  const [open, setOpen] = useState(section.defaultOpen ?? false);
+  const isSectionActive = isActive(section.url, true);
+  const isChildActive = section.items?.some((sub) => isActive(sub.url)) ?? false;
+
+  return (
+    <Collapsible asChild defaultOpen={section.defaultOpen} open={open} onOpenChange={setOpen}>
+      <SidebarMenuItem>
+        <SidebarMenuButton asChild tooltip={section.tooltip} isActive={open ? false : isSectionActive || isChildActive}>
+          {section.url ? (
+            <Link href={section.url}>
+              {section.icon && <section.icon />}
+              <span>{section.title}</span>
+            </Link>
+          ) : (
+            <span>
+              {section.icon && <section.icon />}
+              <span>{section.title}</span>
+            </span>
+          )}
+        </SidebarMenuButton>
+        {section.items?.length ? (
+          <>
+            <CollapsibleTrigger asChild>
+              <SidebarMenuAction className="data-[state=open]:rotate-90 rounded-sm">
+                <ChevronRight />
+                <span className="sr-only">Toggle</span>
+              </SidebarMenuAction>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <SidebarMenuSub>
+                {section.items?.map((subItem) => (
+                  <SidebarMenuSubItem key={subItem.title}>
+                    <SidebarMenuSubButton asChild isActive={isActive(subItem.url)}>
+                      <a href={subItem.url}>
+                        {subItem.icon && <subItem.icon />}
+                        <span>{subItem.title}</span>
+                      </a>
+                    </SidebarMenuSubButton>
+                  </SidebarMenuSubItem>
+                ))}
+              </SidebarMenuSub>
+            </CollapsibleContent>
+          </>
+        ) : null}
+      </SidebarMenuItem>
+    </Collapsible>
+  );
+};
+
 export function AdminSidebar({ logout }: { logout: () => Promise<void> }) {
+  const pathname = usePathname();
   const { isMobile } = useSidebar();
   const { user } = useAuth();
   const { profile } = useProfile();
+
+  function isActive(url?: string, exactMatch = false) {
+    if (!url) return false;
+    if (exactMatch) {
+      return pathname === url;
+    }
+    return pathname === url || pathname.startsWith(`${url}/`);
+  }
 
   if (!profile || !user) {
     return null;
@@ -357,7 +426,13 @@ export function AdminSidebar({ logout }: { logout: () => Promise<void> }) {
             <SidebarMenuButton size="lg" asChild>
               <a href="/admin">
                 <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                  <Image width={28} height={28} alt="Curby Logo" objectFit="cover" src="/Curby-Head.png" />
+                  <Image
+                    width={28}
+                    height={28}
+                    alt="Curby Logo"
+                    style={{ objectFit: 'contain' }}
+                    src="/Curby-Head.png"
+                  />
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">Curby</span>
@@ -374,7 +449,7 @@ export function AdminSidebar({ logout }: { logout: () => Promise<void> }) {
             <SidebarGroup key={section.title}>
               <SidebarMenu key={section.title}>
                 <SidebarMenuItem>
-                  <SidebarMenuButton asChild tooltip={section.title}>
+                  <SidebarMenuButton asChild tooltip={section.title} isActive={isActive(section.url, true)}>
                     <a href={section.url}>
                       {section.icon && <section.icon />}
                       <span>{section.title}</span>
@@ -388,47 +463,7 @@ export function AdminSidebar({ logout }: { logout: () => Promise<void> }) {
               <SidebarGroupLabel>{section.title}</SidebarGroupLabel>
               <SidebarMenu>
                 {section.items?.map((item) => (
-                  <Collapsible key={item.title} asChild defaultOpen={item.defaultOpen}>
-                    <SidebarMenuItem>
-                      <SidebarMenuButton asChild tooltip={item.tooltip}>
-                        {item.url ? (
-                          <Link href={item.url}>
-                            {item.icon && <item.icon />}
-                            <span>{item.title}</span>
-                          </Link>
-                        ) : (
-                          <span>
-                            {item.icon && <item.icon />}
-                            <span>{item.title}</span>
-                          </span>
-                        )}
-                      </SidebarMenuButton>
-                      {item.items?.length ? (
-                        <>
-                          <CollapsibleTrigger asChild>
-                            <SidebarMenuAction className="data-[state=open]:rotate-90 rounded-sm">
-                              <ChevronRight />
-                              <span className="sr-only">Toggle</span>
-                            </SidebarMenuAction>
-                          </CollapsibleTrigger>
-                          <CollapsibleContent>
-                            <SidebarMenuSub>
-                              {item.items?.map((subItem) => (
-                                <SidebarMenuSubItem key={subItem.title}>
-                                  <SidebarMenuSubButton asChild>
-                                    <a href={subItem.url}>
-                                      {subItem.icon && <subItem.icon />}
-                                      <span>{subItem.title}</span>
-                                    </a>
-                                  </SidebarMenuSubButton>
-                                </SidebarMenuSubItem>
-                              ))}
-                            </SidebarMenuSub>
-                          </CollapsibleContent>
-                        </>
-                      ) : null}
-                    </SidebarMenuItem>
-                  </Collapsible>
+                  <SidebarSection key={item.title} section={item} isActive={isActive} />
                 ))}
               </SidebarMenu>
             </SidebarGroup>
@@ -465,7 +500,7 @@ export function AdminSidebar({ logout }: { logout: () => Promise<void> }) {
                   <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                     <Avatar className="h-8 w-8 rounded-lg">
                       <AvatarImage src={profile.avatarUrl ?? undefined} alt={profile.username} />
-                      <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                      <AvatarFallback className="rounded-lg">{profile.username.charAt(0)}</AvatarFallback>
                     </Avatar>
                     <div className="grid flex-1 text-left text-sm leading-tight">
                       <span className="truncate font-medium">{profile.username}</span>

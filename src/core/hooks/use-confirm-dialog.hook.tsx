@@ -1,14 +1,14 @@
 'use client';
 
-import { Button } from '@core/components';
 import {
+  Button,
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle
-} from '@core/components/dialog';
+} from '@common/components';
 import React, { createContext, ReactNode, useCallback, useContext, useEffect, useState } from 'react';
 
 export interface ConfirmDialogOptions<T> {

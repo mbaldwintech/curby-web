@@ -1,7 +1,7 @@
-import { EventTypeKey } from '@core/enumerations';
 import { AuthRoutes } from '@supa/providers';
 import { AuthService as AuthServiceBase } from '@supa/services';
 import { SupabaseClient } from '@supabase/supabase-js';
+import { EventTypeKey } from '../enumerations';
 import { DeviceService } from './device.service';
 import { EventLoggerService } from './event-logger.service';
 import { PrivacyPolicyService } from './privacy-policy.service';

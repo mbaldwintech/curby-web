@@ -1,6 +1,6 @@
 import { BaseService } from '@supa/services';
 import { SupabaseClient } from '@supabase/supabase-js';
-import { Tutorial, TutorialView } from '../types';
+import { Tutorial, TutorialMetadata, TutorialView } from '../types';
 import { ProfileService } from './profile.service';
 import { TutorialViewService } from './tutorial-view.service';
 
@@ -9,7 +9,7 @@ export class TutorialService extends BaseService<Tutorial> {
   protected tutorialViewService: TutorialViewService;
 
   constructor(protected supabase: SupabaseClient) {
-    super('tutorial', supabase);
+    super('tutorial', supabase, TutorialMetadata);
     this.profileService = new ProfileService(supabase);
     this.tutorialViewService = new TutorialViewService(supabase);
   }

@@ -1,4 +1,4 @@
-import { TermsAndConditionsService } from '@core/services/terms-and-conditions.service';
+import { TermsAndConditionsService } from '@core/services';
 import { createServerService } from '@supa/utils/server';
 import { Metadata } from 'next';
 import ReactMarkdown from 'react-markdown';

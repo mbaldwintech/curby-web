@@ -1,9 +1,9 @@
 'use client';
 
-import { showErrorToast, showSuccessToast } from '@common/utils';
 import { useAuth } from '@supa/providers';
 import { createClientService } from '@supa/utils/client';
 import { ReactNode, useEffect, useRef } from 'react';
+import { toast } from 'sonner';
 import { EventTypeKey } from '../enumerations';
 import { useDevice, useUserDevice } from '../hooks';
 import { DeviceService, EventLoggerService, UserDeviceService } from '../services';
@@ -25,12 +25,12 @@ export const ForceLogoutProvider: React.FC<ForceLogoutProviderProps> = ({ childr
       if (isAuthenticated) {
         logout()
           .then(() => {
-            showSuccessToast('You have been logged out due to a forced logout from another device.');
+            toast.success('You have been logged out due to a forced logout from another device.');
             eventLoggerService.log(EventTypeKey.ForcedLogout, { deviceId: userDevice.deviceId });
           })
           .catch((error) => {
             console.error('Error during forced logout:', error);
-            showErrorToast('An error occurred while logging you out. Please try again later.');
+            toast.error('An error occurred while logging you out. Please try again later.');
             eventLoggerService.log(EventTypeKey.DeviceForcedLogoutFailed, { error: error.message });
           });
       } else {

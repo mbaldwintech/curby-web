@@ -1,4 +1,4 @@
-import { AdminHeader } from '@core/components/admin-header';
+import { AdminPageContainer } from '@core/components';
 
 interface TermsAndConditionsAcceptanceDetailsPageProps {
   params: Promise<{ id: string }>;
@@ -10,11 +10,8 @@ export default async function TermsAndConditionsAcceptanceDetailsPage({
   const { id } = await params;
 
   return (
-    <>
-      <AdminHeader title="Terms & Conditions Acceptance Details" />
-      <div className="@container/main flex flex-1 flex-col p-4 md:gap-6 md:p-6">
-        Terms & Conditions Acceptance Details {id}
-      </div>
-    </>
+    <AdminPageContainer title="Terms & Conditions Acceptance Details">
+      Terms & Conditions Acceptance Details {id}
+    </AdminPageContainer>
   );
 }

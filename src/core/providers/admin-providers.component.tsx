@@ -1,13 +1,13 @@
 'use client';
 
 import { PortalQueueProvider } from '@common/providers';
-import { authRoutes, AuthService, DeviceService } from '@core/services';
 import { adminStore } from '@store/admin-store';
 import { AuthProvider } from '@supa/providers';
 import { createClientService } from '@supa/utils/client';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React, { ReactNode, useEffect, useRef } from 'react';
 import { Provider } from 'react-redux';
+import { authRoutes, AuthService, DeviceService } from '../services';
 import { ForceLogoutProvider } from './force-logout.provider';
 import { PolicyGateProvider } from './policy-gate.provider';
 import { ProfileProvider } from './profile.provider';

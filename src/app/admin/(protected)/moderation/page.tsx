@@ -1,13 +1,29 @@
 'use client';
 
-import { AdminHeader } from '@core/components';
-import { Avatar, AvatarFallback, AvatarImage } from '@core/components/avatar';
-import { Badge } from '@core/components/badge';
-import { Button } from '@core/components/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@core/components/card';
-import { Progress } from '@core/components/progress';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@core/components/table';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@core/components/tabs';
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+  Badge,
+  Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  Progress,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger
+} from '@common/components';
+import { AdminPageContainer } from '@core/components';
 import {
   FrequentFalseTaker,
   ModerationOverview,
@@ -104,356 +120,355 @@ export default function ModerationDashboard() {
   }
 
   return (
-    <>
-      <AdminHeader
-        title="Moderation Dashboard"
-        rightContent={
+    <AdminPageContainer
+      title="Moderation Dashboard"
+      headerProps={{
+        rightContent: (
           <Button onClick={fetchModerationData} className="size-7" variant="outline" size="icon">
             <RefreshCcw className="h-[1.2rem] w-[1.2rem]" />
           </Button>
-        }
-      />
-      <div className="container mx-auto p-6 space-y-6">
-        {/* Overview Cards */}
-        {overview && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Pending Reports</CardTitle>
-                <AlertTriangle className="h-4 w-4 text-red-500" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-red-600">{overview.pendingReports}</div>
-                <p className="text-xs text-muted-foreground">{overview.reportsInReview} in review</p>
-              </CardContent>
-            </Card>
+        )
+      }}
+    >
+      {/* Overview Cards */}
+      {overview && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Pending Reports</CardTitle>
+              <AlertTriangle className="h-4 w-4 text-red-500" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-red-600">{overview.pendingReports}</div>
+              <p className="text-xs text-muted-foreground">{overview.reportsInReview} in review</p>
+            </CardContent>
+          </Card>
 
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Suspended Users</CardTitle>
-                <Users className="h-4 w-4 text-yellow-500" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-yellow-600">{overview.currentlySuspendedUsers}</div>
-                <p className="text-xs text-muted-foreground">{overview.bannedUsers} banned</p>
-              </CardContent>
-            </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Suspended Users</CardTitle>
+              <Users className="h-4 w-4 text-yellow-500" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-yellow-600">{overview.currentlySuspendedUsers}</div>
+              <p className="text-xs text-muted-foreground">{overview.bannedUsers} banned</p>
+            </CardContent>
+          </Card>
 
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">False Takings (7d)</CardTitle>
-                <Shield className="h-4 w-4 text-blue-500" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-blue-600">{overview.falseTakingsLast7Days}</div>
-                <p className="text-xs text-muted-foreground">{overview.falseTakingsLast30Days} in 30 days</p>
-              </CardContent>
-            </Card>
-          </div>
-        )}
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">False Takings (7d)</CardTitle>
+              <Shield className="h-4 w-4 text-blue-500" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-blue-600">{overview.falseTakingsLast7Days}</div>
+              <p className="text-xs text-muted-foreground">{overview.falseTakingsLast30Days} in 30 days</p>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
-        <Tabs defaultValue="queue" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-6">
-            <TabsTrigger value="queue">Queue</TabsTrigger>
-            <TabsTrigger value="trends">Trends</TabsTrigger>
-            <TabsTrigger value="reporters">Top Reporters</TabsTrigger>
-            <TabsTrigger value="reported">Most Reported</TabsTrigger>
-            <TabsTrigger value="false-takers">False Takers</TabsTrigger>
-            <TabsTrigger value="moderators">Moderators</TabsTrigger>
-          </TabsList>
+      <Tabs defaultValue="queue" className="space-y-4">
+        <TabsList className="grid w-full grid-cols-6">
+          <TabsTrigger value="queue">Queue</TabsTrigger>
+          <TabsTrigger value="trends">Trends</TabsTrigger>
+          <TabsTrigger value="reporters">Top Reporters</TabsTrigger>
+          <TabsTrigger value="reported">Most Reported</TabsTrigger>
+          <TabsTrigger value="false-takers">False Takers</TabsTrigger>
+          <TabsTrigger value="moderators">Moderators</TabsTrigger>
+        </TabsList>
 
-          {/* Moderation Queue */}
-          <TabsContent value="queue">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Clock className="h-5 w-5" />
-                  Moderation Queue
-                </CardTitle>
-                <CardDescription>Items requiring moderator attention, sorted by priority</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Priority</TableHead>
-                      <TableHead>Type</TableHead>
-                      <TableHead>Description</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Age</TableHead>
-                      <TableHead>Actions</TableHead>
+        {/* Moderation Queue */}
+        <TabsContent value="queue">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Clock className="h-5 w-5" />
+                Moderation Queue
+              </CardTitle>
+              <CardDescription>Items requiring moderator attention, sorted by priority</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Priority</TableHead>
+                    <TableHead>Type</TableHead>
+                    <TableHead>Description</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Age</TableHead>
+                    <TableHead>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {moderationQueue.map((item) => (
+                    <TableRow key={item.queueItemId}>
+                      <TableCell>
+                        <Badge variant={getPriorityColor(item.priority)}>{item.priority.toUpperCase()}</Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline">{item.queueType.replace('_', ' ')}</Badge>
+                      </TableCell>
+                      <TableCell className="max-w-xs truncate">{item.description}</TableCell>
+                      <TableCell>
+                        <Badge variant="secondary">{item.status}</Badge>
+                      </TableCell>
+                      <TableCell>{formatTimeAgo(item.hoursSinceCreated)}</TableCell>
+                      <TableCell>
+                        <div className="flex gap-2">
+                          <Button size="sm" variant="outline">
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button size="sm" variant="outline">
+                            <CheckCircle className="h-4 w-4" />
+                          </Button>
+                          <Button size="sm" variant="outline">
+                            <XCircle className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
                     </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {moderationQueue.map((item) => (
-                      <TableRow key={item.queueItemId}>
-                        <TableCell>
-                          <Badge variant={getPriorityColor(item.priority)}>{item.priority.toUpperCase()}</Badge>
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant="outline">{item.queueType.replace('_', ' ')}</Badge>
-                        </TableCell>
-                        <TableCell className="max-w-xs truncate">{item.description}</TableCell>
-                        <TableCell>
-                          <Badge variant="secondary">{item.status}</Badge>
-                        </TableCell>
-                        <TableCell>{formatTimeAgo(item.hoursSinceCreated)}</TableCell>
-                        <TableCell>
-                          <div className="flex gap-2">
-                            <Button size="sm" variant="outline">
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                            <Button size="sm" variant="outline">
-                              <CheckCircle className="h-4 w-4" />
-                            </Button>
-                            <Button size="sm" variant="outline">
-                              <XCircle className="h-4 w-4" />
-                            </Button>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Trends */}
+        <TabsContent value="trends">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <TrendingUp className="h-5 w-5" />
+                Moderation Trends (30 Days)
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-80">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={trends}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="trendDate" tickFormatter={(date) => new Date(date).toLocaleDateString()} />
+                    <YAxis />
+                    <Tooltip
+                      labelFormatter={(date) => new Date(date).toLocaleDateString()}
+                      labelClassName="text-background font-bold"
+                    />
+                    <Legend />
+                    <Line type="monotone" dataKey="dailyReports" stroke="#ef4444" name="Reports" />
+                    <Line type="monotone" dataKey="dailyUserFlags" stroke="#f97316" name="User Flags" />
+                    <Line type="monotone" dataKey="dailyFalseTakings" stroke="#3b82f6" name="False Takings" />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Top Reporters */}
+        <TabsContent value="reporters">
+          <Card>
+            <CardHeader>
+              <CardTitle>Top Reporters</CardTitle>
+              <CardDescription>Users who report the most content</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>User</TableHead>
+                    <TableHead>Total Reports</TableHead>
+                    <TableHead>Accuracy</TableHead>
+                    <TableHead>Last 7 Days</TableHead>
+                    <TableHead>Status</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {topReporters.map((reporter) => (
+                    <TableRow key={reporter.userId}>
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <Avatar>
+                            <AvatarImage src={reporter.avatarUrl || undefined} />
+                            <AvatarFallback>{reporter.username.slice(0, 2).toUpperCase()}</AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <div className="font-medium">{reporter.username}</div>
+                            <div className="text-sm text-muted-foreground">{reporter.email}</div>
                           </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Trends */}
-          <TabsContent value="trends">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <TrendingUp className="h-5 w-5" />
-                  Moderation Trends (30 Days)
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="h-80">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={trends}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="trendDate" tickFormatter={(date) => new Date(date).toLocaleDateString()} />
-                      <YAxis />
-                      <Tooltip
-                        labelFormatter={(date) => new Date(date).toLocaleDateString()}
-                        labelClassName="text-background font-bold"
-                      />
-                      <Legend />
-                      <Line type="monotone" dataKey="dailyReports" stroke="#ef4444" name="Reports" />
-                      <Line type="monotone" dataKey="dailyUserFlags" stroke="#f97316" name="User Flags" />
-                      <Line type="monotone" dataKey="dailyFalseTakings" stroke="#3b82f6" name="False Takings" />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Top Reporters */}
-          <TabsContent value="reporters">
-            <Card>
-              <CardHeader>
-                <CardTitle>Top Reporters</CardTitle>
-                <CardDescription>Users who report the most content</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>User</TableHead>
-                      <TableHead>Total Reports</TableHead>
-                      <TableHead>Accuracy</TableHead>
-                      <TableHead>Last 7 Days</TableHead>
-                      <TableHead>Status</TableHead>
+                        </div>
+                      </TableCell>
+                      <TableCell className="font-medium">{reporter.totalReports}</TableCell>
+                      <TableCell>
+                        {reporter.accuracyPercentage ? (
+                          <div className="flex items-center gap-2">
+                            <Progress value={reporter.accuracyPercentage} className="w-16" />
+                            <span className="text-sm">{reporter.accuracyPercentage}%</span>
+                          </div>
+                        ) : (
+                          <span className="text-muted-foreground">N/A</span>
+                        )}
+                      </TableCell>
+                      <TableCell>{reporter.reportsLast7Days}</TableCell>
+                      <TableCell>
+                        <Badge variant={reporter.status === 'active' ? 'default' : 'destructive'}>
+                          {reporter.status}
+                        </Badge>
+                      </TableCell>
                     </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {topReporters.map((reporter) => (
-                      <TableRow key={reporter.userId}>
-                        <TableCell>
-                          <div className="flex items-center gap-3">
-                            <Avatar>
-                              <AvatarImage src={reporter.avatarUrl || undefined} />
-                              <AvatarFallback>{reporter.username.slice(0, 2).toUpperCase()}</AvatarFallback>
-                            </Avatar>
-                            <div>
-                              <div className="font-medium">{reporter.username}</div>
-                              <div className="text-sm text-muted-foreground">{reporter.email}</div>
-                            </div>
-                          </div>
-                        </TableCell>
-                        <TableCell className="font-medium">{reporter.totalReports}</TableCell>
-                        <TableCell>
-                          {reporter.accuracyPercentage ? (
-                            <div className="flex items-center gap-2">
-                              <Progress value={reporter.accuracyPercentage} className="w-16" />
-                              <span className="text-sm">{reporter.accuracyPercentage}%</span>
-                            </div>
-                          ) : (
-                            <span className="text-muted-foreground">N/A</span>
-                          )}
-                        </TableCell>
-                        <TableCell>{reporter.reportsLast7Days}</TableCell>
-                        <TableCell>
-                          <Badge variant={reporter.status === 'active' ? 'default' : 'destructive'}>
-                            {reporter.status}
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Most Reported Content */}
+        <TabsContent value="reported">
+          <Card>
+            <CardHeader>
+              <CardTitle>Most Reported Content</CardTitle>
+              <CardDescription>Items receiving the most reports</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Content</TableHead>
+                    <TableHead>Posted By</TableHead>
+                    <TableHead>Total Reports</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Created</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {mostReported.map((content) => (
+                    <TableRow key={content.contentId}>
+                      <TableCell>
+                        <div>
+                          <div className="font-medium">{content.contentTitle}</div>
+                          <Badge variant="outline" className="text-xs">
+                            {content.itemType}
                           </Badge>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Most Reported Content */}
-          <TabsContent value="reported">
-            <Card>
-              <CardHeader>
-                <CardTitle>Most Reported Content</CardTitle>
-                <CardDescription>Items receiving the most reports</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Content</TableHead>
-                      <TableHead>Posted By</TableHead>
-                      <TableHead>Total Reports</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Created</TableHead>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div>
+                          <div className="font-medium">{content.posterUsername}</div>
+                          <div className="text-sm text-muted-foreground">{content.posterEmail}</div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="text-center">
+                          <div className="font-bold text-red-600">{content.totalReports}</div>
+                          <div className="text-xs text-muted-foreground">{content.pendingReports} pending</div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="space-y-1">
+                          <Badge variant="secondary">{content.resolvedReports} resolved</Badge>
+                          <Badge variant="outline">{content.dismissedReports} dismissed</Badge>
+                        </div>
+                      </TableCell>
+                      <TableCell>{new Date(content.contentCreatedDate).toLocaleDateString()}</TableCell>
                     </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {mostReported.map((content) => (
-                      <TableRow key={content.contentId}>
-                        <TableCell>
-                          <div>
-                            <div className="font-medium">{content.contentTitle}</div>
-                            <Badge variant="outline" className="text-xs">
-                              {content.itemType}
-                            </Badge>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div>
-                            <div className="font-medium">{content.posterUsername}</div>
-                            <div className="text-sm text-muted-foreground">{content.posterEmail}</div>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="text-center">
-                            <div className="font-bold text-red-600">{content.totalReports}</div>
-                            <div className="text-xs text-muted-foreground">{content.pendingReports} pending</div>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="space-y-1">
-                            <Badge variant="secondary">{content.resolvedReports} resolved</Badge>
-                            <Badge variant="outline">{content.dismissedReports} dismissed</Badge>
-                          </div>
-                        </TableCell>
-                        <TableCell>{new Date(content.contentCreatedDate).toLocaleDateString()}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          </TabsContent>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-          {/* False Takers */}
-          <TabsContent value="false-takers">
-            <Card>
-              <CardHeader>
-                <CardTitle>Frequent False Takers</CardTitle>
-                <CardDescription>Users with the most false takings</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>User</TableHead>
-                      <TableHead>Total False Takings</TableHead>
-                      <TableHead>Last 7 Days</TableHead>
-                      <TableHead>Avg Days Between</TableHead>
-                      <TableHead>Status</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {falseTakers.map((taker) => (
-                      <TableRow key={taker.userId}>
-                        <TableCell>
-                          <div className="flex items-center gap-3">
-                            <Avatar>
-                              <AvatarImage src={taker.avatarUrl || undefined} />
-                              <AvatarFallback>{taker.username.slice(0, 2).toUpperCase()}</AvatarFallback>
-                            </Avatar>
-                            <div>
-                              <div className="font-medium">{taker.username}</div>
-                              <div className="text-sm text-muted-foreground">{taker.email}</div>
-                            </div>
-                          </div>
-                        </TableCell>
-                        <TableCell className="font-bold text-red-600">{taker.totalFalseTakings}</TableCell>
-                        <TableCell>{taker.falseTakingsLast7Days}</TableCell>
-                        <TableCell>
-                          {taker.avgDaysBetweenFalseTakings
-                            ? `${Math.round(taker.avgDaysBetweenFalseTakings)} days`
-                            : 'N/A'}
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant={taker.status === 'active' ? 'default' : 'destructive'}>{taker.status}</Badge>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Moderator Performance */}
-          <TabsContent value="moderators">
-            <Card>
-              <CardHeader>
-                <CardTitle>Moderator Performance</CardTitle>
-                <CardDescription>Performance metrics for moderation team</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Moderator</TableHead>
-                      <TableHead>Items Handled</TableHead>
-                      <TableHead>Resolution Rate</TableHead>
-                      <TableHead>Avg Time (hrs)</TableHead>
-                      <TableHead>Last Activity</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {moderatorPerformance.map((mod) => (
-                      <TableRow key={mod.userId}>
-                        <TableCell>
+        {/* False Takers */}
+        <TabsContent value="false-takers">
+          <Card>
+            <CardHeader>
+              <CardTitle>Frequent False Takers</CardTitle>
+              <CardDescription>Users with the most false takings</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>User</TableHead>
+                    <TableHead>Total False Takings</TableHead>
+                    <TableHead>Last 7 Days</TableHead>
+                    <TableHead>Avg Days Between</TableHead>
+                    <TableHead>Status</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {falseTakers.map((taker) => (
+                    <TableRow key={taker.userId}>
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <Avatar>
+                            <AvatarImage src={taker.avatarUrl || undefined} />
+                            <AvatarFallback>{taker.username.slice(0, 2).toUpperCase()}</AvatarFallback>
+                          </Avatar>
                           <div>
-                            <div className="font-medium">{mod.moderatorUsername}</div>
-                            <div className="text-sm text-muted-foreground">{mod.moderatorEmail}</div>
+                            <div className="font-medium">{taker.username}</div>
+                            <div className="text-sm text-muted-foreground">{taker.email}</div>
                           </div>
-                        </TableCell>
-                        <TableCell>
-                          {mod.lastActionDate ? new Date(mod.lastActionDate).toLocaleDateString() : 'Never'}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
-      </div>
-    </>
+                        </div>
+                      </TableCell>
+                      <TableCell className="font-bold text-red-600">{taker.totalFalseTakings}</TableCell>
+                      <TableCell>{taker.falseTakingsLast7Days}</TableCell>
+                      <TableCell>
+                        {taker.avgDaysBetweenFalseTakings
+                          ? `${Math.round(taker.avgDaysBetweenFalseTakings)} days`
+                          : 'N/A'}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={taker.status === 'active' ? 'default' : 'destructive'}>{taker.status}</Badge>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Moderator Performance */}
+        <TabsContent value="moderators">
+          <Card>
+            <CardHeader>
+              <CardTitle>Moderator Performance</CardTitle>
+              <CardDescription>Performance metrics for moderation team</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Moderator</TableHead>
+                    <TableHead>Items Handled</TableHead>
+                    <TableHead>Resolution Rate</TableHead>
+                    <TableHead>Avg Time (hrs)</TableHead>
+                    <TableHead>Last Activity</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {moderatorPerformance.map((mod) => (
+                    <TableRow key={mod.userId}>
+                      <TableCell>
+                        <div>
+                          <div className="font-medium">{mod.moderatorUsername}</div>
+                          <div className="text-sm text-muted-foreground">{mod.moderatorEmail}</div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        {mod.lastActionDate ? new Date(mod.lastActionDate).toLocaleDateString() : 'Never'}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </AdminPageContainer>
   );
 }
