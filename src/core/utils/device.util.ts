@@ -1,5 +1,5 @@
 import { IconProps } from '@common/components';
-import { DeviceInfo } from '@core/types';
+import { DeviceInfo } from '../types';
 
 const DEVICE_ID_KEY = 'device_id';
 

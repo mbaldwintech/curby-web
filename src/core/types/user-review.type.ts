@@ -12,7 +12,7 @@ export interface UserReview extends GenericRecord {
   reviewNotes?: string | null;
   reviewOutcome?: 'resolved' | 'dismissed' | null;
   reviewOutcomeReason?: string | null;
-  reviewOutcomeActions?: 'no_action' | 'user_warning' | 'user_suspension' | 'user_ban' | null;
+  reviewOutcomeAction?: 'no_action' | 'user_warning' | 'user_suspension' | 'user_ban' | null;
   reviewOutcomeActionTakenAt?: Date | null;
   reviewOutcomeComments?: string | null;
   reviewOutcomeMessageToUser?: string | null;

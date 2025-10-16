@@ -8,8 +8,8 @@ import { CurbyCoinTransactionService } from './curby-coin-transaction.service';
 import { EventLoggerService } from './event-logger.service';
 import { FalseTakingService } from './false-taking.service';
 import { ItemMediaService } from './item-media.service';
+import { ItemReportService } from './item-report.service';
 import { MediaService } from './media.service';
-import { ReportedItemService } from './reported-item.service';
 import { SavedItemService } from './saved-item.service';
 
 const EXPIRATION_DAYS = 3;
@@ -25,7 +25,7 @@ export class ExtendedItemService {
   protected falseTakingsService: FalseTakingService;
   protected mediaService: MediaService;
   protected savedItemService: SavedItemService;
-  protected reportedItemService: ReportedItemService;
+  protected reportedItemService: ItemReportService;
   protected itemMediaService: ItemMediaService;
 
   constructor(protected supabase: SupabaseClient) {
@@ -34,7 +34,7 @@ export class ExtendedItemService {
     this.falseTakingsService = new FalseTakingService(supabase);
     this.mediaService = new MediaService(supabase);
     this.savedItemService = new SavedItemService(supabase);
-    this.reportedItemService = new ReportedItemService(supabase);
+    this.reportedItemService = new ItemReportService(supabase);
     this.itemMediaService = new ItemMediaService(supabase);
   }
 

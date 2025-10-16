@@ -1,8 +1,5 @@
-import { Button } from '@core/components/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@core/components/card';
-import { Input } from '@core/components/input';
-import { Label } from '@core/components/label';
-import { cn } from '@core/utils/utils';
+import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Input, Label } from '@common/components';
+import { cn } from '@common/utils';
 
 export interface LoginFormProps {
   loginAction: (formData: FormData) => Promise<void>;

@@ -1,4 +1,3 @@
-// src/app/terms/page.tsx
 import { PrivacyPolicyService } from '@core/services';
 import { createServerService } from '@supa/utils/server';
 import { Metadata } from 'next';

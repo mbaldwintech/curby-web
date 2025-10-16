@@ -1,9 +1,10 @@
 'use client';
 
-import { debounce, showErrorToast, showSuccessToast, wait } from '@common/utils';
+import { debounce, wait } from '@common/utils';
 import { EmailOtpType, Session, User } from '@supabase/supabase-js';
 import { useRouter } from 'next/navigation';
 import { createContext, ReactNode, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { toast } from 'sonner';
 import { AuthValidationStatus } from '../types';
 
 export interface AuthServiceInterface {
@@ -224,10 +225,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ authService, authRou
       await wait(1000);
       router.replace(authRoutes.home);
       wait(5 * 1000).then();
-      showSuccessToast('Successfully signed in as guest!');
+      toast.success('Successfully signed in as guest!');
     } catch (error) {
       console.error('Error signing in as guest:', error);
-      showErrorToast('Error signing in as guest. Please try again later.');
+      toast.error('Error signing in as guest. Please try again later.');
     }
   }, [isAuthenticated, router, authRoutes, authService]);
 
@@ -238,10 +239,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ authService, authRou
         await authService.joinWithEmail(email, password, username);
         await wait(1000);
         router.push(authRoutes.awaitingVerification);
-        showSuccessToast('Successfully signed up with email!');
+        toast.success('Successfully signed up with email!');
       } catch (error) {
         console.error('Error joining with email:', error);
-        showErrorToast('Error joining with email. Please try again later.');
+        toast.error('Error joining with email. Please try again later.');
       }
     },
     [isAuthenticated, router, authRoutes, authService]
@@ -262,7 +263,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ authService, authRou
       await authService.verifyConfirmEmail(params.access_token!, params.refresh_token!);
       await wait(1000);
       router.replace(authRoutes.home);
-      showSuccessToast('Email verified successfully!');
+      toast.success('Email verified successfully!');
     }
   };
 
@@ -271,7 +272,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ authService, authRou
       await authService.verifyConfirmEmail(params.access_token!, params.refresh_token!);
       await wait(1000);
       router.replace('/(tabs)/free-items');
-      showSuccessToast('Email verified successfully!');
+      toast.success('Email verified successfully!');
     }
   };
 
@@ -287,10 +288,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ authService, authRou
         throw new Error('Email is required to resend OTP');
       }
       await authService.resendSignupConfirmationEmail(email);
-      showSuccessToast('Signup confirmation email resent successfully!');
+      toast.success('Signup confirmation email resent successfully!');
     } catch (error) {
       console.error('Error resending signup confirmation email:', error);
-      showErrorToast('Error resending. Please try again.');
+      toast.error('Error resending. Please try again.');
     }
   };
 
@@ -298,11 +299,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ authService, authRou
     try {
       await authService.loginWithEmail(email, password);
       await wait(1000);
-      showSuccessToast('Successfully logged in!');
+      toast.success('Successfully logged in!');
       router.replace(authRoutes.home);
     } catch (error) {
       console.error('Error logging in:', error);
-      showErrorToast('Error logging in. Please check your credentials and try again.');
+      toast.error('Error logging in. Please check your credentials and try again.');
     }
   };
 
@@ -310,10 +311,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ authService, authRou
     try {
       await authService.logout();
       router.replace(authRoutes.login);
-      showSuccessToast('Successfully logged out!');
+      toast.success('Successfully logged out!');
     } catch (error) {
       console.error('Error logging out:', error);
-      showErrorToast('Error logging out. Please try again later.');
+      toast.error('Error logging out. Please try again later.');
     }
   }, [router, authService, authRoutes]);
 
@@ -324,10 +325,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ authService, authRou
           throw new Error('User not found or not a guest');
         }
         await authService.convertGuest(user.id, email, password);
-        showSuccessToast('Registration confirmation email sent.  Please check your inbox.');
+        toast.success('Registration confirmation email sent.  Please check your inbox.');
       } catch (error) {
         console.error('Error converting guest:', error);
-        showErrorToast('Error registering user. Please try again later.');
+        toast.error('Error registering user. Please try again later.');
       }
     },
     [user, authService]
@@ -337,11 +338,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ authService, authRou
     try {
       await authService.resetPassword(email);
       await wait(1000);
-      showSuccessToast('Password reset email sent successfully!');
+      toast.success('Password reset email sent successfully!');
       router.push(authRoutes.awaitingVerification);
     } catch (error) {
       console.error('Error resetting password:', error);
-      showErrorToast('Error submitting password reset. Please try again later.');
+      toast.error('Error submitting password reset. Please try again later.');
     }
   };
 
@@ -350,10 +351,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ authService, authRou
       await authService.updatePassword(password);
       await wait(1000);
       router.replace(authRoutes.home);
-      showSuccessToast('Password updated successfully!');
+      toast.success('Password updated successfully!');
     } catch (error) {
       console.error('Error updating password:', error);
-      showErrorToast('Error updating password. Please try again later.');
+      toast.error('Error updating password. Please try again later.');
     }
   };
 
@@ -362,17 +363,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ authService, authRou
       await authService.updateEmail(newEmail);
     } catch (error) {
       console.error('Error updating email:', error);
-      showErrorToast('Error updating email. Please try again later.');
+      toast.error('Error updating email. Please try again later.');
     }
   };
 
   const updateUsername = async ({ username }: UpdateUsernameParams) => {
     try {
       await authService.updateUsername(username);
-      showSuccessToast('Username updated successfully!');
+      toast.success('Username updated successfully!');
     } catch (error) {
       console.error('Error updating username:', error);
-      showErrorToast('Error updating username. Please try again later.');
+      toast.error('Error updating username. Please try again later.');
     }
   };
 
@@ -392,7 +393,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ authService, authRou
       });
     } catch (error) {
       console.error('Error confirming password:', error);
-      showErrorToast('Error confirming password. Please try again.');
+      toast.error('Error confirming password. Please try again.');
       return new Promise<boolean>((resolve) => {
         resolve(false);
       });
@@ -403,18 +404,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ authService, authRou
     async (password: string) => {
       try {
         if (!user || !user.email || !password) {
-          showErrorToast('User not found or password is empty');
+          toast.error('User not found or password is empty');
           return;
         }
         await authService.loginWithEmail(user.email, password);
         setPasswordConfirmedAt(new Date());
-        showSuccessToast('Password confirmed successfully!');
+        toast.success('Password confirmed successfully!');
         passwordConfirmationResolver.current?.(true);
         passwordConfirmationResolver.current = null;
         router.back();
       } catch (error) {
         console.error('Error confirming password:', error instanceof Error ? error.message : error);
-        showErrorToast('Error confirming password. Please try again.');
+        toast.error('Error confirming password. Please try again.');
       }
     },
     [user, router, authService]

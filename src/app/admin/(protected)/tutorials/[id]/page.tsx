@@ -1,4 +1,4 @@
-import { AdminHeader } from '@core/components/admin-header';
+import { AdminPageContainer } from '@core/components';
 
 interface TutorialDetailsPageProps {
   params: Promise<{ id: string }>;
@@ -7,10 +7,5 @@ interface TutorialDetailsPageProps {
 export default async function TutorialDetailsPage({ params }: TutorialDetailsPageProps) {
   const { id } = await params;
 
-  return (
-    <>
-      <AdminHeader title="Tutorial Details" />
-      <div className="@container/main flex flex-1 flex-col p-4 md:gap-6 md:p-6">Tutorial Details {id}</div>
-    </>
-  );
+  return <AdminPageContainer title="Tutorial Details">Tutorial Details {id}</AdminPageContainer>;
 }

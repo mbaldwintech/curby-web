@@ -1,4 +1,4 @@
-import { AdminHeader } from '@core/components/admin-header';
+import { AdminPageContainer } from '@core/components';
 
 interface PrivacyPolicyVersionDetailsPageProps {
   params: Promise<{ id: string }>;
@@ -8,11 +8,6 @@ export default async function PrivacyPolicyVersionDetailsPage({ params }: Privac
   const { id } = await params;
 
   return (
-    <>
-      <AdminHeader title="Privacy Policy Version Details" />
-      <div className="@container/main flex flex-1 flex-col p-4 md:gap-6 md:p-6">
-        Privacy Policy Version Details {id}
-      </div>
-    </>
+    <AdminPageContainer title="Privacy Policy Version Details">Privacy Policy Version Details {id}</AdminPageContainer>
   );
 }

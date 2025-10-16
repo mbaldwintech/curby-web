@@ -1,4 +1,5 @@
-import { LinkButton, LogoHorizontal } from '@core/components';
+import { LinkButton } from '@common/components';
+import { LogoHorizontal } from '@core/components';
 
 export default function PublicHomePage() {
   return (

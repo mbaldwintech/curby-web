@@ -1,5 +1,5 @@
-import { AdminSidebar, LinkButton, LogoHorizontal } from '@core/components';
-import { SidebarInset, SidebarProvider } from '@core/components/sidebar';
+import { LinkButton, SidebarInset, SidebarProvider } from '@common/components';
+import { AdminSidebar, LogoHorizontal } from '@core/components';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { logout } from './actions';
@@ -20,7 +20,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       }
     >
       <AdminSidebar logout={logout} />
-      <SidebarInset className="p-0 m-0">
+      <SidebarInset>
         <div className="flex flex-1 flex-col">{children}</div>
 
         <footer id="contact" className="border-t-2 border-t-sidebar border-border">

@@ -1,7 +1,7 @@
-import { getDeviceId } from '@core/utils';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { User } from '@supabase/supabase-js';
 import { EventTypeKey } from '../enumerations';
+import { getDeviceId } from '../utils';
 import { FunctionsService } from './functions.service';
 
 export class EventLoggerService {
@@ -45,10 +45,17 @@ export class EventLoggerService {
       return;
     }
 
+    const { data: device, error } = await this.supabase.from('device').select('*').eq('deviceId', deviceId).single();
+
+    if (error && error.code !== 'PGRST116') {
+      console.error('Error fetching device for event logger:', error);
+      return;
+    }
+
     // Log event via Supabase Edge Function
     await this.functionsService.trackEvent(eventKey, {
       userId: user?.id,
-      deviceId: deviceId,
+      deviceId: device?.id,
       metadata
     });
   }

@@ -1,6 +1,6 @@
-import { ExtendedItemService, ItemService } from '@core/services';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { AdminExtra } from '@store/admin-store';
+import { ExtendedItemService, ItemService } from '../services';
 import { ExtendedItem } from '../types';
 
 export interface UrgentItemsSliceStateType {

@@ -12,7 +12,7 @@ export interface ItemReview extends GenericRecord {
   reviewNotes?: string | null;
   reviewOutcome?: 'resolved' | 'dismissed' | null;
   reviewOutcomeReason?: string | null;
-  reviewOutcomeActions?: 'no_action' | 'item_removed' | 'item_restored' | 'open_user_review' | null;
+  reviewOutcomeAction?: 'no_action' | 'item_removed' | 'item_restored' | 'open_user_review' | null;
   reviewOutcomeActionTakenAt?: Date | null;
   reviewOutcomeComments?: string | null;
   reviewOutcomeMessageToUser?: string | null;

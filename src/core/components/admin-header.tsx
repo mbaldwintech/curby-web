@@ -1,8 +1,12 @@
-import { Separator } from '@core/components/separator';
-import { SidebarTrigger } from '@core/components/sidebar';
+import { Separator, SidebarTrigger } from '@common/components';
 import { ThemeToggle } from './theme-toggle';
 
-export function AdminHeader({ title, rightContent }: { title?: string; rightContent?: React.ReactNode }) {
+export interface AdminHeaderProps {
+  title?: string;
+  rightContent?: React.ReactNode;
+}
+
+export function AdminHeader({ title, rightContent }: AdminHeaderProps) {
   return (
     <header className="flex shrink-0 items-center border-b-2 border-b-sidebar transition-[width,height] ease-linear">
       <div className="flex w-full h-full items-center px-4 py-2 lg:px-6">
