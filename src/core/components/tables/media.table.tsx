@@ -1,38 +1,22 @@
 'use client';
 
 import { Badge, CustomColumnDef } from '@common/components';
-import { Filters } from '@supa/services';
 import { createClientService } from '@supa/utils/client';
 import { forwardRef, useCallback, useMemo, useRef } from 'react';
 import { MediaService } from '../../services';
 import { Media } from '../../types';
 import { CopyableStringCell, FileExistsCell } from '../cells';
-import { buildColumnDef, CurbyTable, CurbyTableRef, CurbyTableRowAction } from '../curby-table';
+import { buildColumnDef, CurbyTable, CurbyTableProps, CurbyTableRef } from '../curby-table';
 
-export interface MediaTableProps {
-  defaultFilters?: Filters<Media>;
-  onRowClick?: (media: Media) => void;
-  rowActionSections?: CurbyTableRowAction<Media>[][];
-  toolbarLeft?: React.ReactNode;
-  toolbarRight?: React.ReactNode;
-  height?: number;
-  maxHeight?: number;
+export interface MediaTableProps extends Omit<CurbyTableProps<Media>, 'service' | 'columns'> {
   extraColumns?: CustomColumnDef<Media>[];
 }
 
 export const MediaTable = forwardRef<CurbyTableRef<Media>, MediaTableProps>(function MediaTable(
-  {
-    defaultFilters,
-    onRowClick,
-    rowActionSections,
-    toolbarLeft,
-    toolbarRight,
-    height = 500,
-    maxHeight,
-    extraColumns = []
-  }: MediaTableProps,
+  props: MediaTableProps,
   ref
 ) {
+  const { extraColumns = [], ...rest } = props;
   const service = useRef(createClientService(MediaService)).current;
 
   const buildColumn = useCallback(
@@ -75,18 +59,5 @@ export const MediaTable = forwardRef<CurbyTableRef<Media>, MediaTableProps>(func
     [buildColumn, extraColumns]
   );
 
-  return (
-    <CurbyTable
-      ref={ref}
-      service={service}
-      defaultFilters={defaultFilters}
-      columns={columns}
-      height={height}
-      maxHeight={maxHeight}
-      onRowClick={onRowClick}
-      rowActionSections={rowActionSections}
-      toolbarLeft={toolbarLeft}
-      toolbarRight={toolbarRight}
-    />
-  );
+  return <CurbyTable ref={ref} service={service} columns={columns} {...rest} />;
 });

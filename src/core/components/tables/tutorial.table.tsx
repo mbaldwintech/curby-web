@@ -1,37 +1,21 @@
 'use client';
 
 import { Badge, CustomColumnDef } from '@common/components';
-import { Filters } from '@supa/services';
 import { createClientService } from '@supa/utils/client';
 import { forwardRef, useCallback, useMemo, useRef } from 'react';
 import { TutorialService } from '../../services';
 import { Tutorial } from '../../types';
-import { buildColumnDef, CurbyTable, CurbyTableRef, CurbyTableRowAction } from '../curby-table';
+import { buildColumnDef, CurbyTable, CurbyTableProps, CurbyTableRef } from '../curby-table';
 
-export interface TutorialTableProps {
-  defaultFilters?: Filters<Tutorial>;
-  onRowClick?: (tutorial: Tutorial) => void;
-  rowActionSections?: CurbyTableRowAction<Tutorial>[][];
-  toolbarLeft?: React.ReactNode;
-  toolbarRight?: React.ReactNode;
-  height?: number;
-  maxHeight?: number;
+export interface TutorialTableProps extends Omit<CurbyTableProps<Tutorial>, 'service' | 'columns'> {
   extraColumns?: CustomColumnDef<Tutorial>[];
 }
 
 export const TutorialTable = forwardRef<CurbyTableRef<Tutorial>, TutorialTableProps>(function TutorialTable(
-  {
-    defaultFilters,
-    onRowClick,
-    rowActionSections,
-    toolbarLeft,
-    toolbarRight,
-    height = 500,
-    maxHeight,
-    extraColumns = []
-  }: TutorialTableProps,
+  props: TutorialTableProps,
   ref
 ) {
+  const { extraColumns = [], ...rest } = props;
   const service = useRef(createClientService(TutorialService)).current;
 
   const buildColumn = useCallback(
@@ -43,19 +27,21 @@ export const TutorialTable = forwardRef<CurbyTableRef<Tutorial>, TutorialTablePr
 
   const columns: CustomColumnDef<Tutorial>[] = useMemo(
     () => [
-      buildColumn('key', 'Event Key', { enableHiding: false }),
+      buildColumn('key', 'Event Key', { enableHiding: false, size: 200 }),
       buildColumn('title', 'Title'),
       buildColumn('description', 'Description'),
       buildColumn('roles', 'Roles', {
         cell: ({ row }) =>
-          row.original.roles.length > 0 && (
-            <div className="w-32">
+          row.original.roles.length > 0 ? (
+            <div className="flex flex-wrap gap-1 max-w-48">
               {row.original.roles.map((role, idx) => (
-                <Badge key={role + '_' + idx} variant="outline" className="text-muted-foreground px-1.5">
+                <Badge key={role + '_' + idx} variant="outline" className="text-xs px-2 py-1 whitespace-nowrap">
                   {role}
                 </Badge>
               ))}
             </div>
+          ) : (
+            <span className="text-muted-foreground text-sm">No roles</span>
           )
       }),
       buildColumn('active', 'Active', { cell: ({ row }) => (row.original.active ? 'Yes' : 'No') }),
@@ -64,18 +50,5 @@ export const TutorialTable = forwardRef<CurbyTableRef<Tutorial>, TutorialTablePr
     [buildColumn, extraColumns]
   );
 
-  return (
-    <CurbyTable
-      ref={ref}
-      service={service}
-      defaultFilters={defaultFilters}
-      columns={columns}
-      height={height}
-      maxHeight={maxHeight}
-      onRowClick={onRowClick}
-      rowActionSections={rowActionSections}
-      toolbarLeft={toolbarLeft}
-      toolbarRight={toolbarRight}
-    />
-  );
+  return <CurbyTable ref={ref} service={service} columns={columns} {...rest} />;
 });

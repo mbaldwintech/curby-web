@@ -13,16 +13,14 @@ export default function TutorialViewsPage() {
         onRowClick={(view) => {
           router.push(`/admin/tutorials/views/${view.id}`);
         }}
-        rowActionSections={[
-          [
-            {
-              label: 'View Details',
-              icon: <InfoIcon size={14} />,
-              onClick: (view) => {
-                router.push(`/admin/tutorials/views/${view.id}`);
-              }
+        getRowActionMenuItems={() => [
+          {
+            label: 'View Details',
+            icon: InfoIcon,
+            onClick: (view) => {
+              router.push(`/admin/tutorials/views/${view.id}`);
             }
-          ]
+          }
         ]}
       />
     </AdminPageContainer>

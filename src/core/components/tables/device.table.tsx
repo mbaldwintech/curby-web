@@ -1,38 +1,22 @@
 'use client';
 
 import { Badge, CustomColumnDef } from '@common/components';
-import { Filters } from '@supa/services';
 import { createClientService } from '@supa/utils/client';
 import { forwardRef, useCallback, useMemo, useRef } from 'react';
 import { DeviceService } from '../../services';
 import { Device } from '../../types';
 import { CopyableStringCell, UserForDeviceCell } from '../cells';
-import { buildColumnDef, CurbyTable, CurbyTableRef, CurbyTableRowAction } from '../curby-table';
+import { buildColumnDef, CurbyTable, CurbyTableProps, CurbyTableRef } from '../curby-table';
 
-export interface DeviceTableProps {
-  defaultFilters?: Filters<Device>;
-  onRowClick?: (device: Device) => void;
-  rowActionSections?: CurbyTableRowAction<Device>[][];
-  toolbarLeft?: React.ReactNode;
-  toolbarRight?: React.ReactNode;
-  height?: number;
-  maxHeight?: number;
+export interface DeviceTableProps extends Omit<CurbyTableProps<Device>, 'service' | 'columns'> {
   extraColumns?: CustomColumnDef<Device>[];
 }
 
 export const DeviceTable = forwardRef<CurbyTableRef<Device>, DeviceTableProps>(function DeviceTable(
-  {
-    defaultFilters,
-    onRowClick,
-    rowActionSections,
-    toolbarLeft,
-    toolbarRight,
-    height = 500,
-    maxHeight,
-    extraColumns = []
-  }: DeviceTableProps,
+  props: DeviceTableProps,
   ref
 ) {
+  const { extraColumns = [], ...rest } = props;
   const service = useRef(createClientService(DeviceService)).current;
 
   const buildColumn = useCallback(
@@ -104,18 +88,5 @@ export const DeviceTable = forwardRef<CurbyTableRef<Device>, DeviceTableProps>(f
     [buildColumn, extraColumns]
   );
 
-  return (
-    <CurbyTable
-      ref={ref}
-      service={service}
-      defaultFilters={defaultFilters}
-      columns={columns}
-      height={height}
-      maxHeight={maxHeight}
-      onRowClick={onRowClick}
-      rowActionSections={rowActionSections}
-      toolbarLeft={toolbarLeft}
-      toolbarRight={toolbarRight}
-    />
-  );
+  return <CurbyTable ref={ref} service={service} columns={columns} {...rest} />;
 });

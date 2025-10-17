@@ -1,41 +1,23 @@
 'use client';
 
 import { CustomColumnDef } from '@common/components';
-import { Filters } from '@supa/services';
 import { createClientService } from '@supa/utils/client';
 import { forwardRef, useCallback, useMemo, useRef } from 'react';
 import { PrivacyPolicyAcceptanceService } from '../../services';
 import { PrivacyPolicyAcceptance } from '../../types';
 import { PrivacyPolicyCell, ProfileCell } from '../cells';
-import { buildColumnDef, CurbyTable, CurbyTableRef, CurbyTableRowAction } from '../curby-table';
+import { buildColumnDef, CurbyTable, CurbyTableProps, CurbyTableRef } from '../curby-table';
 
-export interface PrivacyPolicyAcceptanceTableProps {
-  defaultFilters?: Filters<PrivacyPolicyAcceptance>;
-  onRowClick?: (privacyPolicyAcceptance: PrivacyPolicyAcceptance) => void;
-  rowActionSections?: CurbyTableRowAction<PrivacyPolicyAcceptance>[][];
-  toolbarLeft?: React.ReactNode;
-  toolbarRight?: React.ReactNode;
-  height?: number;
-  maxHeight?: number;
+export interface PrivacyPolicyAcceptanceTableProps
+  extends Omit<CurbyTableProps<PrivacyPolicyAcceptance>, 'service' | 'columns'> {
   extraColumns?: CustomColumnDef<PrivacyPolicyAcceptance>[];
 }
 
 export const PrivacyPolicyAcceptanceTable = forwardRef<
   CurbyTableRef<PrivacyPolicyAcceptance>,
   PrivacyPolicyAcceptanceTableProps
->(function PrivacyPolicyAcceptanceTable(
-  {
-    defaultFilters,
-    onRowClick,
-    rowActionSections,
-    toolbarLeft,
-    toolbarRight,
-    height = 500,
-    maxHeight,
-    extraColumns = []
-  }: PrivacyPolicyAcceptanceTableProps,
-  ref
-) {
+>(function PrivacyPolicyAcceptanceTable(props: PrivacyPolicyAcceptanceTableProps, ref) {
+  const { extraColumns = [], ...rest } = props;
   const service = useRef(createClientService(PrivacyPolicyAcceptanceService)).current;
 
   const buildColumn = useCallback(
@@ -68,18 +50,5 @@ export const PrivacyPolicyAcceptanceTable = forwardRef<
     [buildColumn, extraColumns]
   );
 
-  return (
-    <CurbyTable
-      ref={ref}
-      service={service}
-      defaultFilters={defaultFilters}
-      columns={columns}
-      height={height}
-      maxHeight={maxHeight}
-      onRowClick={onRowClick}
-      rowActionSections={rowActionSections}
-      toolbarLeft={toolbarLeft}
-      toolbarRight={toolbarRight}
-    />
-  );
+  return <CurbyTable ref={ref} service={service} columns={columns} {...rest} />;
 });

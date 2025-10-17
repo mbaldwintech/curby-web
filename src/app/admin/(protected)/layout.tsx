@@ -2,7 +2,6 @@ import { LinkButton, SidebarInset, SidebarProvider } from '@common/components';
 import { AdminSidebar, LogoHorizontal } from '@core/components';
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { logout } from './actions';
 
 export const metadata: Metadata = {
   title: 'Curby Admin',
@@ -19,7 +18,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         } as React.CSSProperties
       }
     >
-      <AdminSidebar logout={logout} />
+      <AdminSidebar />
       <SidebarInset>
         <div className="flex flex-1 flex-col">{children}</div>
 

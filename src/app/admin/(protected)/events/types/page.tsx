@@ -13,16 +13,14 @@ export default function EventTypesPage() {
         onRowClick={(event) => {
           router.push(`/admin/events/types/${event.id}`);
         }}
-        rowActionSections={[
-          [
-            {
-              label: 'View Details',
-              icon: <InfoIcon size={14} />,
-              onClick: (event) => {
-                router.push(`/admin/events/types/${event.id}`);
-              }
+        getRowActionMenuItems={() => [
+          {
+            label: 'View Details',
+            icon: InfoIcon,
+            onClick: (event) => {
+              router.push(`/admin/events/types/${event.id}`);
             }
-          ]
+          }
         ]}
       />
     </AdminPageContainer>

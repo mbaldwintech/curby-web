@@ -1,39 +1,20 @@
 'use client';
 
 import { CustomColumnDef } from '@common/components';
-import { Filters } from '@supa/services';
 import { createClientService } from '@supa/utils/client';
 import { forwardRef, useCallback, useMemo, useRef } from 'react';
 import { NotificationService } from '../../services';
 import { Notification } from '../../types';
 import { CurbyCoinTransactionCell, DeviceCell, EventCell, NotificationTemplateCell, ProfileCell } from '../cells';
-import { buildColumnDef, CurbyTable, CurbyTableRef, CurbyTableRowAction } from '../curby-table';
+import { buildColumnDef, CurbyTable, CurbyTableProps, CurbyTableRef } from '../curby-table';
 
-export interface NotificationTableProps {
-  defaultFilters?: Filters<Notification>;
-  onRowClick?: (notification: Notification) => void;
-  rowActionSections?: CurbyTableRowAction<Notification>[][];
-  toolbarLeft?: React.ReactNode;
-  toolbarRight?: React.ReactNode;
-  height?: number;
-  maxHeight?: number;
+export interface NotificationTableProps extends Omit<CurbyTableProps<Notification>, 'service' | 'columns'> {
   extraColumns?: CustomColumnDef<Notification>[];
 }
 
 export const NotificationTable = forwardRef<CurbyTableRef<Notification>, NotificationTableProps>(
-  function NotificationTable(
-    {
-      defaultFilters,
-      onRowClick,
-      rowActionSections,
-      toolbarLeft,
-      toolbarRight,
-      height = 500,
-      maxHeight,
-      extraColumns = []
-    }: NotificationTableProps,
-    ref
-  ) {
+  function NotificationTable(props: NotificationTableProps, ref) {
+    const { extraColumns = [], ...rest } = props;
     const service = useRef(createClientService(NotificationService)).current;
 
     const buildColumn = useCallback(
@@ -74,19 +55,6 @@ export const NotificationTable = forwardRef<CurbyTableRef<Notification>, Notific
       [buildColumn, extraColumns]
     );
 
-    return (
-      <CurbyTable
-        ref={ref}
-        service={service}
-        defaultFilters={defaultFilters}
-        columns={columns}
-        height={height}
-        maxHeight={maxHeight}
-        onRowClick={onRowClick}
-        rowActionSections={rowActionSections}
-        toolbarLeft={toolbarLeft}
-        toolbarRight={toolbarRight}
-      />
-    );
+    return <CurbyTable ref={ref} service={service} columns={columns} {...rest} />;
   }
 );

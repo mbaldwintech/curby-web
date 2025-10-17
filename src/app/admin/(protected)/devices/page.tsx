@@ -13,16 +13,14 @@ export default function DevicesPage() {
         onRowClick={(device) => {
           router.push(`/admin/devices/${device.id}`);
         }}
-        rowActionSections={[
-          [
-            {
-              label: 'View Details',
-              icon: <InfoIcon size={14} />,
-              onClick: (device) => {
-                router.push(`/admin/devices/${device.id}`);
-              }
+        getRowActionMenuItems={() => [
+          {
+            label: 'View Details',
+            icon: InfoIcon,
+            onClick: (device) => {
+              router.push(`/admin/devices/${device.id}`);
             }
-          ]
+          }
         ]}
       />
     </AdminPageContainer>

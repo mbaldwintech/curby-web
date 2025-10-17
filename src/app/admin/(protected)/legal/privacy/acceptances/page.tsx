@@ -13,16 +13,14 @@ export default function PrivacyPolicyAcceptancesPage() {
         onRowClick={(acceptance) => {
           router.push(`/admin/legal/privacy/acceptances/${acceptance.id}`);
         }}
-        rowActionSections={[
-          [
-            {
-              label: 'View Details',
-              icon: <InfoIcon size={14} />,
-              onClick: (acceptance) => {
-                router.push(`/admin/legal/privacy/acceptances/${acceptance.id}`);
-              }
+        getRowActionMenuItems={() => [
+          {
+            label: 'View Details',
+            icon: InfoIcon,
+            onClick: (acceptance) => {
+              router.push(`/admin/legal/privacy/acceptances/${acceptance.id}`);
             }
-          ]
+          }
         ]}
       />
     </AdminPageContainer>

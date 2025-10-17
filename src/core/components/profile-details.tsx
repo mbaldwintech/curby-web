@@ -980,19 +980,17 @@ export function ProfileDetails({ id }: ProfileDetailsProps) {
                                   enableSearching: false
                                 }
                               ]}
-                              onRowClick={(device) => {
-                                router.push(`/admin/devices/${device.id}`);
+                              onRowClick={(row) => {
+                                router.push(`/admin/devices/${row.id}`);
                               }}
-                              rowActionSections={[
-                                [
-                                  {
-                                    label: 'View Details',
-                                    icon: <InfoIcon size={14} />,
-                                    onClick: (device) => {
-                                      router.push(`/admin/devices/${device.id}`);
-                                    }
+                              getRowActionMenuItems={() => [
+                                {
+                                  label: 'View Details',
+                                  icon: InfoIcon,
+                                  onClick: (row) => {
+                                    router.push(`/admin/devices/${row.id}`);
                                   }
-                                ]
+                                }
                               ]}
                               maxHeight={300}
                             />
@@ -1012,19 +1010,17 @@ export function ProfileDetails({ id }: ProfileDetailsProps) {
                           <div className="flex flex-col gap-2">
                             <ItemTable
                               defaultFilters={[{ column: 'postedBy', operator: 'eq', value: profile.userId }]}
-                              onRowClick={(item) => {
-                                router.push(`/admin/items/${item.id}`);
+                              onRowClick={(row) => {
+                                router.push(`/admin/items/${row.id}`);
                               }}
-                              rowActionSections={[
-                                [
-                                  {
-                                    label: 'View Details',
-                                    icon: <InfoIcon size={14} />,
-                                    onClick: (item) => {
-                                      router.push(`/admin/item/${item.id}`);
-                                    }
+                              getRowActionMenuItems={() => [
+                                {
+                                  label: 'View Details',
+                                  icon: InfoIcon,
+                                  onClick: (row) => {
+                                    router.push(`/admin/item/${row.id}`);
                                   }
-                                ]
+                                }
                               ]}
                               maxHeight={300}
                             />
@@ -1046,19 +1042,17 @@ export function ProfileDetails({ id }: ProfileDetailsProps) {
                               defaultFilters={[
                                 { column: 'id', operator: 'in', value: savedItems.map((si) => si.itemId) }
                               ]}
-                              onRowClick={(item) => {
-                                router.push(`/admin/items/${item.id}`);
+                              onRowClick={(row) => {
+                                router.push(`/admin/items/${row.id}`);
                               }}
-                              rowActionSections={[
-                                [
-                                  {
-                                    label: 'View Details',
-                                    icon: <InfoIcon size={14} />,
-                                    onClick: (item) => {
-                                      router.push(`/admin/item/${item.id}`);
-                                    }
+                              getRowActionMenuItems={() => [
+                                {
+                                  label: 'View Details',
+                                  icon: InfoIcon,
+                                  onClick: (row) => {
+                                    router.push(`/admin/item/${row.id}`);
                                   }
-                                ]
+                                }
                               ]}
                               maxHeight={300}
                             />
@@ -1078,19 +1072,17 @@ export function ProfileDetails({ id }: ProfileDetailsProps) {
                         <CardContent>
                           <FalseTakingTable
                             defaultFilters={[{ column: 'takerId', operator: 'eq', value: profile.userId }]}
-                            onRowClick={(falseTaking) => {
-                              router.push(`/admin/items/${falseTaking.itemId}`);
+                            onRowClick={(row) => {
+                              router.push(`/admin/items/${row.original.itemId}`);
                             }}
-                            rowActionSections={[
-                              [
-                                {
-                                  label: 'View Item Details',
-                                  icon: <InfoIcon size={14} />,
-                                  onClick: (falseTaking) => {
-                                    router.push(`/admin/items/${falseTaking.itemId}`);
-                                  }
+                            getRowActionMenuItems={() => [
+                              {
+                                label: 'View Item Details',
+                                icon: InfoIcon,
+                                onClick: (row) => {
+                                  router.push(`/admin/items/${row.original.itemId}`);
                                 }
-                              ]
+                              }
                             ]}
                             maxHeight={300}
                           />
@@ -1108,19 +1100,17 @@ export function ProfileDetails({ id }: ProfileDetailsProps) {
                           <div className="flex flex-col gap-2">
                             <ExtendedEventTable
                               defaultFilters={[{ column: 'userId', operator: 'eq', value: profile.userId }]}
-                              onRowClick={(event) => {
-                                router.push(`/admin/events/logs/${event.id}`);
+                              onRowClick={(row) => {
+                                router.push(`/admin/events/logs/${row.id}`);
                               }}
-                              rowActionSections={[
-                                [
-                                  {
-                                    label: 'View Details',
-                                    icon: <InfoIcon size={14} />,
-                                    onClick: (event) => {
-                                      router.push(`/admin/events/logs/${event.id}`);
-                                    }
+                              getRowActionMenuItems={() => [
+                                {
+                                  label: 'View Details',
+                                  icon: InfoIcon,
+                                  onClick: (row) => {
+                                    router.push(`/admin/events/logs/${row.id}`);
                                   }
-                                ]
+                                }
                               ]}
                               maxHeight={300}
                             />
@@ -1142,19 +1132,17 @@ export function ProfileDetails({ id }: ProfileDetailsProps) {
                           <div className="flex flex-col gap-2">
                             <CurbyCoinTransactionTable
                               defaultFilters={[{ column: 'userId', operator: 'eq', value: profile.userId }]}
-                              onRowClick={(tx) => {
-                                router.push(`/admin/transactions/${tx.id}`);
+                              onRowClick={(row) => {
+                                router.push(`/admin/transactions/${row.id}`);
                               }}
-                              rowActionSections={[
-                                [
-                                  {
-                                    label: 'View Details',
-                                    icon: <InfoIcon size={14} />,
-                                    onClick: (tx) => {
-                                      router.push(`/admin/transactions/${tx.id}`);
-                                    }
+                              getRowActionMenuItems={() => [
+                                {
+                                  label: 'View Details',
+                                  icon: InfoIcon,
+                                  onClick: (row) => {
+                                    router.push(`/admin/transactions/${row.id}`);
                                   }
-                                ]
+                                }
                               ]}
                               maxHeight={300}
                             />
@@ -1173,19 +1161,17 @@ export function ProfileDetails({ id }: ProfileDetailsProps) {
                           <div className="flex flex-col gap-2">
                             <NotificationTable
                               defaultFilters={[{ column: 'userId', operator: 'eq', value: profile.userId }]}
-                              onRowClick={(notif) => {
-                                router.push(`/admin/notifications/${notif.id}`);
+                              onRowClick={(row) => {
+                                router.push(`/admin/notifications/${row.id}`);
                               }}
-                              rowActionSections={[
-                                [
-                                  {
-                                    label: 'View Details',
-                                    icon: <InfoIcon size={14} />,
-                                    onClick: (notif) => {
-                                      router.push(`/admin/notifications/${notif.id}`);
-                                    }
+                              getRowActionMenuItems={() => [
+                                {
+                                  label: 'View Details',
+                                  icon: InfoIcon,
+                                  onClick: (row) => {
+                                    router.push(`/admin/notifications/${row.id}`);
                                   }
-                                ]
+                                }
                               ]}
                               maxHeight={300}
                             />
@@ -1204,19 +1190,17 @@ export function ProfileDetails({ id }: ProfileDetailsProps) {
                           <div className="flex flex-col gap-2">
                             <ItemReportTable
                               defaultFilters={[{ column: 'reporterId', operator: 'eq', value: profile.userId }]}
-                              onRowClick={(itemReview) => {
-                                router.push(`/admin/moderation/item-reviews/${itemReview.id}`);
+                              onRowClick={(row) => {
+                                router.push(`/admin/moderation/item-reviews/${row.id}`);
                               }}
-                              rowActionSections={[
-                                [
-                                  {
-                                    label: 'View Details',
-                                    icon: <InfoIcon size={14} />,
-                                    onClick: (itemReview) => {
-                                      router.push(`/admin/moderation/item-reviews/${itemReview.id}`);
-                                    }
+                              getRowActionMenuItems={() => [
+                                {
+                                  label: 'View Details',
+                                  icon: InfoIcon,
+                                  onClick: (row) => {
+                                    router.push(`/admin/moderation/item-reviews/${row.id}`);
                                   }
-                                ]
+                                }
                               ]}
                               maxHeight={300}
                             />
@@ -1239,19 +1223,17 @@ export function ProfileDetails({ id }: ProfileDetailsProps) {
                               defaultFilters={[
                                 { column: 'itemId', operator: 'in', value: usersItems.map((ui) => ui.id) }
                               ]}
-                              onRowClick={(itemReview) => {
-                                router.push(`/admin/moderation/item-reviews/${itemReview.id}`);
+                              onRowClick={(row) => {
+                                router.push(`/admin/moderation/item-reviews/${row.id}`);
                               }}
-                              rowActionSections={[
-                                [
-                                  {
-                                    label: 'View Details',
-                                    icon: <InfoIcon size={14} />,
-                                    onClick: (itemReview) => {
-                                      router.push(`/admin/moderation/item-reviews/${itemReview.id}`);
-                                    }
+                              getRowActionMenuItems={() => [
+                                {
+                                  label: 'View Details',
+                                  icon: InfoIcon,
+                                  onClick: (row) => {
+                                    router.push(`/admin/moderation/item-reviews/${row.id}`);
                                   }
-                                ]
+                                }
                               ]}
                               maxHeight={300}
                             />
@@ -1272,19 +1254,17 @@ export function ProfileDetails({ id }: ProfileDetailsProps) {
                               defaultFilters={[
                                 { column: 'itemId', operator: 'in', value: usersItems.map((ui) => ui.id) }
                               ]}
-                              onRowClick={(itemReview) => {
-                                router.push(`/admin/moderation/item-reviews/${itemReview.id}`);
+                              onRowClick={(row) => {
+                                router.push(`/admin/moderation/item-reviews/${row.id}`);
                               }}
-                              rowActionSections={[
-                                [
-                                  {
-                                    label: 'View Details',
-                                    icon: <InfoIcon size={14} />,
-                                    onClick: (itemReview) => {
-                                      router.push(`/admin/moderation/item-reviews/${itemReview.id}`);
-                                    }
+                              getRowActionMenuItems={() => [
+                                {
+                                  label: 'View Details',
+                                  icon: InfoIcon,
+                                  onClick: (row) => {
+                                    router.push(`/admin/moderation/item-reviews/${row.id}`);
                                   }
-                                ]
+                                }
                               ]}
                               maxHeight={300}
                             />
@@ -1303,19 +1283,17 @@ export function ProfileDetails({ id }: ProfileDetailsProps) {
                           <div className="flex flex-col gap-2">
                             <UserReviewTable
                               defaultFilters={[{ column: 'userId', operator: 'eq', value: profile.userId }]}
-                              onRowClick={(itemReview) => {
-                                router.push(`/admin/moderation/user-reviews/${itemReview.id}`);
+                              onRowClick={(row) => {
+                                router.push(`/admin/moderation/user-reviews/${row.id}`);
                               }}
-                              rowActionSections={[
-                                [
-                                  {
-                                    label: 'View Details',
-                                    icon: <InfoIcon size={14} />,
-                                    onClick: (itemReview) => {
-                                      router.push(`/admin/moderation/user-reviews/${itemReview.id}`);
-                                    }
+                              getRowActionMenuItems={() => [
+                                {
+                                  label: 'View Details',
+                                  icon: InfoIcon,
+                                  onClick: (row) => {
+                                    router.push(`/admin/moderation/user-reviews/${row.id}`);
                                   }
-                                ]
+                                }
                               ]}
                               maxHeight={300}
                             />
@@ -1336,19 +1314,17 @@ export function ProfileDetails({ id }: ProfileDetailsProps) {
                           <div className="flex flex-col gap-2">
                             <TutorialViewTable
                               defaultFilters={[{ column: 'userId', operator: 'eq', value: profile.userId }]}
-                              onRowClick={(itemReview) => {
-                                router.push(`/admin/tutorials/views/${itemReview.id}`);
+                              onRowClick={(row) => {
+                                router.push(`/admin/tutorials/views/${row.id}`);
                               }}
-                              rowActionSections={[
-                                [
-                                  {
-                                    label: 'View Details',
-                                    icon: <InfoIcon size={14} />,
-                                    onClick: (itemReview) => {
-                                      router.push(`/admin/tutorials/views/${itemReview.id}`);
-                                    }
+                              getRowActionMenuItems={() => [
+                                {
+                                  label: 'View Details',
+                                  icon: InfoIcon,
+                                  onClick: (row) => {
+                                    router.push(`/admin/tutorials/views/${row.id}`);
                                   }
-                                ]
+                                }
                               ]}
                               maxHeight={300}
                             />
@@ -1367,19 +1343,17 @@ export function ProfileDetails({ id }: ProfileDetailsProps) {
                           <div className="flex flex-col gap-2">
                             <TermsAndConditionsAcceptanceTable
                               defaultFilters={[{ column: 'userId', operator: 'eq', value: profile.userId }]}
-                              onRowClick={(terms) => {
-                                router.push(`/admin/legal/terms/acceptances/${terms.id}`);
+                              onRowClick={(row) => {
+                                router.push(`/admin/legal/terms/acceptances/${row.id}`);
                               }}
-                              rowActionSections={[
-                                [
-                                  {
-                                    label: 'View Details',
-                                    icon: <InfoIcon size={14} />,
-                                    onClick: (terms) => {
-                                      router.push(`/admin/legal/terms/acceptances/${terms.id}`);
-                                    }
+                              getRowActionMenuItems={() => [
+                                {
+                                  label: 'View Details',
+                                  icon: InfoIcon,
+                                  onClick: (row) => {
+                                    router.push(`/admin/legal/terms/acceptances/${row.id}`);
                                   }
-                                ]
+                                }
                               ]}
                               maxHeight={300}
                             />
@@ -1398,19 +1372,17 @@ export function ProfileDetails({ id }: ProfileDetailsProps) {
                           <div className="flex flex-col gap-2">
                             <PrivacyPolicyAcceptanceTable
                               defaultFilters={[{ column: 'userId', operator: 'eq', value: profile.userId }]}
-                              onRowClick={(policy) => {
-                                router.push(`/admin/legal/privacy/acceptances/${policy.id}`);
+                              onRowClick={(row) => {
+                                router.push(`/admin/legal/privacy/acceptances/${row.id}`);
                               }}
-                              rowActionSections={[
-                                [
-                                  {
-                                    label: 'View Details',
-                                    icon: <InfoIcon size={14} />,
-                                    onClick: (policy) => {
-                                      router.push(`/admin/legal/privacy/acceptances/${policy.id}`);
-                                    }
+                              getRowActionMenuItems={() => [
+                                {
+                                  label: 'View Details',
+                                  icon: InfoIcon,
+                                  onClick: (row) => {
+                                    router.push(`/admin/legal/privacy/acceptances/${row.id}`);
                                   }
-                                ]
+                                }
                               ]}
                               maxHeight={300}
                             />
@@ -1429,19 +1401,17 @@ export function ProfileDetails({ id }: ProfileDetailsProps) {
                           <div className="flex flex-col gap-2">
                             <FeedbackTable
                               defaultFilters={[{ column: 'userId', operator: 'eq', value: profile.userId }]}
-                              onRowClick={(feedback) => {
-                                router.push(`/admin/feedback/${feedback.id}`);
+                              onRowClick={(row) => {
+                                router.push(`/admin/feedback/${row.id}`);
                               }}
-                              rowActionSections={[
-                                [
-                                  {
-                                    label: 'View Details',
-                                    icon: <InfoIcon size={14} />,
-                                    onClick: (feedback) => {
-                                      router.push(`/admin/feedback/${feedback.id}`);
-                                    }
+                              getRowActionMenuItems={() => [
+                                {
+                                  label: 'View Details',
+                                  icon: InfoIcon,
+                                  onClick: (row) => {
+                                    router.push(`/admin/feedback/${row.id}`);
                                   }
-                                ]
+                                }
                               ]}
                               maxHeight={300}
                             />

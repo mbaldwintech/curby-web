@@ -13,16 +13,14 @@ export default function FeedbackPage() {
         onRowClick={(feedback) => {
           router.push(`/admin/feedback/${feedback.id}`);
         }}
-        rowActionSections={[
-          [
-            {
-              label: 'View Details',
-              icon: <InfoIcon size={14} />,
-              onClick: (feedback) => {
-                router.push(`/admin/feedback/${feedback.id}`);
-              }
+        getRowActionMenuItems={() => [
+          {
+            label: 'View Details',
+            icon: InfoIcon,
+            onClick: (feedback) => {
+              router.push(`/admin/feedback/${feedback.id}`);
             }
-          ]
+          }
         ]}
       />
     </AdminPageContainer>

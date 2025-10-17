@@ -72,7 +72,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
-import { useProfile } from '../hooks';
+import { logout } from '../../actions/auth.actions';
+import { useProfile, useRoutePermissions } from '../hooks';
 
 export interface AdminSidebarItem {
   title: string;
@@ -81,6 +82,35 @@ export interface AdminSidebarItem {
   url?: string;
   icon?: React.ComponentType<React.SVGProps<SVGSVGElement>>;
   items?: AdminSidebarItem[];
+}
+
+// Filter sidebar items based on user permissions
+function filterSidebarItems(items: AdminSidebarItem[], canAccess: (path: string) => boolean): AdminSidebarItem[] {
+  return items
+    .map((item) => {
+      // If item has URL, check if user can access it
+      if (item.url && !canAccess(item.url)) {
+        return null;
+      }
+
+      // If item has sub-items, filter them recursively
+      if (item.items) {
+        const filteredSubItems = filterSidebarItems(item.items, canAccess);
+
+        // If no sub-items are accessible, hide the parent item
+        if (filteredSubItems.length === 0) {
+          return null;
+        }
+
+        return {
+          ...item,
+          items: filteredSubItems
+        };
+      }
+
+      return item;
+    })
+    .filter((item): item is AdminSidebarItem => item !== null);
 }
 
 const data: AdminSidebarItem[] = [
@@ -400,11 +430,12 @@ const SidebarSection = ({
   );
 };
 
-export function AdminSidebar({ logout }: { logout: () => Promise<void> }) {
+export function AdminSidebar() {
   const pathname = usePathname();
   const { isMobile } = useSidebar();
   const { user } = useAuth();
   const { profile } = useProfile();
+  const { canAccess } = useRoutePermissions();
 
   function isActive(url?: string, exactMatch = false) {
     if (!url) return false;
@@ -417,6 +448,9 @@ export function AdminSidebar({ logout }: { logout: () => Promise<void> }) {
   if (!profile || !user) {
     return null;
   }
+
+  // Filter sidebar data based on user permissions
+  const filteredData = filterSidebarItems(data, canAccess);
 
   return (
     <Sidebar variant="inset" collapsible="icon">
@@ -444,7 +478,7 @@ export function AdminSidebar({ logout }: { logout: () => Promise<void> }) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        {data.map((section) =>
+        {filteredData.map((section) =>
           !section.items ? (
             <SidebarGroup key={section.title}>
               <SidebarMenu key={section.title}>

@@ -68,7 +68,12 @@ export default function PrivacyPolicyPage() {
 
       <div className="mt-5 flex flex-col gap-4">
         <PrivacyPolicyAcceptanceTable
-          toolbarLeft={<h2 className="text-2xl font-bold">Privacy Policy Acceptances</h2>}
+          ToolbarLeft={({ children }) => (
+            <>
+              <h2 className="text-2xl font-bold">Privacy Policy Acceptances</h2>
+              {children}
+            </>
+          )}
           height={300}
         />
       </div>

@@ -68,7 +68,12 @@ export default function TermsAndConditionsPage() {
 
       <div className="mt-5 flex flex-col gap-4">
         <TermsAndConditionsAcceptanceTable
-          toolbarLeft={<h2 className="text-2xl font-bold">Terms & Conditions Acceptances</h2>}
+          ToolbarLeft={({ children }) => (
+            <>
+              <h2 className="text-2xl font-bold">Terms & Conditions Acceptances</h2>
+              {children}
+            </>
+          )}
           height={300}
         />
       </div>

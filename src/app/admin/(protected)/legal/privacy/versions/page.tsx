@@ -13,16 +13,14 @@ export default function PrivacyPolicyPage() {
         onRowClick={(policy) => {
           router.push(`/admin/legal/privacy/versions/${policy.id}`);
         }}
-        rowActionSections={[
-          [
-            {
-              label: 'View Details',
-              icon: <InfoIcon size={14} />,
-              onClick: (policy) => {
-                router.push(`/admin/legal/privacy/versions/${policy.id}`);
-              }
+        getRowActionMenuItems={() => [
+          {
+            label: 'View Details',
+            icon: InfoIcon,
+            onClick: (policy) => {
+              router.push(`/admin/legal/privacy/versions/${policy.id}`);
             }
-          ]
+          }
         ]}
       />
     </AdminPageContainer>

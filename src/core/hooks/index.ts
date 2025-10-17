@@ -3,6 +3,7 @@ export * from './use-device.hook';
 export * from './use-notification-count.hook';
 export * from './use-notifications.hook';
 export * from './use-profile.hook';
+export * from './use-route-permissions.hook';
 export * from './use-saved-items.hook';
 export * from './use-urgent-items-count.hook';
 export * from './use-urgent-items.hook';

@@ -13,16 +13,14 @@ export default function TermsAndConditionsAcceptancesPage() {
         onRowClick={(acceptance) => {
           router.push(`/admin/legal/terms/acceptances/${acceptance.id}`);
         }}
-        rowActionSections={[
-          [
-            {
-              label: 'View Details',
-              icon: <InfoIcon size={14} />,
-              onClick: (acceptance) => {
-                router.push(`/admin/legal/terms/acceptances/${acceptance.id}`);
-              }
+        getRowActionMenuItems={() => [
+          {
+            label: 'View Details',
+            icon: InfoIcon,
+            onClick: (acceptance) => {
+              router.push(`/admin/legal/terms/acceptances/${acceptance.id}`);
             }
-          ]
+          }
         ]}
       />
     </AdminPageContainer>

@@ -13,16 +13,14 @@ export default function NotificationTemplatesPage() {
         onRowClick={(template) => {
           router.push(`/admin/notifications/templates/${template.id}`);
         }}
-        rowActionSections={[
-          [
-            {
-              label: 'View Details',
-              icon: <InfoIcon size={14} />,
-              onClick: (template) => {
-                router.push(`/admin/notifications/templates/${template.id}`);
-              }
+        getRowActionMenuItems={() => [
+          {
+            label: 'View Details',
+            icon: InfoIcon,
+            onClick: (template) => {
+              router.push(`/admin/notifications/templates/${template.id}`);
             }
-          ]
+          }
         ]}
       />
     </AdminPageContainer>

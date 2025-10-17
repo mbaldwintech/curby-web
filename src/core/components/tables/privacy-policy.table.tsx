@@ -1,38 +1,19 @@
 'use client';
 
 import { CustomColumnDef } from '@common/components';
-import { Filters } from '@supa/services';
 import { createClientService } from '@supa/utils/client';
 import { forwardRef, useCallback, useMemo, useRef } from 'react';
 import { PrivacyPolicyService } from '../../services';
 import { PrivacyPolicy } from '../../types';
-import { buildColumnDef, CurbyTable, CurbyTableRef, CurbyTableRowAction } from '../curby-table';
+import { buildColumnDef, CurbyTable, CurbyTableProps, CurbyTableRef } from '../curby-table';
 
-export interface PrivacyPolicyTableProps {
-  defaultFilters?: Filters<PrivacyPolicy>;
-  onRowClick?: (privacyPolicy: PrivacyPolicy) => void;
-  rowActionSections?: CurbyTableRowAction<PrivacyPolicy>[][];
-  toolbarLeft?: React.ReactNode;
-  toolbarRight?: React.ReactNode;
-  height?: number;
-  maxHeight?: number;
+export interface PrivacyPolicyTableProps extends Omit<CurbyTableProps<PrivacyPolicy>, 'service' | 'columns'> {
   extraColumns?: CustomColumnDef<PrivacyPolicy>[];
 }
 
 export const PrivacyPolicyTable = forwardRef<CurbyTableRef<PrivacyPolicy>, PrivacyPolicyTableProps>(
-  function PrivacyPolicyTable(
-    {
-      defaultFilters,
-      onRowClick,
-      rowActionSections,
-      toolbarLeft,
-      toolbarRight,
-      height = 500,
-      maxHeight,
-      extraColumns = []
-    }: PrivacyPolicyTableProps,
-    ref
-  ) {
+  function PrivacyPolicyTable(props: PrivacyPolicyTableProps, ref) {
+    const { extraColumns = [], ...rest } = props;
     const service = useRef(createClientService(PrivacyPolicyService)).current;
 
     const buildColumn = useCallback(
@@ -57,19 +38,6 @@ export const PrivacyPolicyTable = forwardRef<CurbyTableRef<PrivacyPolicy>, Priva
       [buildColumn, extraColumns]
     );
 
-    return (
-      <CurbyTable
-        ref={ref}
-        service={service}
-        defaultFilters={defaultFilters}
-        columns={columns}
-        height={height}
-        maxHeight={maxHeight}
-        onRowClick={onRowClick}
-        rowActionSections={rowActionSections}
-        toolbarLeft={toolbarLeft}
-        toolbarRight={toolbarRight}
-      />
-    );
+    return <CurbyTable ref={ref} service={service} columns={columns} {...rest} />;
   }
 );

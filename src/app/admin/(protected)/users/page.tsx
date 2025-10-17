@@ -1,7 +1,6 @@
 'use client';
 
 import { AdminPageContainer, ProfileTable } from '@core/components';
-import { Profile } from '@core/types';
 import { InfoIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
@@ -11,19 +10,17 @@ export default function UsersPage() {
   return (
     <AdminPageContainer title="Users">
       <ProfileTable
-        onRowClick={(user) => {
-          router.push(`/admin/users/${(user as Profile).userId}`);
+        onRowClick={(row) => {
+          router.push(`/admin/users/${row.original.userId}`);
         }}
-        rowActionSections={[
-          [
-            {
-              label: 'View Details',
-              icon: <InfoIcon size={14} />,
-              onClick: (user) => {
-                router.push(`/admin/users/${(user as Profile).userId}`);
-              }
+        getRowActionMenuItems={() => [
+          {
+            label: 'View Details',
+            icon: InfoIcon,
+            onClick: (row) => {
+              router.push(`/admin/users/${row.original.userId}`);
             }
-          ]
+          }
         ]}
       />
     </AdminPageContainer>

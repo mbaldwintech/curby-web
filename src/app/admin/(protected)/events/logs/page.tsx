@@ -13,16 +13,14 @@ export default function EventLogsPage() {
         onRowClick={(event) => {
           router.push(`/admin/events/logs/${event.id}`);
         }}
-        rowActionSections={[
-          [
-            {
-              label: 'View Details',
-              icon: <InfoIcon size={14} />,
-              onClick: (event) => {
-                router.push(`/admin/events/logs/${event.id}`);
-              }
+        getRowActionMenuItems={() => [
+          {
+            label: 'View Details',
+            icon: InfoIcon,
+            onClick: (event) => {
+              router.push(`/admin/events/logs/${event.id}`);
             }
-          ]
+          }
         ]}
       />
     </AdminPageContainer>

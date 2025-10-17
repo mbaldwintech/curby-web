@@ -1,20 +1,9 @@
 'use client';
 
-import {
-  Button,
-  CustomColumnDef,
-  DataTable,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger
-} from '@common/components';
+import { CustomColumnDef, DataTable, DataTableProps, DataTableRef, RowMenuItem } from '@common/components';
 import { useDebounce } from '@common/hooks';
-import { cn } from '@common/utils';
 import { BaseService, Filter, Filters, OrderBy, Pagination } from '@supa/services';
 import { GenericRecord } from '@supa/types';
-import { IconDotsVertical } from '@tabler/icons-react';
 import { CellContext, ColumnDefTemplate, ColumnFiltersState, SortingState } from '@tanstack/react-table';
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useState } from 'react';
 
@@ -24,15 +13,14 @@ const convertToFilters = <T,>(filters: Filters<T>): ColumnFiltersState =>
     value: (f as { value: T[keyof T] }).value
   }));
 
-const convertFromFilter = <T,>(filter: { id: string; value: unknown }): Filter<T> => {
-  return {
-    column: filter.id as keyof T,
-    operator: 'eq',
-    value: filter.value as T[keyof T]
-  } as Filter<T>;
-};
-
-const convertFromFilters = <T,>(filters: ColumnFiltersState): Filters<T> => filters.map((f) => convertFromFilter<T>(f));
+const convertFromFilters = <T,>(filters: ColumnFiltersState): Filters<T> =>
+  filters.map(({ id, value }): Filter<T> => {
+    return {
+      column: id as keyof T,
+      operator: 'eq',
+      value: value as T[keyof T]
+    } as Filter<T>;
+  });
 
 const convertToSort = <T,>(sort: OrderBy<T>): SortingState => [{ id: sort.column as string, desc: !sort.ascending }];
 
@@ -43,14 +31,6 @@ const convertFromSort = <T,>(sort: SortingState): OrderBy<T> | null => {
   }
   return null;
 };
-
-export interface CurbyTableRowAction<T extends GenericRecord> {
-  label: string;
-  variant?: 'default' | 'destructive';
-  icon?: React.ReactNode;
-  getDisabled?: (item: T) => boolean;
-  onClick: (row: T) => void;
-}
 
 export const buildColumnDef = <T extends GenericRecord, K extends keyof T & string>(
   key: K,
@@ -118,37 +98,50 @@ export const buildColumnDef = <T extends GenericRecord, K extends keyof T & stri
   return def;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export interface CurbyTableRef<T extends GenericRecord> {
+export interface ImplementedCurbyTableProps<T extends GenericRecord>
+  extends Omit<CurbyTableProps<T>, 'service' | 'columns'> {
+  extraColumns?: CustomColumnDef<T>[];
+}
+
+export interface CurbyTableRef<T extends GenericRecord> extends DataTableRef<T> {
   refresh: () => void;
 }
 
-export interface CurbyTableProps<T extends GenericRecord> {
+export interface CurbyTableProps1<T extends GenericRecord> {
+  getRowActionSections?: (row: T) => Promise<RowMenuItem<T>[]> | RowMenuItem<T>[];
+}
+
+export interface CurbyTableProps<T extends GenericRecord>
+  extends Omit<
+    DataTableProps<T>,
+    | 'data'
+    | 'refresh'
+    | 'manualPagination'
+    | 'pageCount'
+    | 'pagination'
+    | 'onPaginationChange'
+    | 'manualSorting'
+    | 'sort'
+    | 'onSortChange'
+    | 'manualFiltering'
+    | 'filters'
+    | 'onFiltersChange'
+    | 'manualSearch'
+    | 'searchText'
+    | 'onSearchTextChange'
+    | 'loading'
+    | 'error'
+  > {
   service: BaseService<T>;
   defaultFilters?: Filters<T>;
   columns: CustomColumnDef<T>[];
-  height?: string | number;
-  maxHeight?: string | number;
-  onRowClick?: (row: T) => void;
-  rowActionSections?: CurbyTableRowAction<T>[][];
-  toolbarLeft?: React.ReactNode;
-  toolbarRight?: React.ReactNode;
 }
 
 function CurbyTableInternal<T extends GenericRecord>(
-  {
-    service,
-    defaultFilters,
-    columns,
-    height,
-    maxHeight,
-    onRowClick,
-    rowActionSections,
-    toolbarLeft,
-    toolbarRight
-  }: CurbyTableProps<T>,
+  { service, defaultFilters, columns, getRowContextMenuItems, getRowActionMenuItems, ...rest }: CurbyTableProps<T>,
   ref: React.Ref<CurbyTableRef<T>>
 ) {
+  const dataTableRef = React.useRef<DataTableRef<T>>(null);
   const [searchText, setSearchText] = useState('');
   const debouncedSearchText = useDebounce(searchText, 300);
   const searchableColumns = useMemo(
@@ -163,8 +156,8 @@ function CurbyTableInternal<T extends GenericRecord>(
   const memoizedDefaultFilters = useMemo(() => defaultFilters || [], [defaultFilters]);
   const debouncedFilters = useDebounce(filters, 300);
   const [sort, setSort] = useState<OrderBy<T>>({ column: 'createdAt', ascending: false });
-  const [pagination, setPagination] = useState<Pagination>({ pageIndex: 0, pageSize: 10 });
 
+  const [pagination, setPagination] = useState<Pagination>({ pageIndex: 0, pageSize: 10 });
   const [count, setCount] = useState(0);
   const pageCount = useMemo(() => {
     return Math.ceil(count / pagination.pageSize);
@@ -230,71 +223,21 @@ function CurbyTableInternal<T extends GenericRecord>(
 
   useImperativeHandle<CurbyTableRef<T>, CurbyTableRef<T>>(ref, (): CurbyTableRef<T> => {
     return {
+      toggleExpand: dataTableRef.current?.toggleExpand ?? (() => {}),
       refresh: getData
     };
   });
 
   return (
     <DataTable
-      columns={columns}
+      ref={dataTableRef}
       data={data}
+      columns={columns}
       refresh={getData}
-      actions={
-        rowActionSections && rowActionSections.length > 0 && rowActionSections?.some((s) => s.length > 0)
-          ? (row) => {
-              const item = data.find((d) => d.id === row.id);
-              if (!item) {
-                return null;
-              }
-              return (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
-                      size="icon"
-                      disabled={loading}
-                    >
-                      <IconDotsVertical />
-                      <span className="sr-only">Open menu</span>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="max-w-60">
-                    {rowActionSections?.map((section, i) => (
-                      <React.Fragment key={`section-${i}`}>
-                        {section.map((action, j) => (
-                          <DropdownMenuItem
-                            key={`action-${i}-${j}`}
-                            className={cn(
-                              action.variant === 'destructive' ? 'text-destructive' : '',
-                              'whitespace-nowrap'
-                            )}
-                            disabled={action.getDisabled?.(item) || loading}
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              action.onClick(item);
-                            }}
-                          >
-                            {action.icon && (
-                              <span className="mr-2 flex h-4 w-4 items-center justify-center">{action.icon}</span>
-                            )}
-                            {action.label}
-                          </DropdownMenuItem>
-                        ))}
-                        {i < rowActionSections.length - 1 && <DropdownMenuSeparator />}
-                      </React.Fragment>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              );
-            }
-          : undefined
-      }
-      manualPagination={true}
-      manualSorting={true}
+      getRowActionMenuItems={getRowActionMenuItems}
+      getRowContextMenuItems={getRowContextMenuItems ?? getRowActionMenuItems}
+      // Filtering
       manualFiltering={true}
-      pageCount={pageCount}
       filters={convertToFilters(filters)}
       onFiltersChange={(newFilters) => {
         const newValue = convertFromFilters(
@@ -302,6 +245,8 @@ function CurbyTableInternal<T extends GenericRecord>(
         );
         setFilters(newValue);
       }}
+      // Sorting
+      manualSorting={true}
       sort={convertToSort(sort)}
       onSortChange={(newSorting) => {
         const newValue = convertFromSort(
@@ -309,23 +254,18 @@ function CurbyTableInternal<T extends GenericRecord>(
         );
         setSort(newValue || { column: 'createdAt', ascending: false });
       }}
+      // Pagination
+      manualPagination={true}
+      pageCount={pageCount}
       pagination={pagination}
       onPaginationChange={setPagination}
+      // Search
       manualSearch={true}
       searchText={searchText}
       onSearchTextChange={setSearchText}
       loading={loading}
       error={error}
-      height={height}
-      maxHeight={maxHeight}
-      onRowClick={(e) => {
-        const rowData = data.find((d) => d.id === e.id);
-        if (rowData) {
-          onRowClick?.(rowData);
-        }
-      }}
-      toolbarLeft={toolbarLeft}
-      toolbarRight={toolbarRight}
+      {...rest}
     />
   );
 }

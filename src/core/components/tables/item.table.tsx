@@ -1,38 +1,22 @@
 'use client';
 
 import { Badge, CustomColumnDef } from '@common/components';
-import { Filters } from '@supa/services';
 import { createClientService } from '@supa/utils/client';
 import { forwardRef, useCallback, useMemo, useRef } from 'react';
 import { ItemService } from '../../services';
 import { Item } from '../../types';
 import { ItemMediaCell, ProfileCell } from '../cells';
-import { buildColumnDef, CurbyTable, CurbyTableRef, CurbyTableRowAction } from '../curby-table';
+import { buildColumnDef, CurbyTable, CurbyTableProps, CurbyTableRef } from '../curby-table';
 
-export interface ItemTableProps {
-  defaultFilters?: Filters<Item>;
-  onRowClick?: (item: Item) => void;
-  rowActionSections?: CurbyTableRowAction<Item>[][];
-  toolbarLeft?: React.ReactNode;
-  toolbarRight?: React.ReactNode;
-  height?: number;
-  maxHeight?: number;
+export interface ItemTableProps extends Omit<CurbyTableProps<Item>, 'service' | 'columns'> {
   extraColumns?: CustomColumnDef<Item>[];
 }
 
 export const ItemTable = forwardRef<CurbyTableRef<Item>, ItemTableProps>(function ItemTable(
-  {
-    defaultFilters,
-    onRowClick,
-    rowActionSections,
-    toolbarLeft,
-    toolbarRight,
-    height = 500,
-    maxHeight,
-    extraColumns = []
-  }: ItemTableProps,
+  props: ItemTableProps,
   ref
 ) {
+  const { extraColumns = [], ...rest } = props;
   const service = useRef(createClientService(ItemService)).current;
 
   const buildColumn = useCallback(
@@ -101,18 +85,5 @@ export const ItemTable = forwardRef<CurbyTableRef<Item>, ItemTableProps>(functio
     [buildColumn, extraColumns]
   );
 
-  return (
-    <CurbyTable
-      ref={ref}
-      service={service}
-      defaultFilters={defaultFilters}
-      columns={columns}
-      height={height}
-      maxHeight={maxHeight}
-      onRowClick={onRowClick}
-      rowActionSections={rowActionSections}
-      toolbarLeft={toolbarLeft}
-      toolbarRight={toolbarRight}
-    />
-  );
+  return <CurbyTable ref={ref} service={service} columns={columns} {...rest} />;
 });

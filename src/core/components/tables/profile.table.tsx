@@ -2,7 +2,6 @@
 
 import { Badge, CustomColumnDef } from '@common/components';
 import { UserRole, UserStatus } from '@core/enumerations';
-import { Filters } from '@supa/services';
 import { createClientService } from '@supa/utils/client';
 import { forwardRef, useCallback, useMemo, useRef } from 'react';
 import { ProfileService } from '../../services';
@@ -17,32 +16,17 @@ import {
   SubmittedReportsCountCell,
   TakenItemCountCell
 } from '../cells';
-import { buildColumnDef, CurbyTable, CurbyTableRef, CurbyTableRowAction } from '../curby-table';
+import { buildColumnDef, CurbyTable, CurbyTableProps, CurbyTableRef } from '../curby-table';
 
-export interface ProfileTableProps {
-  defaultFilters?: Filters<Profile>;
-  onRowClick?: (feedback: Profile) => void;
-  rowActionSections?: CurbyTableRowAction<Profile>[][];
-  toolbarLeft?: React.ReactNode;
-  toolbarRight?: React.ReactNode;
-  height?: number;
-  maxHeight?: number;
+export interface ProfileTableProps extends Omit<CurbyTableProps<Profile>, 'service' | 'columns'> {
   extraColumns?: CustomColumnDef<Profile>[];
 }
 
 export const ProfileTable = forwardRef<CurbyTableRef<Profile>, ProfileTableProps>(function ProfileTable(
-  {
-    defaultFilters,
-    onRowClick,
-    rowActionSections,
-    toolbarLeft,
-    toolbarRight,
-    height = 500,
-    maxHeight,
-    extraColumns = []
-  }: ProfileTableProps,
+  props: ProfileTableProps,
   ref
 ) {
+  const { extraColumns = [], ...rest } = props;
   const service = useRef(createClientService(ProfileService)).current;
 
   const buildColumn = useCallback(
@@ -153,18 +137,5 @@ export const ProfileTable = forwardRef<CurbyTableRef<Profile>, ProfileTableProps
     [buildColumn, extraColumns]
   );
 
-  return (
-    <CurbyTable
-      ref={ref}
-      service={service}
-      defaultFilters={defaultFilters}
-      columns={columns}
-      height={height}
-      maxHeight={maxHeight}
-      onRowClick={onRowClick}
-      rowActionSections={rowActionSections}
-      toolbarLeft={toolbarLeft}
-      toolbarRight={toolbarRight}
-    />
-  );
+  return <CurbyTable ref={ref} service={service} columns={columns} {...rest} />;
 });

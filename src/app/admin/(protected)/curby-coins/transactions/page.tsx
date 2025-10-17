@@ -13,16 +13,14 @@ export default function CurbyCoinTransactionsPage() {
         onRowClick={(tx) => {
           router.push(`/admin/curby-coins/transactions/${tx.id}`);
         }}
-        rowActionSections={[
-          [
-            {
-              label: 'View Details',
-              icon: <InfoIcon size={14} />,
-              onClick: (tx) => {
-                router.push(`/admin/curby-coins/transactions/${tx.id}`);
-              }
+        getRowActionMenuItems={() => [
+          {
+            label: 'View Details',
+            icon: InfoIcon,
+            onClick: (tx) => {
+              router.push(`/admin/curby-coins/transactions/${tx.id}`);
             }
-          ]
+          }
         ]}
       />
     </AdminPageContainer>

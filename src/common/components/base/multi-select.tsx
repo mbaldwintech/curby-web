@@ -7,7 +7,6 @@ import { Button, ButtonProps } from './button';
 import { Checkbox } from './checkbox';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from './command';
 import { Popover, PopoverContent, PopoverTrigger } from './popover';
-import { Separator } from './separator';
 
 // ---------- Types ----------
 export type Option = {
@@ -65,13 +64,13 @@ export function MultiSelect<TFieldValues extends FieldValues, TFieldName extends
                   aria-invalid={isInvalid}
                   data-slot="input"
                   className={cn(
-                    'w-full justify-between',
+                    'w-full justify-start items-start h-auto min-h-[2.5rem] p-2',
                     'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
                     'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:aria-invalid:border-destructive'
                   )}
                   variant={variant ?? 'outline'}
                 >
-                  <div className="truncate text-left">
+                  <div className="flex-1 max-h-24 overflow-y-auto">
                     {selected.length === 0 ? (
                       <span className="text-muted-foreground">{placeholder}</span>
                     ) : (
@@ -79,32 +78,23 @@ export function MultiSelect<TFieldValues extends FieldValues, TFieldName extends
                         {selected.map((val) => (
                           <span
                             key={val}
-                            className="inline-flex items-center gap-2 px-2 py-1 text-xs rounded-full border"
+                            className="inline-flex items-center gap-2 px-2 py-1 text-xs rounded-full border bg-muted/50"
                           >
                             {options.find((o) => o.value === val)?.label ?? val}
                             <Button
                               variant="ghost"
                               size="icon-sm"
-                              className={`
-                                p-2
-                                h-4
-                                w-4
-                                bg-destructive/10
-                                text-destructive
-                                hover:bg-destructive/20
-                                focus-visible:ring-destructive/20
-                                dark:bg-destructive/20
-                                dark:text-destructive/60
-                                dark:hover:bg-destructive/30
-                                dark:focus-visible:ring-destructive/40
-                                rounded-full
-                              `}
+                              className={cn(
+                                'p-0 h-4 w-4 bg-destructive/10 text-destructive hover:bg-destructive/20',
+                                'focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:text-destructive/60',
+                                'dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40 rounded-full'
+                              )}
                               onClick={(e) => {
                                 e.stopPropagation();
                                 toggle(val);
                               }}
                             >
-                              <X />
+                              <X className="h-3 w-3" />
                             </Button>
                           </span>
                         ))}
@@ -112,11 +102,10 @@ export function MultiSelect<TFieldValues extends FieldValues, TFieldName extends
                     )}
                   </div>
 
-                  <div className="ml-auto flex items-center gap-1">
-                    <div className="ml-2 text-sm text-muted-foreground">
-                      {selected.length > 0 ? `${selected.length} selected` : ''}
-                    </div>
-                    <Separator orientation="vertical" className="mx-2 h-4" />
+                  <div className="ml-2 flex flex-col items-end gap-1 flex-shrink-0">
+                    {selected.length > 0 && (
+                      <div className="text-xs text-muted-foreground">{selected.length} selected</div>
+                    )}
                     <ChevronDown className="w-4 h-4" />
                   </div>
                 </Button>
