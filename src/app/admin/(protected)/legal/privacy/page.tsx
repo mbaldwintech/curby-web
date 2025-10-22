@@ -1,8 +1,9 @@
 'use client';
 
-import { AdminPageContainer, PrivacyPolicyAcceptanceTable } from '@core/components';
+import { AdminPageContainer } from '@core/components';
 import { PrivacyPolicyService } from '@core/services';
 import { PrivacyPolicy } from '@core/types';
+import { PrivacyPolicyAcceptanceTable } from '@features/legal/components';
 import { createClientService } from '@supa/utils/client';
 import { useEffect, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';

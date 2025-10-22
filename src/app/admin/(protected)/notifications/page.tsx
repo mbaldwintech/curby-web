@@ -1,6 +1,7 @@
 'use client';
 
-import { AdminPageContainer, NotificationTable } from '@core/components';
+import { AdminPageContainer } from '@core/components';
+import { NotificationTable } from '@features/notifications/components';
 import { InfoIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 

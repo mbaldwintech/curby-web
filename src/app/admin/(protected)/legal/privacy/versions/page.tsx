@@ -1,6 +1,7 @@
 'use client';
 
-import { AdminPageContainer, PrivacyPolicyTable } from '@core/components';
+import { AdminPageContainer } from '@core/components';
+import { PrivacyPolicyTable } from '@features/legal/components';
 import { InfoIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 

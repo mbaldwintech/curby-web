@@ -1,6 +1,7 @@
 'use client';
 
-import { AdminPageContainer, EventTypeTable } from '@core/components';
+import { AdminPageContainer } from '@core/components';
+import { EventTypeTable } from '@features/events/components';
 import { InfoIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 

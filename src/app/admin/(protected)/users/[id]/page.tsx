@@ -1,4 +1,5 @@
-import { AdminPageContainer, ProfileDetails } from '@core/components';
+import { AdminPageContainer } from '@core/components';
+import { ProfileDetails } from '@features/users/components';
 
 type UserDetailsPageParams = {
   id: string;

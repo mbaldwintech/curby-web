@@ -11,6 +11,7 @@ export * from './false-taking.service';
 export * from './feedback.service';
 export * from './functions.service';
 export * from './image.service';
+export * from './item-media.service';
 export * from './item-report.service';
 export * from './item-review.service';
 export * from './item.service';

@@ -1,6 +1,7 @@
 'use client';
 
 import {
+  AdminPageContainer,
   Badge,
   Card,
   CardContent,
@@ -12,8 +13,7 @@ import {
   TableHead,
   TableHeader,
   TableRow
-} from '@common/components';
-import { AdminPageContainer } from '@core/components';
+} from '@core/components';
 import { UserStatus } from '@core/enumerations';
 import {
   CurbyCoinTransactionService,

@@ -1,4 +1,4 @@
-import { IconProps } from '@common/components';
+import { IconProps } from '../components/icon.component';
 import { DeviceInfo } from '../types';
 
 const DEVICE_ID_KEY = 'device_id';

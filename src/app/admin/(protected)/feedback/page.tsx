@@ -1,6 +1,7 @@
 'use client';
 
-import { AdminPageContainer, FeedbackTable } from '@core/components';
+import { AdminPageContainer } from '@core/components';
+import { FeedbackTable } from '@features/feedback/components';
 import { InfoIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 

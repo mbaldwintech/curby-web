@@ -1,6 +1,7 @@
 'use client';
 
 import {
+  AdminPageContainer,
   Avatar,
   AvatarFallback,
   AvatarImage,
@@ -22,8 +23,7 @@ import {
   TabsContent,
   TabsList,
   TabsTrigger
-} from '@common/components';
-import { AdminPageContainer } from '@core/components';
+} from '@core/components';
 import {
   FrequentFalseTaker,
   ModerationOverview,

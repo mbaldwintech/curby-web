@@ -1,6 +1,6 @@
 // utils/location.ts
-import { Coordinates, GeoPoint } from '@common/types';
-import { milesToFeet } from '@common/utils';
+import { Coordinates, GeoPoint } from '../types';
+import { milesToFeet } from './miles-to-feet.util';
 
 const EARTH_RADIUS_MILES = 3958.8;
 const EARTH_RADIUS_FT = EARTH_RADIUS_MILES * 5280;

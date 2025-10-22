@@ -1,6 +1,7 @@
 'use client';
 
-import { AdminPageContainer, DeviceTable } from '@core/components';
+import { AdminPageContainer } from '@core/components';
+import { DeviceTable } from '@features/devices/components';
 import { InfoIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 

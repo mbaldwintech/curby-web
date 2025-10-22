@@ -1,5 +1,5 @@
-import { Coordinates } from '@common/types';
 import { FileAssetCreate } from '@supa/services';
+import { Coordinates } from './coordinates.type';
 
 export interface CreateItem {
   title: string;

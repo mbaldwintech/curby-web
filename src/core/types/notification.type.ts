@@ -1,5 +1,5 @@
-import { IconProps } from '@common/components';
 import { GenericRecord } from '@supa/types';
+import { IconProps } from '../components/icon.component';
 import { NotificationPayload } from './notification-payload.type';
 
 export interface Notification extends GenericRecord {

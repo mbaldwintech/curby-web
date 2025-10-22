@@ -1,4 +1,3 @@
-import { AdminProviders } from '@core/providers';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -7,5 +6,5 @@ export const metadata: Metadata = {
 };
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  return <AdminProviders>{children}</AdminProviders>;
+  return children;
 }

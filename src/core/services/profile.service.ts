@@ -29,13 +29,11 @@ export class ProfileService extends BaseService<Profile> {
   async getMyProfile(): Promise<Profile> {
     const user = await this.getUser();
     const profile = await this.getOneOrNull({ column: 'userId', operator: 'eq', value: user.id });
-    console.log('Fetched profile for user:', user.id, profile);
 
     if (profile) {
       return profile;
     }
 
-    console.info('Profile not yet created for user:', user.id, 'creating a new one');
     return this.create({
       userId: user.id,
       username: user.user_metadata.username || `Guest_${Math.floor(Math.random() * 1000000)}`,

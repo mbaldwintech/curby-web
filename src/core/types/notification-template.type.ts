@@ -1,5 +1,5 @@
-import { IconProps } from '@common/components';
 import { GenericRecord } from '@supa/types';
+import { IconProps } from '../components/icon.component';
 
 export interface NotificationTemplate extends GenericRecord {
   key: string;

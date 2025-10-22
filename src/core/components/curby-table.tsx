@@ -1,11 +1,11 @@
 'use client';
 
-import { CustomColumnDef, DataTable, DataTableProps, DataTableRef, RowMenuItem } from '@common/components';
-import { useDebounce } from '@common/hooks';
 import { BaseService, Filter, Filters, OrderBy, Pagination } from '@supa/services';
 import { GenericRecord } from '@supa/types';
 import { CellContext, ColumnDefTemplate, ColumnFiltersState, SortingState } from '@tanstack/react-table';
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useState } from 'react';
+import { useDebounce } from '../hooks';
+import { CustomColumnDef, DataTable, DataTableProps, DataTableRef, RowMenuItem } from './base';
 
 const convertToFilters = <T,>(filters: Filters<T>): ColumnFiltersState =>
   filters.map((f) => ({
@@ -50,13 +50,14 @@ export const buildColumnDef = <T extends GenericRecord, K extends keyof T & stri
     filterComponent: 'paged-autocomplete',
     filterComponentOptions: {
       getCount: async (query: string) => {
-        return service.count({ column: key, operator: 'ilike', value: `%${query}%` } as Filter<T>);
+        return service.count(undefined, { text: query, columns: [key] });
       },
       fetchOptions: async (query: string, pageIndex: number, pageSize: number) => {
         const items = await service.getAllPaged(
-          query ? ({ column: key, operator: 'ilike', value: `%${query}%` } as Filter<T>) : undefined,
+          undefined,
           { column: key, ascending: true },
-          { pageIndex, pageSize }
+          { pageIndex, pageSize },
+          { text: query, columns: [key] }
         );
         const res = items.reduce(
           (acc, item) => {

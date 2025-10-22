@@ -1,9 +1,9 @@
 'use client';
 
-import { GeoPoint } from '@common/types';
 import 'leaflet/dist/leaflet.css';
 import { MapPinIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { GeoPoint } from '../types';
 import { useCurbyMarker } from './curby-marker';
 
 interface LeafletMapProps {

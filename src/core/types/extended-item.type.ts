@@ -1,4 +1,4 @@
-import { GeoPoint } from '@common/types';
+import { GeoPoint } from './geo-point.type';
 import { Item } from './item.type';
 import { Media } from './media.type';
 

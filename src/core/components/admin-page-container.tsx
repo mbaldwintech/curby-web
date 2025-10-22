@@ -1,5 +1,5 @@
-import { cn } from '@common/utils';
 import React from 'react';
+import { cn } from '../utils';
 import { AdminHeader, AdminHeaderProps } from './admin-header';
 
 export interface AdminPageContainerProps extends React.PropsWithChildren {

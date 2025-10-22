@@ -1,6 +1,7 @@
 'use client';
 
-import { AdminPageContainer, CurbyCoinTransactionTypeTable } from '@core/components';
+import { AdminPageContainer } from '@core/components';
+import { CurbyCoinTransactionTypeTable } from '@features/curby-coins/components';
 import { InfoIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 

@@ -1,20 +1,26 @@
 'use client';
 
-import { Toaster } from '@common/components';
-import { rootStore } from '@store/root-store';
+import { appStore } from '@store/store';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider as NextThemesProvider } from 'next-themes';
 import React from 'react';
 import { Provider } from 'react-redux';
-import { ConfirmDialogProvider } from '../hooks/use-confirm-dialog.hook';
+import { Toaster } from '../components';
+import { ConfirmDialogProvider } from './confirm-dialog.provider';
+import { PortalQueueProvider } from './portal-queue.provider';
+
+const queryClient = new QueryClient();
 
 export const AppProviders: React.FC<React.PropsWithChildren> = ({ children }) => {
   return (
     <NextThemesProvider attribute="class" defaultTheme="dark" disableTransitionOnChange>
-      <Provider store={rootStore}>
-        <ConfirmDialogProvider>
-          {children}
-          <Toaster />
-        </ConfirmDialogProvider>
+      <Provider store={appStore}>
+        <QueryClientProvider client={queryClient}>
+          <ConfirmDialogProvider>
+            <PortalQueueProvider>{children}</PortalQueueProvider>
+            <Toaster />
+          </ConfirmDialogProvider>
+        </QueryClientProvider>
       </Provider>
     </NextThemesProvider>
   );

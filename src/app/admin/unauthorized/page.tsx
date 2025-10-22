@@ -1,4 +1,4 @@
-import { Button, Card, CardContent, CardHeader, CardTitle } from '@common/components';
+import { Button, Card, CardContent, CardHeader, CardTitle } from '@core/components';
 import { ShieldX } from 'lucide-react';
 import Link from 'next/link';
 

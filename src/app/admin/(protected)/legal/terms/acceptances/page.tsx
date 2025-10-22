@@ -1,6 +1,7 @@
 'use client';
 
-import { AdminPageContainer, TermsAndConditionsAcceptanceTable } from '@core/components';
+import { AdminPageContainer } from '@core/components';
+import { TermsAndConditionsAcceptanceTable } from '@features/legal/components';
 import { InfoIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 

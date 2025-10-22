@@ -1,8 +1,9 @@
 'use client';
 
-import { AdminPageContainer, TermsAndConditionsAcceptanceTable } from '@core/components';
+import { AdminPageContainer } from '@core/components';
 import { TermsAndConditionsService } from '@core/services';
 import { TermsAndConditions } from '@core/types';
+import { TermsAndConditionsAcceptanceTable } from '@features/legal/components';
 import { createClientService } from '@supa/utils/client';
 import { useEffect, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';

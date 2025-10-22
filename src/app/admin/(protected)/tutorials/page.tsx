@@ -1,17 +1,10 @@
 'use client';
 
-import { Button, RowMenuItem } from '@common/components';
-import {
-  AdminPageContainer,
-  CurbyTableRef,
-  TutorialDetailPanel,
-  TutorialDetailPanelRef,
-  TutorialTable,
-  TutorialViewTable
-} from '@core/components';
-import { useConfirmDialog } from '@core/hooks/use-confirm-dialog.hook';
+import { AdminPageContainer, Button, CurbyTableRef, RowMenuItem } from '@core/components';
+import { useConfirmDialog } from '@core/providers';
 import { TutorialService, TutorialViewService } from '@core/services';
 import { Tutorial } from '@core/types';
+import { TutorialPanel, TutorialPanelRef, TutorialTable, TutorialViewTable } from '@features/tutorials/components';
 import { createClientService } from '@supa/utils/client';
 import { EyeIcon, InfoIcon, PlusIcon, TrashIcon } from 'lucide-react';
 import { useRef } from 'react';
@@ -20,7 +13,7 @@ export default function TutorialsPage() {
   const tutorialService = useRef(createClientService(TutorialService)).current;
   const tutorialViewService = useRef(createClientService(TutorialViewService)).current;
   const tutorialTableRef = useRef<CurbyTableRef<Tutorial>>(null);
-  const tutorialDetailPanelRef = useRef<TutorialDetailPanelRef>(null);
+  const tutorialPanelRef = useRef<TutorialPanelRef>(null);
   const { open: openConfirmDialog } = useConfirmDialog();
 
   const getCanDelete = async (tutorialId: string): Promise<boolean> => {
@@ -38,14 +31,14 @@ export default function TutorialsPage() {
       <TutorialTable
         ref={tutorialTableRef}
         onRowClick={(tutorial) => {
-          tutorialDetailPanelRef.current?.open(tutorial.id);
+          tutorialPanelRef.current?.open(tutorial.id);
         }}
         getRowActionMenuItems={async (row) => {
           const menuItems: RowMenuItem<Tutorial>[] = [
             {
               label: 'View Details',
               icon: InfoIcon,
-              onClick: ({ id }) => tutorialDetailPanelRef.current?.open(id)
+              onClick: ({ id }) => tutorialPanelRef.current?.open(id)
             },
             {
               label: 'View Tutorial Views',
@@ -90,14 +83,15 @@ export default function TutorialsPage() {
         ToolbarRight={({ children }) => (
           <>
             {children}
-            <Button size="sm" onClick={() => tutorialDetailPanelRef.current?.open()}>
+            <Button size="sm" onClick={() => tutorialPanelRef.current?.open()}>
               <PlusIcon />
             </Button>
           </>
         )}
+        height={500}
       />
 
-      <TutorialDetailPanel ref={tutorialDetailPanelRef} onClose={tutorialTableRef.current?.refresh} />
+      <TutorialPanel ref={tutorialPanelRef} onClose={tutorialTableRef.current?.refresh} />
     </AdminPageContainer>
   );
 }
