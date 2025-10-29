@@ -140,10 +140,5 @@ function extractPrefix(pattern: string): string {
 }
 
 export const config = {
-  matcher: [
-    '/admin/:path*'
-    // Add other protected routes here as needed
-    // '/api/admin/:path*',
-    // '/dashboard/:path*'
-  ]
+  matcher: '/admin/:path*'
 };
