@@ -175,10 +175,12 @@ function TruncatedCellContent({
   // Listen for resize events to handle column resizing
   React.useEffect(() => {
     checkOverflow();
-    window.addEventListener('resize', checkOverflow);
-    return () => {
-      window.removeEventListener('resize', checkOverflow);
-    };
+    if (typeof window !== 'undefined') {
+      window.addEventListener('resize', checkOverflow);
+      return () => {
+        window.removeEventListener('resize', checkOverflow);
+      };
+    }
   }, [checkOverflow]);
 
   const content = (
