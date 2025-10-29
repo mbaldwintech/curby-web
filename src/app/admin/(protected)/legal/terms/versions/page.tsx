@@ -1,6 +1,7 @@
 'use client';
 
-import { AdminPageContainer, TermsAndConditionsTable } from '@core/components';
+import { AdminPageContainer } from '@core/components';
+import { TermsAndConditionsTable } from '@features/legal/components';
 import { InfoIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
@@ -13,16 +14,14 @@ export default function TermsAndConditionsPage() {
         onRowClick={(terms) => {
           router.push(`/admin/legal/terms/versions/${terms.id}`);
         }}
-        rowActionSections={[
-          [
-            {
-              label: 'View Details',
-              icon: <InfoIcon size={14} />,
-              onClick: (terms) => {
-                router.push(`/admin/legal/terms/versions/${terms.id}`);
-              }
+        getRowActionMenuItems={() => [
+          {
+            label: 'View Details',
+            icon: InfoIcon,
+            onClick: (terms) => {
+              router.push(`/admin/legal/terms/versions/${terms.id}`);
             }
-          ]
+          }
         ]}
       />
     </AdminPageContainer>

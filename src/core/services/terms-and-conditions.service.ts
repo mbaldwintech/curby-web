@@ -1,7 +1,7 @@
 import { BaseService } from '@supa/services';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { EventTypeKey } from '../enumerations';
-import { TermsAndConditions } from '../types';
+import { TermsAndConditions, TermsAndConditionsMetadata } from '../types';
 import { EventLoggerService } from './event-logger.service';
 import { TermsAndConditionsAcceptanceService } from './terms-and-conditions-acceptance.service';
 
@@ -10,7 +10,7 @@ export class TermsAndConditionsService extends BaseService<TermsAndConditions> {
   protected termsAndConditionsAcceptanceService: TermsAndConditionsAcceptanceService;
 
   constructor(protected supabase: SupabaseClient) {
-    super('terms_and_conditions', supabase);
+    super('terms_and_conditions', supabase, TermsAndConditionsMetadata);
     this.eventLoggerService = new EventLoggerService(supabase);
     this.termsAndConditionsAcceptanceService = new TermsAndConditionsAcceptanceService(supabase);
   }

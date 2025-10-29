@@ -64,7 +64,7 @@ export abstract class BaseService<T extends GenericRecord> {
   constructor(
     protected table: string,
     protected supabase: SupabaseClient,
-    protected metadata?: Partial<GenericRecordMetadata<T>>
+    protected metadata: Partial<GenericRecordMetadata<T>>
   ) {}
 
   /**
@@ -118,7 +118,7 @@ export abstract class BaseService<T extends GenericRecord> {
    * Build safe search conditions that handle different column types
    * This method relies on GenericRecordMetadata to determine searchability
    */
-  protected buildSearchConditions(searchText: string, columns: (keyof T)[]): string[] {
+  protected buildSearchConditions(searchText: string, columns: (keyof T)[] = []): string[] {
     const conditions: string[] = [];
 
     for (const col of columns) {
@@ -401,7 +401,7 @@ export abstract class BaseService<T extends GenericRecord> {
     filters?: Filters<T> | Filter<T>,
     orderBy?: OrderBy<T> | OrderBy<T>[],
     pagination?: Pagination,
-    search?: { text: string; columns: (keyof T)[] }
+    search?: { text: string; columns?: (keyof T)[] }
   ): Promise<T[]> {
     let query = this.supabase.from(this.table).select('*');
 

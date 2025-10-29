@@ -117,11 +117,6 @@ src/
 │   ├── admin/             # Admin panel and authentication
 │   ├── globals.css        # Global styles
 │   └── layout.tsx         # Root layout
-├── common/                 # Shared utilities and components
-│   ├── components/        # Reusable UI components
-│   ├── providers/         # Context providers
-│   ├── types/            # Shared TypeScript types
-│   └── utils/            # Utility functions
 ├── core/                  # Business logic and app-specific code
 │   ├── components/        # Feature-specific components
 │   ├── hooks/            # Custom React hooks

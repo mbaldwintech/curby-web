@@ -1,8 +1,9 @@
 'use client';
 
-import { AdminPageContainer, PrivacyPolicyAcceptanceTable } from '@core/components';
+import { AdminPageContainer } from '@core/components';
 import { PrivacyPolicyService } from '@core/services';
 import { PrivacyPolicy } from '@core/types';
+import { PrivacyPolicyAcceptanceTable } from '@features/legal/components';
 import { createClientService } from '@supa/utils/client';
 import { useEffect, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
@@ -68,7 +69,12 @@ export default function PrivacyPolicyPage() {
 
       <div className="mt-5 flex flex-col gap-4">
         <PrivacyPolicyAcceptanceTable
-          toolbarLeft={<h2 className="text-2xl font-bold">Privacy Policy Acceptances</h2>}
+          ToolbarLeft={({ children }) => (
+            <>
+              <h2 className="text-2xl font-bold">Privacy Policy Acceptances</h2>
+              {children}
+            </>
+          )}
           height={300}
         />
       </div>

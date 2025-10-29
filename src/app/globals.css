@@ -22,8 +22,10 @@
   --secondary-foreground: #cfc3b3; /* secondary-text */
   --muted: #e0dacf; /* disabled */
   --muted-foreground: #9a9996; /* disabled-text */
-  --accent: #4caf50; /* primary-accent-light */
-  --accent-foreground: #fff5dc; /* primary-text */
+  --accent: #587652;
+  --accent-foreground: #fff5dc;
+  --accent-2: #4caf50; /* primary-accent-light */
+  --accent-2-foreground: #fff5dc; /* primary-text */
   --destructive: #d1001f; /* error */
   --border: #9a9996; /* borders */
   --input: #e0dacf; /* surface */
@@ -33,7 +35,14 @@
   --chart-3: #374f34;
   --chart-4: #2b3d43;
   --chart-5: #ffc107;
-  --sidebar: #e0dacf; /* background */
+  --sidebar: #d6cfb9; /* sidebar background color options:
+    - warmer beige: d6cfb9
+    - Muted green/gray: cfd6c8
+    - muted sand: cfc6b0
+    - light olive: cfc3b3
+    - soft taupe: bbb6a4
+    - soft charcoal: 9a9996 ccc7bb
+    */
   --sidebar-foreground: #282a29; /* primary-text */
   --sidebar-primary: #587652;
   --sidebar-primary-foreground: #282a29;
@@ -56,8 +65,10 @@
   --secondary-foreground: #cfc3b3; /* secondary-text */
   --muted: #5a5a5a; /* surface */
   --muted-foreground: #7e7f7e; /* borders */
-  --accent: #4caf50; /* primary-accent-light */
+  --accent: #587652; /* primary-accent-light */
   --accent-foreground: #fff5dc; /* primary-text */
+  --accent-2: #4caf50; /* primary-accent-light */
+  --accent-2-foreground: #fff5dc; /* primary-text */
   --destructive: #f94449; /* error */
   --border: #7e7f7e; /* borders */
   --input: #5a5a5a; /* surface */

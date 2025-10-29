@@ -1,6 +1,7 @@
 'use client';
 
-import { AdminPageContainer, ItemTable } from '@core/components';
+import { AdminPageContainer } from '@core/components';
+import { ItemTable } from '@features/items/components';
 import { InfoIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
@@ -13,16 +14,14 @@ export default function ItemsPage() {
         onRowClick={(item) => {
           router.push(`/admin/items/${item.id}`);
         }}
-        rowActionSections={[
-          [
-            {
-              label: 'View Details',
-              icon: <InfoIcon size={14} />,
-              onClick: (item) => {
-                router.push(`/admin/items/${item.id}`);
-              }
+        getRowActionMenuItems={() => [
+          {
+            label: 'View Details',
+            icon: InfoIcon,
+            onClick: (item) => {
+              router.push(`/admin/items/${item.id}`);
             }
-          ]
+          }
         ]}
       />
     </AdminPageContainer>

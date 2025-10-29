@@ -1,4 +1,5 @@
-import { AdminPageContainer, ItemDetails } from '@core/components';
+import { AdminPageContainer } from '@core/components';
+import { ItemDetails } from '@features/items/components';
 
 interface ItemDetailsPageProps {
   params: Promise<{ id: string }>;

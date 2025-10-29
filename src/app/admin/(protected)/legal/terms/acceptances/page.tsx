@@ -1,6 +1,7 @@
 'use client';
 
-import { AdminPageContainer, TermsAndConditionsAcceptanceTable } from '@core/components';
+import { AdminPageContainer } from '@core/components';
+import { TermsAndConditionsAcceptanceTable } from '@features/legal/components';
 import { InfoIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
@@ -13,16 +14,14 @@ export default function TermsAndConditionsAcceptancesPage() {
         onRowClick={(acceptance) => {
           router.push(`/admin/legal/terms/acceptances/${acceptance.id}`);
         }}
-        rowActionSections={[
-          [
-            {
-              label: 'View Details',
-              icon: <InfoIcon size={14} />,
-              onClick: (acceptance) => {
-                router.push(`/admin/legal/terms/acceptances/${acceptance.id}`);
-              }
+        getRowActionMenuItems={() => [
+          {
+            label: 'View Details',
+            icon: InfoIcon,
+            onClick: (acceptance) => {
+              router.push(`/admin/legal/terms/acceptances/${acceptance.id}`);
             }
-          ]
+          }
         ]}
       />
     </AdminPageContainer>

@@ -1,43 +1,11 @@
 'use client';
 
-import {
-  Bell,
-  BookOpen,
-  Boxes,
-  CheckSquare,
-  ChevronRight,
-  CircleUserRound,
-  Clock,
-  Coins,
-  EllipsisVertical,
-  Eye,
-  FileText,
-  Flag,
-  Gavel,
-  Home,
-  Image as ImageIcon,
-  Inbox,
-  LayoutPanelTop,
-  List,
-  ListCheck,
-  LogOut,
-  Megaphone,
-  MessageSquare,
-  Monitor,
-  Package,
-  Scale,
-  Send,
-  Settings,
-  Shield,
-  ShieldCheck,
-  Tags,
-  Tv,
-  UserCog,
-  UserLock,
-  UserRoundX,
-  Users
-} from 'lucide-react';
+import { ChevronRight, CircleUserRound, EllipsisVertical, LogOut } from 'lucide-react';
 
+import Image from 'next/image';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useState } from 'react';
 import {
   Avatar,
   AvatarFallback,
@@ -66,13 +34,7 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
   useSidebar
-} from '@common/components';
-import { useAuth } from '@supa/providers';
-import Image from 'next/image';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { useState } from 'react';
-import { useProfile } from '../hooks';
+} from './base';
 
 export interface AdminSidebarItem {
   title: string;
@@ -83,276 +45,49 @@ export interface AdminSidebarItem {
   items?: AdminSidebarItem[];
 }
 
-const data: AdminSidebarItem[] = [
-  {
-    title: 'Dashboard',
-    tooltip: 'Dashboard',
-    url: '/admin',
-    icon: Home
-  },
-  {
-    title: 'Platform',
-    tooltip: 'Platform Management',
-    items: [
-      {
-        title: 'User Management',
-        tooltip: 'Manage Users & Devices',
-        defaultOpen: true,
-        url: '/admin/users',
-        icon: UserCog,
-        items: [
-          {
-            title: 'Users',
-            tooltip: 'Manage Users',
-            url: '/admin/users',
-            icon: Users
-          },
-          {
-            title: 'Devices',
-            tooltip: 'Manage Devices',
-            url: '/admin/devices',
-            icon: Monitor
-          }
-        ]
-      },
-      {
-        title: 'Content Management',
-        tooltip: 'Manage Items & Media',
-        defaultOpen: true,
-        url: '/admin/items',
-        icon: Boxes,
-        items: [
-          {
-            title: 'Items',
-            tooltip: 'Manage Items',
-            url: '/admin/items',
-            icon: Package
-          },
-          {
-            title: 'Media',
-            tooltip: 'Manage Media',
-            url: '/admin/media',
-            icon: ImageIcon
-          }
-        ]
-      },
-      {
-        title: 'Moderation',
-        tooltip: 'Moderation Queue & History',
-        defaultOpen: false,
-        url: '/admin/moderation',
-        icon: Shield,
-        items: [
-          {
-            title: 'My Queue',
-            tooltip: 'My Moderation Queue',
-            url: '/admin/moderation/my-queue',
-            icon: Inbox
-          },
-          {
-            title: 'Pending Reported Items',
-            tooltip: 'Pending Reported Items',
-            url: '/admin/moderation/unassigned/reported-items',
-            icon: List
-          },
-          {
-            title: 'Pending Flagged Users',
-            tooltip: 'Pending Flagged Users',
-            url: '/admin/moderation/unassigned/flagged-users',
-            icon: Flag
-          },
-          {
-            title: 'Resolved Reports',
-            tooltip: 'Resolved Reports',
-            url: '/admin/moderation/resolved-reports',
-            icon: ListCheck
-          },
-          {
-            title: 'Suspended Users',
-            tooltip: 'Suspended Users',
-            url: '/admin/moderation/suspended-users',
-            icon: UserLock
-          },
-          {
-            title: 'Banned Users',
-            tooltip: 'Banned Users',
-            url: '/admin/moderation/banned-users',
-            icon: UserRoundX
-          }
-        ]
-      },
-      {
-        title: 'Activity',
-        tooltip: 'Activity & Logs',
-        defaultOpen: false,
-        url: '/admin/events/logs',
-        icon: List,
-        items: [
-          {
-            title: 'Event Log',
-            tooltip: 'System Event Log',
-            url: '/admin/events/logs',
-            icon: List
-          },
-          {
-            title: 'Transactions',
-            tooltip: 'Curby Coin Transactions',
-            url: '/admin/curby-coins/transactions',
-            icon: Coins
-          },
-          {
-            title: 'Notifications',
-            tooltip: 'User Notifications',
-            url: '/admin/notifications',
-            icon: Bell
-          },
-          {
-            title: 'Tutorial Views',
-            tooltip: 'Tutorial View Tracking',
-            url: '/admin/tutorials/views',
-            icon: Eye
-          },
-          {
-            title: 'Feedback',
-            tooltip: 'User Feedback',
-            url: '/admin/feedback',
-            icon: MessageSquare
-          }
-        ]
-      },
-      {
-        title: 'Broadcasts & Messaging',
-        tooltip: 'Manage Broadcasts & Messaging',
-        defaultOpen: false,
-        url: '/admin/broadcasts',
-        icon: Megaphone,
-        items: [
-          {
-            title: 'Broadcasts',
-            tooltip: 'Manage Broadcasts',
-            defaultOpen: false,
-            url: '/admin/broadcasts',
-            icon: Tv,
-            items: [
-              {
-                title: 'Broadcasts',
-                tooltip: 'Manage Broadcasts',
-                url: '/admin/broadcasts',
-                icon: Megaphone
-              },
-              {
-                title: 'Schedules',
-                tooltip: 'Manage Broadcast Schedules',
-                url: '/admin/broadcasts/schedules',
-                icon: Clock
-              },
-              {
-                title: 'Deliveries',
-                tooltip: 'Manage Broadcast Deliveries',
-                url: '/admin/broadcasts/deliveries',
-                icon: Send
-              },
-              {
-                title: 'Delivery Views',
-                tooltip: 'View Broadcast Delivery Views',
-                url: '/admin/broadcasts/delivery-views',
-                icon: Eye
-              }
-            ]
-          }
-        ]
+// Filter sidebar items based on user permissions
+function filterSidebarItems(items: AdminSidebarItem[], canAccess: (path: string) => boolean): AdminSidebarItem[] {
+  return items
+    .map((item) => {
+      // If item has URL, check if user can access it
+      if (item.url && !canAccess(item.url)) {
+        return null;
       }
-    ]
-  },
-  {
-    title: 'System Settings',
-    tooltip: 'Configuration & Settings',
-    items: [
-      {
-        title: 'Event Types',
-        tooltip: 'Manage Event Types',
-        url: '/admin/events/types',
-        icon: Tags
-      },
-      {
-        title: 'Curby Coin Transaction Types',
-        tooltip: 'Manage Curby Coin Transaction Types',
-        url: '/admin/curby-coins/transactions/types',
-        icon: Settings
-      },
-      {
-        title: 'Notification Templates',
-        tooltip: 'Manage Notification Templates',
-        url: '/admin/notifications/templates',
-        icon: LayoutPanelTop
-      },
-      {
-        title: 'Tutorials',
-        tooltip: 'Manage Tutorials',
-        url: '/admin/tutorials',
-        icon: BookOpen
+
+      // If item has sub-items, filter them recursively
+      if (item.items) {
+        const filteredSubItems = filterSidebarItems(item.items, canAccess);
+
+        // If no sub-items are accessible, hide the parent item
+        if (filteredSubItems.length === 0) {
+          return null;
+        }
+
+        return {
+          ...item,
+          items: filteredSubItems
+        };
       }
-    ]
-  },
-  {
-    title: 'Legal & Compliance',
-    tooltip: 'Manage Legal & Compliance',
-    items: [
-      {
-        title: 'Terms & Conditions',
-        tooltip: 'Manage Terms & Conditions',
-        defaultOpen: false,
-        url: '/admin/legal/terms',
-        icon: Scale,
-        items: [
-          {
-            title: 'T&C Versions',
-            tooltip: 'Terms & Conditions Versions',
-            url: '/admin/legal/terms/versions',
-            icon: FileText
-          },
-          {
-            title: 'T&C Acceptances',
-            tooltip: 'Terms & Conditions Acceptances',
-            url: '/admin/legal/terms/acceptances',
-            icon: CheckSquare
-          }
-        ]
-      },
-      {
-        title: 'Privacy Policy',
-        tooltip: 'Manage Privacy Policy',
-        defaultOpen: false,
-        url: '/admin/legal/privacy',
-        icon: Gavel,
-        items: [
-          {
-            title: 'Privacy Policy Versions',
-            tooltip: 'Privacy Policy Versions',
-            url: '/admin/legal/privacy/versions',
-            icon: FileText
-          },
-          {
-            title: 'Privacy Acceptances',
-            tooltip: 'Privacy Policy Acceptances',
-            url: '/admin/legal/privacy/acceptances',
-            icon: ShieldCheck
-          }
-        ]
-      }
-    ]
-  }
-];
+
+      return item;
+    })
+    .filter((item): item is AdminSidebarItem => item !== null);
+}
+
+export interface SidebarConfig {
+  profilePageUrl?: string;
+  items: AdminSidebarItem[];
+}
 
 const SidebarSection = ({
   section,
   isActive
 }: {
   section: AdminSidebarItem;
-  isActive: (path?: string, exactMatch?: boolean) => boolean;
+  isActive: (path?: string, children?: AdminSidebarItem[]) => boolean;
 }) => {
   const [open, setOpen] = useState(section.defaultOpen ?? false);
-  const isSectionActive = isActive(section.url, true);
+  const isSectionActive = isActive(section.url, section.items);
   const isChildActive = section.items?.some((sub) => isActive(sub.url)) ?? false;
 
   return (
@@ -400,23 +135,37 @@ const SidebarSection = ({
   );
 };
 
-export function AdminSidebar({ logout }: { logout: () => Promise<void> }) {
+export function AdminSidebar({
+  config,
+  profile,
+  canAccess,
+  logout
+}: {
+  config: SidebarConfig;
+  profile?: { username: string; email?: string | null; avatarUrl?: string | null } | null;
+  canAccess: (path: string) => boolean;
+  logout: () => Promise<void>;
+}) {
   const pathname = usePathname();
   const { isMobile } = useSidebar();
-  const { user } = useAuth();
-  const { profile } = useProfile();
 
-  function isActive(url?: string, exactMatch = false) {
+  function isActive(url?: string, children?: AdminSidebarItem[]) {
     if (!url) return false;
-    if (exactMatch) {
-      return pathname === url;
+    if (pathname === url) {
+      return true;
     }
-    return pathname === url || pathname.startsWith(`${url}/`);
+    if (children?.some((child) => isActive(child.url, child.items || []))) {
+      return true;
+    }
+    return false;
   }
 
-  if (!profile || !user) {
+  if (!profile) {
     return null;
   }
+
+  // Filter sidebar data based on user permissions
+  const filteredData = filterSidebarItems(config.items, canAccess);
 
   return (
     <Sidebar variant="inset" collapsible="icon">
@@ -444,12 +193,12 @@ export function AdminSidebar({ logout }: { logout: () => Promise<void> }) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        {data.map((section) =>
+        {filteredData.map((section) =>
           !section.items ? (
             <SidebarGroup key={section.title}>
               <SidebarMenu key={section.title}>
                 <SidebarMenuItem>
-                  <SidebarMenuButton asChild tooltip={section.title} isActive={isActive(section.url, true)}>
+                  <SidebarMenuButton asChild tooltip={section.title} isActive={isActive(section.url)}>
                     <a href={section.url}>
                       {section.icon && <section.icon />}
                       <span>{section.title}</span>
@@ -480,12 +229,12 @@ export function AdminSidebar({ logout }: { logout: () => Promise<void> }) {
                   className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                 >
                   <Avatar className="h-8 w-8 rounded-lg grayscale">
-                    <AvatarImage src={profile.avatarUrl ?? undefined} alt={profile.username} />
-                    <AvatarFallback className="rounded-lg">{profile.username.charAt(0)}</AvatarFallback>
+                    <AvatarImage src={profile?.avatarUrl ?? undefined} alt={profile?.username} />
+                    <AvatarFallback className="rounded-lg">{profile?.username.charAt(0)}</AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-medium">{profile.username}</span>
-                    <span className="text-muted-foreground truncate text-xs">{user.email}</span>
+                    <span className="truncate font-medium">{profile?.username}</span>
+                    <span className="text-muted-foreground truncate text-xs">{profile?.email}</span>
                   </div>
                   <EllipsisVertical className="ml-auto size-4" />
                 </SidebarMenuButton>
@@ -499,18 +248,18 @@ export function AdminSidebar({ logout }: { logout: () => Promise<void> }) {
                 <DropdownMenuLabel className="p-0 font-normal">
                   <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                     <Avatar className="h-8 w-8 rounded-lg">
-                      <AvatarImage src={profile.avatarUrl ?? undefined} alt={profile.username} />
-                      <AvatarFallback className="rounded-lg">{profile.username.charAt(0)}</AvatarFallback>
+                      <AvatarImage src={profile?.avatarUrl ?? undefined} alt={profile?.username} />
+                      <AvatarFallback className="rounded-lg">{profile?.username.charAt(0)}</AvatarFallback>
                     </Avatar>
                     <div className="grid flex-1 text-left text-sm leading-tight">
-                      <span className="truncate font-medium">{profile.username}</span>
-                      <span className="text-muted-foreground truncate text-xs">{user.email}</span>
+                      <span className="truncate font-medium">{profile?.username}</span>
+                      <span className="text-muted-foreground truncate text-xs">{profile?.email}</span>
                     </div>
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
-                  <Link href="/admin/profile">
+                  <Link href={config.profilePageUrl || '/admin/profile'}>
                     <DropdownMenuItem>
                       <CircleUserRound />
                       Account

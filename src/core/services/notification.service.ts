@@ -1,13 +1,13 @@
 import { BaseService } from '@supa/services';
 import { SupabaseClient } from '@supabase/supabase-js';
-import { Notification } from '../types';
+import { Notification, NotificationMetadata } from '../types';
 import { getDeviceId } from '../utils';
 import { DeviceService } from './device.service';
 
 export class NotificationService extends BaseService<Notification> {
   protected deviceService: DeviceService;
   constructor(protected supabase: SupabaseClient) {
-    super('notification', supabase);
+    super('notification', supabase, NotificationMetadata);
     this.deviceService = new DeviceService(supabase);
   }
 

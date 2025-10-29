@@ -1,6 +1,7 @@
 'use client';
 
-import { AdminPageContainer, NotificationTemplateTable } from '@core/components';
+import { AdminPageContainer } from '@core/components';
+import { NotificationTemplateTable } from '@features/notifications/components';
 import { InfoIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
@@ -13,16 +14,14 @@ export default function NotificationTemplatesPage() {
         onRowClick={(template) => {
           router.push(`/admin/notifications/templates/${template.id}`);
         }}
-        rowActionSections={[
-          [
-            {
-              label: 'View Details',
-              icon: <InfoIcon size={14} />,
-              onClick: (template) => {
-                router.push(`/admin/notifications/templates/${template.id}`);
-              }
+        getRowActionMenuItems={() => [
+          {
+            label: 'View Details',
+            icon: InfoIcon,
+            onClick: (template) => {
+              router.push(`/admin/notifications/templates/${template.id}`);
             }
-          ]
+          }
         ]}
       />
     </AdminPageContainer>

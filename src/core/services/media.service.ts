@@ -1,6 +1,6 @@
 import { BaseService, FileAssetCreate } from '@supa/services';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { Media } from '../types';
+import { Media, MediaMetadata } from '../types';
 import { ImageService } from './image.service';
 
 export class MediaService extends BaseService<Media> {
@@ -10,7 +10,7 @@ export class MediaService extends BaseService<Media> {
     protected supabase: SupabaseClient,
     bucket: string = 'images'
   ) {
-    super('media', supabase);
+    super('media', supabase, MediaMetadata);
     this.imageService = new ImageService(supabase, bucket);
   }
 

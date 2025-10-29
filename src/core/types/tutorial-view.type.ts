@@ -1,4 +1,4 @@
-import { GenericRecord } from '@supa/types';
+import { GenericRecord, GenericRecordMetadata, GenericRecordMetadataBase } from '@supa/types';
 
 export interface TutorialView extends GenericRecord {
   tutorialId: string;
@@ -6,3 +6,39 @@ export interface TutorialView extends GenericRecord {
   deviceId?: string;
   status: 'not-started' | 'viewed' | 'skipped' | 'completed';
 }
+
+export const TutorialViewMetadata: GenericRecordMetadata<TutorialView> = {
+  tutorialId: {
+    isArray: false,
+    isNullable: false,
+    type: 'string',
+    searchable: false,
+    sortable: false,
+    filterable: true
+  },
+  userId: {
+    isArray: false,
+    isNullable: true,
+    type: 'string',
+    searchable: false,
+    sortable: false,
+    filterable: true
+  },
+  deviceId: {
+    isArray: false,
+    isNullable: true,
+    type: 'string',
+    searchable: false,
+    sortable: false,
+    filterable: true
+  },
+  status: {
+    isArray: false,
+    isNullable: false,
+    type: 'string',
+    searchable: true,
+    sortable: true,
+    filterable: true
+  },
+  ...GenericRecordMetadataBase
+};

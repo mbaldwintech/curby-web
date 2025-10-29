@@ -1,5 +1,4 @@
-import { LinkButton } from '@common/components';
-import { LogoHorizontal, ThemeToggle } from '@core/components';
+import { LinkButton, LogoHorizontal, ThemeToggle } from '@core/components';
 import Link from 'next/link';
 
 export default function PublicLayout({ children }: { children: React.ReactNode }) {

@@ -1,6 +1,6 @@
 'use client';
 
-import { debounce, wait } from '@common/utils';
+import { debounce, wait } from '@core/utils';
 import { EmailOtpType, Session, User } from '@supabase/supabase-js';
 import { useRouter } from 'next/navigation';
 import { createContext, ReactNode, useCallback, useContext, useEffect, useRef, useState } from 'react';

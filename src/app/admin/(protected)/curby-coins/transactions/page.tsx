@@ -1,6 +1,7 @@
 'use client';
 
-import { AdminPageContainer, CurbyCoinTransactionTable } from '@core/components';
+import { AdminPageContainer } from '@core/components';
+import { CurbyCoinTransactionTable } from '@features/curby-coins/components';
 import { InfoIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
@@ -13,16 +14,14 @@ export default function CurbyCoinTransactionsPage() {
         onRowClick={(tx) => {
           router.push(`/admin/curby-coins/transactions/${tx.id}`);
         }}
-        rowActionSections={[
-          [
-            {
-              label: 'View Details',
-              icon: <InfoIcon size={14} />,
-              onClick: (tx) => {
-                router.push(`/admin/curby-coins/transactions/${tx.id}`);
-              }
+        getRowActionMenuItems={() => [
+          {
+            label: 'View Details',
+            icon: InfoIcon,
+            onClick: (tx) => {
+              router.push(`/admin/curby-coins/transactions/${tx.id}`);
             }
-          ]
+          }
         ]}
       />
     </AdminPageContainer>

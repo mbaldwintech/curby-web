@@ -1,10 +1,10 @@
 import { BaseService, Cursor } from '@supa/services';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { CurbyCoinTransaction } from '../types';
+import { CurbyCoinTransaction, CurbyCoinTransactionMetadata } from '../types';
 
 export class CurbyCoinTransactionService extends BaseService<CurbyCoinTransaction> {
   constructor(protected supabase: SupabaseClient) {
-    super('curby_coin_transaction', supabase);
+    super('curby_coin_transaction', supabase, CurbyCoinTransactionMetadata);
   }
 
   async getMyBalance(): Promise<number> {

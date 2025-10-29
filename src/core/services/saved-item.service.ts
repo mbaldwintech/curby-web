@@ -1,10 +1,10 @@
 import { BaseService } from '@supa/services';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { SavedItem } from '../types';
+import { SavedItem, SavedItemMetadata } from '../types';
 
 export class SavedItemService extends BaseService<SavedItem> {
   constructor(protected supabase: SupabaseClient) {
-    super('saved_item', supabase);
+    super('saved_item', supabase, SavedItemMetadata);
   }
 
   async getMySavedItems(): Promise<SavedItem[]> {

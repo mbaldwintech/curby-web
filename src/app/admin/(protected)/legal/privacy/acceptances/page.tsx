@@ -1,6 +1,7 @@
 'use client';
 
-import { AdminPageContainer, PrivacyPolicyAcceptanceTable } from '@core/components';
+import { AdminPageContainer } from '@core/components';
+import { PrivacyPolicyAcceptanceTable } from '@features/legal/components';
 import { InfoIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
@@ -13,16 +14,14 @@ export default function PrivacyPolicyAcceptancesPage() {
         onRowClick={(acceptance) => {
           router.push(`/admin/legal/privacy/acceptances/${acceptance.id}`);
         }}
-        rowActionSections={[
-          [
-            {
-              label: 'View Details',
-              icon: <InfoIcon size={14} />,
-              onClick: (acceptance) => {
-                router.push(`/admin/legal/privacy/acceptances/${acceptance.id}`);
-              }
+        getRowActionMenuItems={() => [
+          {
+            label: 'View Details',
+            icon: InfoIcon,
+            onClick: (acceptance) => {
+              router.push(`/admin/legal/privacy/acceptances/${acceptance.id}`);
             }
-          ]
+          }
         ]}
       />
     </AdminPageContainer>

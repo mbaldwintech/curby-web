@@ -22,8 +22,8 @@
       "@app/*": ["./src/app/*"],
       "@core/*": ["./src/core/*"],
       "@supa/*": ["./src/supa/*"],
-      "@common/*": ["./src/common/*"],
-      "@store/*": ["./src/store/*"]
+      "@store/*": ["./src/store/*"],
+      "@features/*": ["./src/features/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

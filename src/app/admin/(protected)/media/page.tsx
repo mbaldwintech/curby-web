@@ -1,6 +1,7 @@
 'use client';
 
-import { AdminPageContainer, MediaTable } from '@core/components';
+import { AdminPageContainer } from '@core/components';
+import { MediaTable } from '@features/media/components';
 import { InfoIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
@@ -13,16 +14,14 @@ export default function MediaPage() {
         onRowClick={(media) => {
           router.push(`/admin/media/${media.id}`);
         }}
-        rowActionSections={[
-          [
-            {
-              label: 'View Details',
-              icon: <InfoIcon size={14} />,
-              onClick: (media) => {
-                router.push(`/admin/media/${media.id}`);
-              }
+        getRowActionMenuItems={() => [
+          {
+            label: 'View Details',
+            icon: InfoIcon,
+            onClick: (media) => {
+              router.push(`/admin/media/${media.id}`);
             }
-          ]
+          }
         ]}
       />
     </AdminPageContainer>

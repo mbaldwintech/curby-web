@@ -1,4 +1,7 @@
 import { AppProviders } from '@core/providers/app-providers.component';
+import { AuthProvider } from '@features/auth/providers';
+import { DeviceProvider } from '@features/devices/providers';
+import { ProfileProvider } from '@features/users/providers';
 import type { Metadata } from 'next';
 import { Poppins, Roboto_Mono } from 'next/font/google';
 import './globals.css';
@@ -27,7 +30,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${poppins.variable} ${robotoMono.variable} antialiased`}>
-        <AppProviders>{children}</AppProviders>
+        <AppProviders>
+          <AuthProvider>
+            <ProfileProvider>
+              <DeviceProvider>{children}</DeviceProvider>
+            </ProfileProvider>
+          </AuthProvider>
+        </AppProviders>
       </body>
     </html>
   );

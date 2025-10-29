@@ -1,6 +1,7 @@
 'use client';
 
-import { AdminPageContainer, DeviceTable } from '@core/components';
+import { AdminPageContainer } from '@core/components';
+import { DeviceTable } from '@features/devices/components';
 import { InfoIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
@@ -13,16 +14,14 @@ export default function DevicesPage() {
         onRowClick={(device) => {
           router.push(`/admin/devices/${device.id}`);
         }}
-        rowActionSections={[
-          [
-            {
-              label: 'View Details',
-              icon: <InfoIcon size={14} />,
-              onClick: (device) => {
-                router.push(`/admin/devices/${device.id}`);
-              }
+        getRowActionMenuItems={() => [
+          {
+            label: 'View Details',
+            icon: InfoIcon,
+            onClick: (device) => {
+              router.push(`/admin/devices/${device.id}`);
             }
-          ]
+          }
         ]}
       />
     </AdminPageContainer>
