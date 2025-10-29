@@ -1,10 +1,10 @@
 import { BaseService } from '@supa/services';
 import { SupabaseClient } from '@supabase/supabase-js';
-import { UserDevice } from '../types';
+import { UserDevice, UserDeviceMetadata } from '../types';
 
 export class UserDeviceService extends BaseService<UserDevice> {
   constructor(protected supabase: SupabaseClient) {
-    super('user_device', supabase);
+    super('user_device', supabase, UserDeviceMetadata);
   }
 
   async getAllMyUserDevices() {

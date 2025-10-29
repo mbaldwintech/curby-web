@@ -32,12 +32,7 @@ export const EventCell = ({ eventId }: { eventId?: string | null }) => {
   }
 
   return (
-    <LinkButton
-      variant="link"
-      href={`/admin/events/logs/${event.id}`}
-      onClick={(e) => e.stopPropagation()}
-      className="p-0"
-    >
+    <LinkButton variant="link" href={`/admin/events/${event.id}`} onClick={(e) => e.stopPropagation()} className="p-0">
       {event.eventKey}
     </LinkButton>
   );

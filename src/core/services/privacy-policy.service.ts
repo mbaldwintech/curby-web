@@ -1,7 +1,7 @@
 import { BaseService } from '@supa/services';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { EventTypeKey } from '../enumerations';
-import { PrivacyPolicy } from '../types';
+import { PrivacyPolicy, PrivacyPolicyMetadata } from '../types';
 import { EventLoggerService } from './event-logger.service';
 import { PrivacyPolicyAcceptanceService } from './privacy-policy-acceptance.service';
 
@@ -10,7 +10,7 @@ export class PrivacyPolicyService extends BaseService<PrivacyPolicy> {
   protected privacyPolicyAcceptanceService: PrivacyPolicyAcceptanceService;
 
   constructor(protected supabase: SupabaseClient) {
-    super('privacy_policy', supabase);
+    super('privacy_policy', supabase, PrivacyPolicyMetadata);
     this.eventLoggerService = new EventLoggerService(supabase);
     this.privacyPolicyAcceptanceService = new PrivacyPolicyAcceptanceService(supabase);
   }

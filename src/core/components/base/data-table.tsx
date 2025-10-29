@@ -469,7 +469,11 @@ const ActionsCell = <T,>({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="data-[state=open]:bg-muted text-muted-foreground flex size-8" size="icon">
+        <Button
+          variant="ghost"
+          className="data-[state=open]:bg-muted text-muted-foreground flex size-8 justify-self-end"
+          size="icon"
+        >
           <IconDotsVertical />
           <span className="sr-only">Open menu</span>
         </Button>

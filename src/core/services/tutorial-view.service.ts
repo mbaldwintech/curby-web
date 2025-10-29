@@ -1,13 +1,13 @@
 import { BaseService } from '@supa/services';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { TutorialView } from '../types';
+import { TutorialView, TutorialViewMetadata } from '../types';
 import { DeviceService } from './device.service';
 
 export class TutorialViewService extends BaseService<TutorialView> {
   protected deviceService: DeviceService;
 
   constructor(protected supabase: SupabaseClient) {
-    super('tutorial_view', supabase);
+    super('tutorial_view', supabase, TutorialViewMetadata);
     this.deviceService = new DeviceService(supabase);
   }
 

@@ -1,11 +1,11 @@
 import { BaseService } from '@supa/services';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { UserRole, UserStatus } from '../enumerations';
-import { CreateProfile, Profile } from '../types';
+import { CreateProfile, Profile, ProfileMetadata } from '../types';
 
 export class ProfileService extends BaseService<Profile> {
   constructor(protected supabase: SupabaseClient) {
-    super('profile', supabase);
+    super('profile', supabase, ProfileMetadata);
   }
 
   async findByUserId(userId: string): Promise<Profile> {

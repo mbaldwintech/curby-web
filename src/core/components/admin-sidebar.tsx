@@ -84,10 +84,10 @@ const SidebarSection = ({
   isActive
 }: {
   section: AdminSidebarItem;
-  isActive: (path?: string, exactMatch?: boolean) => boolean;
+  isActive: (path?: string, children?: AdminSidebarItem[]) => boolean;
 }) => {
   const [open, setOpen] = useState(section.defaultOpen ?? false);
-  const isSectionActive = isActive(section.url, true);
+  const isSectionActive = isActive(section.url, section.items);
   const isChildActive = section.items?.some((sub) => isActive(sub.url)) ?? false;
 
   return (
@@ -149,12 +149,15 @@ export function AdminSidebar({
   const pathname = usePathname();
   const { isMobile } = useSidebar();
 
-  function isActive(url?: string, exactMatch = false) {
+  function isActive(url?: string, children?: AdminSidebarItem[]) {
     if (!url) return false;
-    if (exactMatch) {
-      return pathname === url;
+    if (pathname === url) {
+      return true;
     }
-    return pathname === url || pathname.startsWith(`${url}/`);
+    if (children?.some((child) => isActive(child.url, child.items || []))) {
+      return true;
+    }
+    return false;
   }
 
   if (!profile) {
@@ -195,7 +198,7 @@ export function AdminSidebar({
             <SidebarGroup key={section.title}>
               <SidebarMenu key={section.title}>
                 <SidebarMenuItem>
-                  <SidebarMenuButton asChild tooltip={section.title} isActive={isActive(section.url, true)}>
+                  <SidebarMenuButton asChild tooltip={section.title} isActive={isActive(section.url)}>
                     <a href={section.url}>
                       {section.icon && <section.icon />}
                       <span>{section.title}</span>

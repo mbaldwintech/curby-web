@@ -3,6 +3,7 @@ export * from './bounding-box.type';
 export * from './broadcast-delivery-view.type';
 export * from './broadcast-delivery.type';
 export * from './broadcast.type';
+export * from './condition.type';
 export * from './coordinates.type';
 export * from './create-item.type';
 export * from './create-profile.type';

@@ -2,7 +2,7 @@ import { BaseService } from '@supa/services';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { PostgrestResponse, PostgrestSingleResponse } from '@supabase/supabase-js';
 import { EventTypeKey } from '../enumerations';
-import { Device, UserDevice } from '../types';
+import { Device, DeviceMetadata, UserDevice } from '../types';
 import { geoJsonPointToWkt, getCurrentGeoJson, getDeviceId, getDeviceInfo } from '../utils';
 import { EventLoggerService } from './event-logger.service';
 import { UserDeviceService } from './user-device.service';
@@ -19,7 +19,7 @@ export class DeviceService extends BaseService<Device> {
   }
 
   constructor(protected supabase: SupabaseClient) {
-    super('device', supabase);
+    super('device', supabase, DeviceMetadata);
     this.userDeviceService = new UserDeviceService(supabase);
     this.eventLoggerService = new EventLoggerService(supabase);
   }

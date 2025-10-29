@@ -1097,14 +1097,14 @@ export function ProfileDetails({ id }: ProfileDetailsProps) {
                             <ExtendedEventTable
                               defaultFilters={[{ column: 'userId', operator: 'eq', value: profile.userId }]}
                               onRowClick={(row) => {
-                                router.push(`/admin/events/logs/${row.id}`);
+                                router.push(`/admin/events/${row.id}`);
                               }}
                               getRowActionMenuItems={() => [
                                 {
                                   label: 'View Details',
                                   icon: InfoIcon,
                                   onClick: (row) => {
-                                    router.push(`/admin/events/logs/${row.id}`);
+                                    router.push(`/admin/events/${row.id}`);
                                   }
                                 }
                               ]}

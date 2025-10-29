@@ -2,14 +2,14 @@ import { BaseService } from '@supa/services';
 import { GenericRecord } from '@supa/types';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { EventTypeKey } from '../enumerations';
-import { Feedback } from '../types';
+import { Feedback, FeedbackMetadata } from '../types';
 import { EventLoggerService } from './event-logger.service';
 
 export class FeedbackService extends BaseService<Feedback> {
   private eventLoggerService: EventLoggerService;
 
   constructor(protected supabase: SupabaseClient) {
-    super('feedback', supabase);
+    super('feedback', supabase, FeedbackMetadata);
     this.eventLoggerService = new EventLoggerService(supabase);
   }
 

@@ -2,6 +2,7 @@ export * from './admin-header';
 export * from './admin-page-container';
 export * from './admin-sidebar';
 export * from './base';
+export * from './condition-form-group';
 export * from './copyable-string-cell';
 export * from './curby-table';
 export * from './icon.component';

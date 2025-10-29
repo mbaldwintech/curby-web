@@ -7,6 +7,7 @@ import { DeviceCell } from '@features/devices/components';
 import { ProfileCell } from '@features/users/components';
 import { createClientService } from '@supa/utils/client';
 import { forwardRef, useCallback, useMemo, useRef } from 'react';
+import { EventTypeCell } from './event-type-cell.component';
 
 export interface ExtendedEventTableProps extends Omit<CurbyTableProps<ExtendedEvent>, 'service' | 'columns'> {
   extraColumns?: CustomColumnDef<ExtendedEvent>[];
@@ -32,7 +33,9 @@ export const ExtendedEventTable = forwardRef<CurbyTableRef<ExtendedEvent>, Exten
       () => [
         buildColumn('createdAt', 'Timestamp', { cell: ({ row }) => new Date(row.original.createdAt).toLocaleString() }),
         buildColumn('eventKey', 'Event Key', { enableHiding: false }),
-        buildColumn('eventTypeName', 'Name'),
+        buildColumn('eventTypeName', 'Name', {
+          cell: ({ row }) => <EventTypeCell eventTypeId={row.original.eventTypeId} />
+        }),
         buildColumn('eventTypeCategory', 'Category'),
         buildColumn('username', 'User', {
           cell: ({ row }) => <ProfileCell userId={row.original.userId} />

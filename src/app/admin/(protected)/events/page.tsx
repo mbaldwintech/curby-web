@@ -12,14 +12,14 @@ export default function EventLogsPage() {
     <AdminPageContainer title="Event Logs">
       <ExtendedEventTable
         onRowClick={(event) => {
-          router.push(`/admin/events/logs/${event.id}`);
+          router.push(`/admin/events/${event.id}`);
         }}
         getRowActionMenuItems={() => [
           {
             label: 'View Details',
             icon: InfoIcon,
             onClick: (event) => {
-              router.push(`/admin/events/logs/${event.id}`);
+              router.push(`/admin/events/${event.id}`);
             }
           }
         ]}

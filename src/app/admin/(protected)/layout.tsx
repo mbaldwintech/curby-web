@@ -151,13 +151,13 @@ const sidebarConfig: SidebarConfig = {
           title: 'Activity',
           tooltip: 'Activity & Logs',
           defaultOpen: false,
-          url: '/admin/events/logs',
+          url: '/admin/events',
           icon: List,
           items: [
             {
               title: 'Event Log',
               tooltip: 'System Event Log',
-              url: '/admin/events/logs',
+              url: '/admin/events',
               icon: List
             },
             {

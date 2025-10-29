@@ -1,4 +1,4 @@
-export interface ReportedItemMetadata {
+export interface ReportedItemRecordMetadata {
   reportId: string;
   itemId: string;
   itemTitle: string;
@@ -9,7 +9,7 @@ export interface ReportedItemMetadata {
   reviewId: string | null;
 }
 
-export interface ItemReviewMetadata {
+export interface ItemReviewRecordMetadata {
   reviewId: string;
   itemId: string;
   itemTitle: string;
@@ -18,7 +18,7 @@ export interface ItemReviewMetadata {
   reviewerId: string;
 }
 
-export interface UserReviewMetadata {
+export interface UserReviewRecordMetadata {
   reviewId: string;
   userId: string;
   username: string;
@@ -35,7 +35,7 @@ export interface ModerationQueueItem {
   hoursSinceCreated: number;
   reason: string | null;
   description: string;
-  metadata: ReportedItemMetadata | ItemReviewMetadata | UserReviewMetadata;
+  metadata: ReportedItemRecordMetadata | ItemReviewRecordMetadata | UserReviewRecordMetadata;
   priority: 'high' | 'medium' | 'low';
   priorityOrder: number;
 }

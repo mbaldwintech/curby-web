@@ -1,13 +1,13 @@
 import { BaseService } from '@supa/services';
 import type { PostgrestResponse, SupabaseClient } from '@supabase/supabase-js';
-import { Item } from '../types';
+import { Item, ItemMetadata } from '../types';
 import { SavedItemService } from './saved-item.service';
 
 export class ItemService extends BaseService<Item> {
   protected savedItemService: SavedItemService;
 
   constructor(protected supabase: SupabaseClient) {
-    super('item', supabase);
+    super('item', supabase, ItemMetadata);
     this.savedItemService = new SavedItemService(supabase);
   }
 

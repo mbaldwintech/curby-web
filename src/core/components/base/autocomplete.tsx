@@ -4,7 +4,7 @@ import { Check, ChevronsUpDown, X } from 'lucide-react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDebounce } from '../../hooks';
 import { cn } from '../../utils';
-import { Button } from './button';
+import { Button, ButtonProps } from './button';
 import { Command, CommandEmpty, CommandInput, CommandItem, CommandList } from './command';
 import { Popover, PopoverContent, PopoverTrigger } from './popover';
 
@@ -25,15 +25,26 @@ const AutocompleteItem = React.memo(
   (prev, next) => prev.isSelected === next.isSelected && prev.item.id === next.item.id
 );
 
-interface AutocompleteProps {
+export interface AutocompleteProps extends Omit<ButtonProps, 'value' | 'onSelect'> {
   value?: string | null;
   onSelect: (id: string | null) => void;
   pageSize: number;
   getCount: (query: string) => Promise<number>;
   fetchItems: (query: string, page: number, pageSize: number) => Promise<Item[]>;
+  fetchSelectedItem?: (id: string) => Promise<Item | null>;
+  placeholder?: string;
 }
 
-export function Autocomplete({ value, onSelect, pageSize, getCount, fetchItems }: AutocompleteProps) {
+export function Autocomplete({
+  value,
+  onSelect,
+  pageSize,
+  getCount,
+  fetchItems,
+  fetchSelectedItem,
+  placeholder,
+  ...rest
+}: AutocompleteProps) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const debouncedQuery = useDebounce(query, 300);
@@ -78,8 +89,33 @@ export function Autocomplete({ value, onSelect, pageSize, getCount, fetchItems }
   }, [fetchItems, debouncedQuery, page, pageSize]);
 
   useEffect(() => {
+    if (value == null) {
+      setSelected(null);
+      return;
+    }
+    if (items.find((i) => i.id === value)) {
+      setSelected(items.find((i) => i.id === value) || null);
+      return;
+    }
+    if (fetchSelectedItem) {
+      fetchSelectedItem(value)
+        .then((item) => {
+          if (item) {
+            setSelected(item);
+            setItems((prev) => {
+              const existing = new Map(prev.map((i) => [i.id, i]));
+              existing.set(item.id, item);
+              return Array.from(existing.values());
+            });
+          } else {
+            setSelected(null);
+          }
+        })
+        .catch(() => setSelected(null));
+      return;
+    }
     setSelected(value ? { id: value, label: value } : null);
-  }, [value]);
+  }, [value, fetchSelectedItem, items]);
 
   const handleSelect = useCallback(
     (item: Item) => {
@@ -99,8 +135,10 @@ export function Autocomplete({ value, onSelect, pageSize, getCount, fetchItems }
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button variant="outline" role="combobox" aria-expanded={open} className="w-full justify-between">
-          <span className="truncate">{selected ? selected.label : 'Select item...'}</span>
+        <Button variant="outline" role="combobox" aria-expanded={open} className="w-full justify-between" {...rest}>
+          <span className="truncate flex-grow text-left">
+            {selected ? selected.label : placeholder ? placeholder : 'Select item...'}
+          </span>
           {selected && (
             <div
               className="flex items-center gap-1 rounded-md hover:bg-destructive text-destructive hover:text-primary p-1"
@@ -128,26 +166,31 @@ export function Autocomplete({ value, onSelect, pageSize, getCount, fetchItems }
               setQuery(search);
             }}
           />
-          <CommandList>
-            {items.map((item) => (
-              <AutocompleteItem
-                key={item.id}
-                item={item}
-                isSelected={selected?.id === item.id}
-                onSelect={() => handleSelect(item)}
-              />
-            ))}
-            {loading && <div className="p-2 text-sm text-muted-foreground">Loading...</div>}
-            {!loading && items.length === 0 && <CommandEmpty>No results.</CommandEmpty>}
-            {!loading && hasMore && (
-              <CommandItem
-                className="text-center text-sm text-muted-foreground cursor-pointer"
-                onSelect={() => setPage((prev) => prev + 1)}
-              >
-                Load more...
-              </CommandItem>
-            )}
-          </CommandList>
+          <div
+            className="overflow-y-auto max-h-[200px] scrollbar-thin scrollbar-track-transparent scrollbar-thumb-gray-300"
+            onWheel={(e) => e.stopPropagation()}
+          >
+            <CommandList className="max-h-none overflow-visible">
+              {items.map((item) => (
+                <AutocompleteItem
+                  key={item.id}
+                  item={item}
+                  isSelected={selected?.id === item.id}
+                  onSelect={() => handleSelect(item)}
+                />
+              ))}
+              {loading && <div className="p-2 text-sm text-muted-foreground">Loading...</div>}
+              {!loading && items.length === 0 && <CommandEmpty>No results.</CommandEmpty>}
+              {!loading && hasMore && (
+                <CommandItem
+                  className="text-center text-sm text-muted-foreground cursor-pointer"
+                  onSelect={() => setPage((prev) => prev + 1)}
+                >
+                  Load more...
+                </CommandItem>
+              )}
+            </CommandList>
+          </div>
         </Command>
       </PopoverContent>
     </Popover>
