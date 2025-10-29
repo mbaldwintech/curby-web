@@ -16,7 +16,7 @@ export function AdminHeader({ title, rightContent }: AdminHeaderProps) {
         <div className="h-full flex items-center gap-2 lg:gap-4">
           <SidebarTrigger />
           <Separator orientation="vertical" className="data-[orientation=vertical]:h-4" />
-          {window.history.length > 1 && (
+          {typeof window !== 'undefined' && window.history.length > 1 && (
             <>
               <BackButton />
               <Separator orientation="vertical" className="data-[orientation=vertical]:h-4" />
