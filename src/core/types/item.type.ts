@@ -1,9 +1,10 @@
+import { ItemStatus, ItemType } from '@core/enumerations';
 import { GenericRecord, GenericRecordMetadata, GenericRecordMetadataBase } from '@supa/types';
 
 export interface Item extends GenericRecord {
   title: string;
-  type: string;
-  status: 'active' | 'extended' | 'expired' | 'removed' | 'under_review' | 'restored';
+  type: ItemType;
+  status: ItemStatus;
   geoLocation: string; // WKT format
   posterCurbyCoinCount: number;
   postedBy: string;

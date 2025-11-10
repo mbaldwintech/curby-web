@@ -1,3 +1,4 @@
+import { TutorialViewStatus } from '@core/enumerations';
 import { BaseService } from '@supa/services';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { TutorialView, TutorialViewMetadata } from '../types';
@@ -37,11 +38,14 @@ export class TutorialViewService extends BaseService<TutorialView> {
       tutorialId: tutorialId,
       userId: user?.id,
       deviceId: device.id,
-      status: 'viewed'
+      status: TutorialViewStatus.Viewed
     });
   }
 
-  async updateStatus(tutorialId: string, status: 'skipped' | 'completed'): Promise<TutorialView | null> {
+  async updateStatus(
+    tutorialId: string,
+    status: TutorialViewStatus.Skipped | TutorialViewStatus.Completed
+  ): Promise<TutorialView | null> {
     const user = await this.getUserOrNull();
     const device = await this.deviceService.getMyDevice();
     if (!user && !device) return null;

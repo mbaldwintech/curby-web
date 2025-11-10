@@ -23,6 +23,7 @@ export default function UsersPage() {
             }
           }
         ]}
+        height={500}
       />
     </AdminPageContainer>
   );

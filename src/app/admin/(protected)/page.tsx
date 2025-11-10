@@ -24,117 +24,129 @@ import {
 } from '@core/services';
 import { CurbyCoinTransaction, Item, ItemReport, Notification, Profile } from '@core/types';
 import { createClientService } from '@supa/utils/client';
+import { useQuery } from '@tanstack/react-query';
 import { AlertTriangle, Bell, DollarSign, Loader2, Package, Users } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useMemo } from 'react';
 
 export default function AdminDashboard() {
-  const profileService = useRef(createClientService(ProfileService)).current;
-  const reportedItemService = useRef(createClientService(ItemReportService)).current;
-  const curbyCoinTransactionService = useRef(createClientService(CurbyCoinTransactionService)).current;
-  const notificationService = useRef(createClientService(NotificationService)).current;
-  const itemService = useRef(createClientService(ItemService)).current;
+  const profileService = useMemo(() => createClientService(ProfileService), []);
+  const reportedItemService = useMemo(() => createClientService(ItemReportService), []);
+  const curbyCoinTransactionService = useMemo(() => createClientService(CurbyCoinTransactionService), []);
+  const notificationService = useMemo(() => createClientService(NotificationService), []);
+  const itemService = useMemo(() => createClientService(ItemService), []);
 
-  const [stats, setStats] = useState({
-    totalUsers: 0,
-    activeItems: 0,
-    reportedItems: 0,
-    totalCoinTransactions: 0,
-    totalNotifications: 0
+  // Stats queries
+
+  const { data: activeUserCount = 0, isLoading: loadingUsers } = useQuery<number>({
+    queryKey: ['admin-stats', 'users'],
+    queryFn: () => profileService.count({ column: 'status', operator: 'eq', value: UserStatus.Active }),
+    staleTime: 10000
   });
-  const [itemReportes, setItemReports] = useState<ItemReport[]>([]);
-  const [reportedItems, setReportedItems] = useState<Item[]>([]);
-  const [coinTransactions, setCoinTransactions] = useState<CurbyCoinTransaction[]>([]);
-  const [profiles, setProfiles] = useState<Profile[]>([]);
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        // Fetch total users
-        const activeUserCount = await profileService.count({
-          column: 'status',
-          operator: 'eq',
-          value: UserStatus.Active
-        });
+  const { data: activeItemCount = 0, isLoading: loadingItems } = useQuery<number>({
+    queryKey: ['admin-stats', 'active-items'],
+    queryFn: () =>
+      itemService.count([
+        { column: 'taken', operator: 'eq', value: false },
+        { column: 'expiresAt', operator: 'gt', value: new Date().toISOString() }
+      ]),
+    staleTime: 10000
+  });
 
-        // Fetch active items
-        const activeItemCount = await itemService.count([
-          { column: 'taken', operator: 'eq', value: false },
-          { column: 'expiresAt', operator: 'gt', value: new Date().toISOString() }
-        ]);
+  const { data: reportedItemCount = 0, isLoading: loadingReported } = useQuery<number>({
+    queryKey: ['admin-stats', 'reported-items'],
+    queryFn: () => reportedItemService.count({ column: 'reviewId', operator: 'is', value: null }),
+    staleTime: 10000
+  });
 
-        // Fetch reported items
-        const reportedItemCount = await reportedItemService.count({
-          column: 'reviewId',
-          operator: 'is',
-          value: null
-        });
+  const { data: coinTransactionCount = 0, isLoading: loadingCoin } = useQuery<number>({
+    queryKey: ['admin-stats', 'coin-transactions'],
+    queryFn: () => curbyCoinTransactionService.count(),
+    staleTime: 10000
+  });
 
-        // Fetch total coin transactions
-        const coinTransactionCount = await curbyCoinTransactionService.count();
+  const { data: notificationCount = 0, isLoading: loadingNotifications } = useQuery<number>({
+    queryKey: ['admin-stats', 'notifications'],
+    queryFn: () => notificationService.count(),
+    staleTime: 10000
+  });
 
-        // Fetch total notifications
-        const notificationCount = await notificationService.count();
+  // Recent data queries
 
-        // Fetch reported items details
-        const itemReports = await reportedItemService.getAll(
-          {
-            column: 'reviewId',
-            operator: 'is',
-            value: null
-          }, // Filter by status
-          { column: 'reportedAt', ascending: false }, // Order by reportedAt descending
-          { column: 'reportedAt', value: new Date().toISOString() }, // Cursor pagination placeholder
-          5
-        );
+  const { data: itemReportes = [], isLoading: loadingItemReports } = useQuery<ItemReport[]>({
+    queryKey: ['admin-recent', 'item-reports'],
+    queryFn: async () => {
+      return await reportedItemService.getAll(
+        { column: 'reviewId', operator: 'is', value: null },
+        { column: 'reportedAt', ascending: false },
+        { column: 'reportedAt', value: new Date().toISOString() },
+        5
+      );
+    },
+    staleTime: 10000
+  });
 
-        // Enrich reported items with actual item entities
-        const itemIds = itemReports.map((ri) => ri.itemId);
-        const reportedItems = await itemService.getAll({ column: 'id', operator: 'in', value: itemIds });
+  const itemIds = useMemo(
+    () => (Array.isArray(itemReportes) ? itemReportes.map((ri) => ri.itemId) : []),
+    [itemReportes]
+  );
+  const { data: reportedItems = [], isLoading: loadingReportedItems } = useQuery<Item[]>({
+    queryKey: ['admin-recent', 'reported-items', itemIds],
+    queryFn: () =>
+      itemIds.length > 0 ? itemService.getAll({ column: 'id', operator: 'in', value: itemIds }) : Promise.resolve([]),
+    enabled: itemIds.length > 0,
+    staleTime: 10000
+  });
 
-        // Fetch recent coin transactions
-        const coinTransactions = await curbyCoinTransactionService.getAll(
-          [],
-          { column: 'occurredAt', ascending: false },
-          { column: 'occurredAt', value: new Date().toISOString() },
-          5
-        );
+  const { data: coinTransactions = [], isLoading: loadingCoinTx } = useQuery<CurbyCoinTransaction[]>({
+    queryKey: ['admin-recent', 'coin-transactions'],
+    queryFn: () =>
+      curbyCoinTransactionService.getAll(
+        [],
+        { column: 'occurredAt', ascending: false },
+        { column: 'occurredAt', value: new Date().toISOString() },
+        5
+      ),
+    staleTime: 10000
+  });
 
-        // Enrich transactions with usernames
-        const userIds = coinTransactions.map((tx) => tx.userId);
-        const profiles = await profileService.getAll({ column: 'userId', operator: 'in', value: userIds });
+  const userIds = useMemo(
+    () => (Array.isArray(coinTransactions) ? coinTransactions.map((tx) => tx.userId) : []),
+    [coinTransactions]
+  );
+  const { data: profiles = [], isLoading: loadingProfiles } = useQuery<Profile[]>({
+    queryKey: ['admin-recent', 'profiles', userIds],
+    queryFn: () =>
+      userIds.length > 0
+        ? profileService.getAll({ column: 'userId', operator: 'in', value: userIds })
+        : Promise.resolve([]),
+    enabled: userIds.length > 0,
+    staleTime: 10000
+  });
 
-        // Fetch recent notifications
-        const notifications = await notificationService.getAll(
-          [],
-          { column: 'sentAt', ascending: false },
-          { column: 'sentAt', value: new Date().toISOString() },
-          5
-        );
+  const { data: notifications = [], isLoading: loadingRecentNotifications } = useQuery<Notification[]>({
+    queryKey: ['admin-recent', 'notifications'],
+    queryFn: () =>
+      notificationService.getAll(
+        [],
+        { column: 'sentAt', ascending: false },
+        { column: 'sentAt', value: new Date().toISOString() },
+        5
+      ),
+    staleTime: 10000
+  });
 
-        setStats({
-          totalUsers: activeUserCount || 0,
-          activeItems: activeItemCount || 0,
-          reportedItems: reportedItemCount || 0,
-          totalCoinTransactions: coinTransactionCount || 0,
-          totalNotifications: notificationCount || 0
-        });
-        setItemReports(itemReports);
-        setReportedItems(reportedItems);
-        setCoinTransactions(coinTransactions);
-        setProfiles(profiles);
-        setNotifications(notifications);
-      } catch (error) {
-        console.error('Error fetching dashboard data:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [itemService, notificationService, profileService, reportedItemService, curbyCoinTransactionService]);
+  const loading =
+    loadingUsers ||
+    loadingItems ||
+    loadingReported ||
+    loadingCoin ||
+    loadingNotifications ||
+    loadingItemReports ||
+    loadingReportedItems ||
+    loadingCoinTx ||
+    loadingProfiles ||
+    loadingRecentNotifications;
 
   return (
     <AdminPageContainer title="Dashboard">
@@ -147,7 +159,7 @@ export default function AdminDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {loading ? <Loader2 className="h-6 w-6 animate-spin" /> : stats.totalUsers}
+              {loading ? <Loader2 className="h-6 w-6 animate-spin" /> : activeUserCount}
             </div>
           </CardContent>
         </Card>
@@ -158,7 +170,7 @@ export default function AdminDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {loading ? <Loader2 className="h-6 w-6 animate-spin" /> : stats.activeItems}
+              {loading ? <Loader2 className="h-6 w-6 animate-spin" /> : activeItemCount}
             </div>
           </CardContent>
         </Card>
@@ -169,7 +181,7 @@ export default function AdminDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {loading ? <Loader2 className="h-6 w-6 animate-spin" /> : stats.reportedItems}
+              {loading ? <Loader2 className="h-6 w-6 animate-spin" /> : reportedItemCount}
             </div>
           </CardContent>
         </Card>
@@ -180,7 +192,7 @@ export default function AdminDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {loading ? <Loader2 className="h-6 w-6 animate-spin" /> : stats.totalCoinTransactions}
+              {loading ? <Loader2 className="h-6 w-6 animate-spin" /> : coinTransactionCount}
             </div>
           </CardContent>
         </Card>
@@ -191,7 +203,7 @@ export default function AdminDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {loading ? <Loader2 className="h-6 w-6 animate-spin" /> : stats.totalNotifications}
+              {loading ? <Loader2 className="h-6 w-6 animate-spin" /> : notificationCount}
             </div>
           </CardContent>
         </Card>
@@ -209,7 +221,7 @@ export default function AdminDashboard() {
               <div className="flex justify-center">
                 <Loader2 className="h-6 w-6 animate-spin" />
               </div>
-            ) : itemReportes.length > 0 ? (
+            ) : Array.isArray(itemReportes) && itemReportes.length > 0 ? (
               <Table>
                 <TableHeader>
                   <TableRow>

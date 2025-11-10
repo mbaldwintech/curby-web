@@ -9,14 +9,14 @@ import { Command, CommandEmpty, CommandInput, CommandItem, CommandList } from '.
 import { Popover, PopoverContent, PopoverTrigger } from './popover';
 
 interface Item {
-  id: string;
+  id: string | null;
   label: string;
 }
 
 const AutocompleteItem = React.memo(
   function AutocompleteItem({ item, isSelected, onSelect }: { item: Item; isSelected: boolean; onSelect: () => void }) {
     return (
-      <CommandItem key={item.id} onSelect={onSelect}>
+      <CommandItem key={`autocomplete_item_${item.id}`} onSelect={onSelect}>
         <Check className={cn('mr-2 h-4 w-4', isSelected ? 'opacity-100' : 'opacity-0')} />
         {item.label}
       </CommandItem>
@@ -27,12 +27,14 @@ const AutocompleteItem = React.memo(
 
 export interface AutocompleteProps extends Omit<ButtonProps, 'value' | 'onSelect'> {
   value?: string | null;
-  onSelect: (id: string | null) => void;
+  onSelect: (id: string | null | undefined) => void;
   pageSize: number;
   getCount: (query: string) => Promise<number>;
   fetchItems: (query: string, page: number, pageSize: number) => Promise<Item[]>;
-  fetchSelectedItem?: (id: string) => Promise<Item | null>;
+  fetchSelectedItem: (id: string) => Promise<Item | null>;
   placeholder?: string;
+  nullable?: boolean;
+  nullValueLabel?: string;
 }
 
 export function Autocomplete({
@@ -43,10 +45,12 @@ export function Autocomplete({
   fetchItems,
   fetchSelectedItem,
   placeholder,
+  nullable = false,
+  nullValueLabel = 'None',
   ...rest
 }: AutocompleteProps) {
   const [open, setOpen] = useState(false);
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState<string>('');
   const debouncedQuery = useDebounce(query, 300);
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(false);
@@ -55,7 +59,7 @@ export function Autocomplete({
   const hasMore = useMemo(() => {
     return totalCount !== null && pageSize ? (page + 1) * pageSize < totalCount : false;
   }, [page, pageSize, totalCount]);
-  const [selected, setSelected] = useState<Item | null>(null);
+  const [selected, setSelected] = useState<Item | undefined>(undefined);
 
   // Fetch total count if available
   useEffect(() => {
@@ -89,12 +93,17 @@ export function Autocomplete({
   }, [fetchItems, debouncedQuery, page, pageSize]);
 
   useEffect(() => {
-    if (value == null) {
-      setSelected(null);
+    if (value === null && nullable) {
+      setSelected({ id: null, label: nullValueLabel });
       return;
     }
-    if (items.find((i) => i.id === value)) {
-      setSelected(items.find((i) => i.id === value) || null);
+    if (value === null || value === undefined) {
+      setSelected(undefined);
+      return;
+    }
+    const foundItem = items.find((i) => i.id === value);
+    if (foundItem) {
+      setSelected(foundItem);
       return;
     }
     if (fetchSelectedItem) {
@@ -108,14 +117,14 @@ export function Autocomplete({
               return Array.from(existing.values());
             });
           } else {
-            setSelected(null);
+            setSelected(undefined);
           }
         })
-        .catch(() => setSelected(null));
+        .catch(() => setSelected(undefined));
       return;
     }
-    setSelected(value ? { id: value, label: value } : null);
-  }, [value, fetchSelectedItem, items]);
+    setSelected(value ? { id: value, label: value } : undefined);
+  }, [value, fetchSelectedItem, items, nullable, nullValueLabel]);
 
   const handleSelect = useCallback(
     (item: Item) => {
@@ -124,8 +133,8 @@ export function Autocomplete({
         onSelect(item.id);
         setOpen(false);
       } else {
-        setSelected(null);
-        onSelect(null);
+        setSelected(undefined);
+        onSelect(undefined);
         setOpen(false);
       }
     },
@@ -144,8 +153,8 @@ export function Autocomplete({
               className="flex items-center gap-1 rounded-md hover:bg-destructive text-destructive hover:text-primary p-1"
               onClick={(e) => {
                 e.stopPropagation();
-                setSelected(null);
-                onSelect(null);
+                setSelected(undefined);
+                onSelect(undefined);
               }}
             >
               <X className="h-4 w-4" />
@@ -171,6 +180,16 @@ export function Autocomplete({
             onWheel={(e) => e.stopPropagation()}
           >
             <CommandList className="max-h-none overflow-visible">
+              {nullable && (!debouncedQuery || nullValueLabel.includes(debouncedQuery.toLowerCase())) && (
+                <AutocompleteItem
+                  key="__null__"
+                  item={{ id: null, label: nullValueLabel }}
+                  isSelected={selected === null}
+                  onSelect={() => {
+                    handleSelect({ id: null, label: nullValueLabel });
+                  }}
+                />
+              )}
               {items.map((item) => (
                 <AutocompleteItem
                   key={item.id}

@@ -1,7 +1,6 @@
 'use client';
 
 import {
-  Badge,
   Button,
   Card,
   CardContent,
@@ -21,7 +20,8 @@ import {
   TabsList,
   TabsTrigger
 } from '@core/components';
-import { UserRole, UserStatus } from '@core/enumerations';
+import { ReviewStatus, ReviewTriggerType, UserRole, UserStatus } from '@core/enumerations';
+import { useConfirmDialog } from '@core/providers';
 import {
   CurbyCoinTransactionService,
   ItemService,
@@ -31,7 +31,8 @@ import {
   SavedItemService,
   TermsAndConditionsAcceptanceService,
   TermsAndConditionsService,
-  UserDeviceService
+  UserDeviceService,
+  UserReviewService
 } from '@core/services';
 import { Item, Profile, SavedItem, UserDevice } from '@core/types';
 import { debounce, formatDateTime } from '@core/utils';
@@ -41,7 +42,9 @@ import { ExtendedEventTable } from '@features/events/components';
 import { FeedbackTable } from '@features/feedback/components';
 import { ItemTable } from '@features/items/components';
 import { PrivacyPolicyAcceptanceTable, TermsAndConditionsAcceptanceTable } from '@features/legal/components';
-import { ItemReportTable, ItemReviewTable, UserReviewTable } from '@features/moderation/components';
+import { ItemReportTable } from '@features/moderation/item-reports/components';
+import { ItemReviewTable } from '@features/moderation/item-reviews/components';
+import { UserReviewTable } from '@features/moderation/user-reviews/components';
 import { NotificationTable } from '@features/notifications/components';
 import { TutorialViewTable } from '@features/tutorials/components';
 import { updateEmail, updateUsername } from '@features/users/actions';
@@ -52,6 +55,7 @@ import {
   CheckCircleIcon,
   CircleAlertIcon,
   CoinsIcon,
+  FileSearch2,
   HouseIcon,
   InfoIcon,
   MailIcon,
@@ -69,6 +73,7 @@ import * as z from 'zod';
 import { useProfile } from '../hooks';
 import { FalseTakingTable } from './false-taking-table.component';
 import { ProfileCell } from './profile-cell.component';
+import { UserStatusBadge } from './user-status-badge.component';
 
 const profileBaseSchema = z.object({
   username: z
@@ -124,6 +129,7 @@ export function ProfileDetails({ id }: ProfileDetailsProps) {
   const termsAndConditionsAcceptanceService = useRef(createClientService(TermsAndConditionsAcceptanceService)).current;
   const privacyPolicyService = useRef(createClientService(PrivacyPolicyService)).current;
   const privacyPolicyAcceptanceService = useRef(createClientService(PrivacyPolicyAcceptanceService)).current;
+  const userReviewService = useRef(createClientService(UserReviewService)).current;
 
   const router = useRouter();
   const { user, validateUsername } = useAuth();
@@ -173,6 +179,9 @@ export function ProfileDetails({ id }: ProfileDetailsProps) {
 
   const isCurrentUser = useMemo(() => user?.id === profile?.userId, [user, profile]);
   const isAdmin = useMemo(() => userProfile?.role === UserRole.Admin, [userProfile]);
+  const isModerator = useMemo(() => userProfile?.role === UserRole.Moderator, [userProfile]);
+
+  const { open: openConfirmDialog } = useConfirmDialog();
 
   const loadProfile = useCallback(async () => {
     if (!id) return;
@@ -326,21 +335,6 @@ export function ProfileDetails({ id }: ProfileDetailsProps) {
     await loadProfile();
   }, [loadProfile]);
 
-  // small helper to render status badge
-  const renderStatusBadge = (p?: Profile | null) => {
-    if (!p) return null;
-    switch (p.status) {
-      case 'active':
-        return <Badge>Active</Badge>;
-      case 'suspended':
-        return <Badge variant="secondary">Suspended</Badge>;
-      case 'banned':
-        return <Badge variant="destructive">Banned</Badge>;
-      default:
-        return <Badge>{p.status}</Badge>;
-    }
-  };
-
   return (
     <div>
       {/* Enhanced Header */}
@@ -364,7 +358,7 @@ export function ProfileDetails({ id }: ProfileDetailsProps) {
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">{profile?.username ?? 'Loading...'}</h1>
             <div className="flex items-center gap-2 mt-1">
-              {renderStatusBadge(profile)}
+              <UserStatusBadge status={profile?.status} />
               {profile && (
                 <span className="text-sm text-muted-foreground">
                   {profile.role.charAt(0).toUpperCase() + profile.role.slice(1)}
@@ -436,6 +430,58 @@ export function ProfileDetails({ id }: ProfileDetailsProps) {
               'Refresh'
             )}
           </Button>
+
+          {(isAdmin || isModerator) && (
+            <Button
+              variant="outline"
+              onClick={() => {
+                openConfirmDialog({
+                  title: 'Launch User Review',
+                  message: `Are you sure you want to launch a user review for ${profile?.username}?`,
+                  initialData: { reason: '' },
+                  Body: ({ formState, setFormState }) => {
+                    return (
+                      <div className="space-y-4">
+                        <p>Please enter the reason for triggering this review.</p>
+                        <div>
+                          <Label htmlFor="reason">Reason</Label>
+                          <Input
+                            id="reason"
+                            value={formState.reason || ''}
+                            onChange={(e) => setFormState({ ...formState, reason: e.target.value })}
+                            placeholder="Enter reason"
+                            className="mt-1"
+                          />
+                        </div>
+                      </div>
+                    );
+                  },
+                  confirmButtonText: 'Launch',
+                  variant: 'default',
+                  onConfirm: (data) => {
+                    if (!profile) return;
+                    userReviewService
+                      .create({
+                        userId: profile.userId,
+                        triggerType: ReviewTriggerType.Manual,
+                        triggerReason: data.reason || 'No reason provided',
+                        triggerData: {},
+                        status: ReviewStatus.Pending,
+                        appealable: true
+                      })
+                      .then((newReview) => {
+                        router.push(`/admin/moderation/user-reviews/${newReview.id}`);
+                      });
+                  }
+                });
+              }}
+              className="min-w-[120px]"
+              disabled={!profile}
+            >
+              <FileSearch2 className="w-4 h-4 mr-2" />
+              Launch Review
+            </Button>
+          )}
 
           {isCurrentUser || isAdmin ? (
             <Button
@@ -666,23 +712,7 @@ export function ProfileDetails({ id }: ProfileDetailsProps) {
                   <Label htmlFor="role" className="text-sm font-medium">
                     Status
                   </Label>
-                  {isAdmin ? (
-                    <Select
-                      onValueChange={(v) => setValue('status', v as UserStatus, { shouldDirty: true })}
-                      value={watch('status')}
-                    >
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Status" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value={UserStatus.Active}>Active</SelectItem>
-                        <SelectItem value={UserStatus.Suspended}>Suspended</SelectItem>
-                        <SelectItem value={UserStatus.Banned}>Banned</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  ) : (
-                    <Input value={watch('status')} readOnly />
-                  )}
+                  <Input value={watch('status')} readOnly />
                 </div>
               </CardContent>
             </Card>
@@ -872,8 +902,7 @@ export function ProfileDetails({ id }: ProfileDetailsProps) {
                             dark:data-[state=active]:bg-primary
                             data-[state=active]:shadow-sm
                             dark:data-[state=active]:shadow-sm
-                            hover:bg-muted/80
-                            dark:hover:bg-muted/80
+                            hover:bg-muted/80 dark:hover:bg-muted/80
                             text-xs
                             px-3
                             py-2.5
@@ -931,7 +960,7 @@ export function ProfileDetails({ id }: ProfileDetailsProps) {
                           </div>
                           <div className="flex flex-col gap-2">
                             <DeviceTable
-                              defaultFilters={[
+                              restrictiveFilters={[
                                 { column: 'id', operator: 'in', value: userDevices.map((ud) => ud.deviceId) }
                               ]}
                               extraColumns={[
@@ -1005,7 +1034,7 @@ export function ProfileDetails({ id }: ProfileDetailsProps) {
                           </div>
                           <div className="flex flex-col gap-2">
                             <ItemTable
-                              defaultFilters={[{ column: 'postedBy', operator: 'eq', value: profile.userId }]}
+                              restrictiveFilters={[{ column: 'postedBy', operator: 'eq', value: profile.userId }]}
                               onRowClick={(row) => {
                                 router.push(`/admin/items/${row.id}`);
                               }}
@@ -1035,7 +1064,7 @@ export function ProfileDetails({ id }: ProfileDetailsProps) {
                           </div>
                           <div className="flex flex-col gap-2">
                             <ItemTable
-                              defaultFilters={[
+                              restrictiveFilters={[
                                 { column: 'id', operator: 'in', value: savedItems.map((si) => si.itemId) }
                               ]}
                               onRowClick={(row) => {
@@ -1067,7 +1096,7 @@ export function ProfileDetails({ id }: ProfileDetailsProps) {
                         </CardHeader>
                         <CardContent>
                           <FalseTakingTable
-                            defaultFilters={[{ column: 'takerId', operator: 'eq', value: profile.userId }]}
+                            restrictiveFilters={[{ column: 'takerId', operator: 'eq', value: profile.userId }]}
                             onRowClick={(row) => {
                               router.push(`/admin/items/${row.original.itemId}`);
                             }}
@@ -1095,7 +1124,7 @@ export function ProfileDetails({ id }: ProfileDetailsProps) {
                         <CardContent>
                           <div className="flex flex-col gap-2">
                             <ExtendedEventTable
-                              defaultFilters={[{ column: 'userId', operator: 'eq', value: profile.userId }]}
+                              restrictiveFilters={[{ column: 'userId', operator: 'eq', value: profile.userId }]}
                               onRowClick={(row) => {
                                 router.push(`/admin/events/${row.id}`);
                               }}
@@ -1127,7 +1156,7 @@ export function ProfileDetails({ id }: ProfileDetailsProps) {
                         <CardContent>
                           <div className="flex flex-col gap-2">
                             <CurbyCoinTransactionTable
-                              defaultFilters={[{ column: 'userId', operator: 'eq', value: profile.userId }]}
+                              restrictiveFilters={[{ column: 'userId', operator: 'eq', value: profile.userId }]}
                               onRowClick={(row) => {
                                 router.push(`/admin/transactions/${row.id}`);
                               }}
@@ -1156,7 +1185,7 @@ export function ProfileDetails({ id }: ProfileDetailsProps) {
                         <CardContent>
                           <div className="flex flex-col gap-2">
                             <NotificationTable
-                              defaultFilters={[{ column: 'userId', operator: 'eq', value: profile.userId }]}
+                              restrictiveFilters={[{ column: 'userId', operator: 'eq', value: profile.userId }]}
                               onRowClick={(row) => {
                                 router.push(`/admin/notifications/${row.id}`);
                               }}
@@ -1185,7 +1214,7 @@ export function ProfileDetails({ id }: ProfileDetailsProps) {
                         <CardContent>
                           <div className="flex flex-col gap-2">
                             <ItemReportTable
-                              defaultFilters={[{ column: 'reporterId', operator: 'eq', value: profile.userId }]}
+                              restrictiveFilters={[{ column: 'reporterId', operator: 'eq', value: profile.userId }]}
                               onRowClick={(row) => {
                                 router.push(`/admin/moderation/item-reviews/${row.id}`);
                               }}
@@ -1216,7 +1245,7 @@ export function ProfileDetails({ id }: ProfileDetailsProps) {
                         <CardContent>
                           <div className="flex flex-col gap-2">
                             <ItemReportTable
-                              defaultFilters={[
+                              restrictiveFilters={[
                                 { column: 'itemId', operator: 'in', value: usersItems.map((ui) => ui.id) }
                               ]}
                               onRowClick={(row) => {
@@ -1247,7 +1276,7 @@ export function ProfileDetails({ id }: ProfileDetailsProps) {
                         <CardContent>
                           <div className="flex flex-col gap-2">
                             <ItemReviewTable
-                              defaultFilters={[
+                              restrictiveFilters={[
                                 { column: 'itemId', operator: 'in', value: usersItems.map((ui) => ui.id) }
                               ]}
                               onRowClick={(row) => {
@@ -1278,7 +1307,7 @@ export function ProfileDetails({ id }: ProfileDetailsProps) {
                         <CardContent>
                           <div className="flex flex-col gap-2">
                             <UserReviewTable
-                              defaultFilters={[{ column: 'userId', operator: 'eq', value: profile.userId }]}
+                              restrictiveFilters={[{ column: 'userId', operator: 'eq', value: profile.userId }]}
                               onRowClick={(row) => {
                                 router.push(`/admin/moderation/user-reviews/${row.id}`);
                               }}
@@ -1309,7 +1338,7 @@ export function ProfileDetails({ id }: ProfileDetailsProps) {
                         <CardContent>
                           <div className="flex flex-col gap-2">
                             <TutorialViewTable
-                              defaultFilters={[{ column: 'userId', operator: 'eq', value: profile.userId }]}
+                              restrictiveFilters={[{ column: 'userId', operator: 'eq', value: profile.userId }]}
                               onRowClick={(row) => {
                                 router.push(`/admin/tutorials/views/${row.id}`);
                               }}
@@ -1338,7 +1367,7 @@ export function ProfileDetails({ id }: ProfileDetailsProps) {
                         <CardContent>
                           <div className="flex flex-col gap-2">
                             <TermsAndConditionsAcceptanceTable
-                              defaultFilters={[{ column: 'userId', operator: 'eq', value: profile.userId }]}
+                              restrictiveFilters={[{ column: 'userId', operator: 'eq', value: profile.userId }]}
                               onRowClick={(row) => {
                                 router.push(`/admin/legal/terms/acceptances/${row.id}`);
                               }}
@@ -1367,7 +1396,7 @@ export function ProfileDetails({ id }: ProfileDetailsProps) {
                         <CardContent>
                           <div className="flex flex-col gap-2">
                             <PrivacyPolicyAcceptanceTable
-                              defaultFilters={[{ column: 'userId', operator: 'eq', value: profile.userId }]}
+                              restrictiveFilters={[{ column: 'userId', operator: 'eq', value: profile.userId }]}
                               onRowClick={(row) => {
                                 router.push(`/admin/legal/privacy/acceptances/${row.id}`);
                               }}
@@ -1396,7 +1425,7 @@ export function ProfileDetails({ id }: ProfileDetailsProps) {
                         <CardContent>
                           <div className="flex flex-col gap-2">
                             <FeedbackTable
-                              defaultFilters={[{ column: 'userId', operator: 'eq', value: profile.userId }]}
+                              restrictiveFilters={[{ column: 'userId', operator: 'eq', value: profile.userId }]}
                               onRowClick={(row) => {
                                 router.push(`/admin/feedback/${row.id}`);
                               }}
@@ -1416,32 +1445,6 @@ export function ProfileDetails({ id }: ProfileDetailsProps) {
                       </Card>
                     </TabsContent>
                   </Tabs>
-                </CardContent>
-              </Card>
-            )}
-
-            {isAdmin && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Moderation Links</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  <div className="text-sm">
-                    <a
-                      className="underline"
-                      href={`/admin/moderation/unassigned/flagged-users?userId=${profile.userId}`}
-                    >
-                      View flagged reports for this user
-                    </a>
-                  </div>
-                  <div className="text-sm">
-                    <a
-                      className="underline"
-                      href={`/admin/moderation/unassigned/reported-items?userId=${profile.userId}`}
-                    >
-                      View reported items by this user
-                    </a>
-                  </div>
                 </CardContent>
               </Card>
             )}

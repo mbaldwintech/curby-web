@@ -1,3 +1,4 @@
+import { SupportRequestCategory, SupportRequestPriority, SupportRequestStatus } from '@core/enumerations';
 import { GenericRecord } from '@supa/types';
 
 export interface SupportRequest extends GenericRecord {
@@ -5,9 +6,9 @@ export interface SupportRequest extends GenericRecord {
   deviceId?: string | null;
   subject: string;
   message: string;
-  category: 'bug' | 'account' | 'billing' | 'general' | 'content_moderation' | 'other';
-  priority: 'low' | 'normal' | 'high' | 'urgent';
-  status: 'open' | 'in_progress' | 'waiting_for_user' | 'resolved' | 'closed';
+  category: SupportRequestCategory;
+  priority: SupportRequestPriority;
+  status: SupportRequestStatus;
   assignedTo?: string | null;
   assignedAt?: string | null;
   resolvedAt?: string | null;

@@ -29,6 +29,8 @@ export const EventTypeKey = {
   ProfileUpdated: 'PROFILE_UPDATED',
 
   // Moderation Events
+  UserWarned: 'USER_WARNED', // New - Needs to be added to db
+  UserWarningRemoved: 'USER_WARNING_REMOVED', // New - Needs to be added to db
   UserSuspended: 'USER_SUSPENDED',
   UserUnsuspended: 'USER_UNSUSPENDED',
   UserBanned: 'USER_BANNED',
@@ -43,11 +45,12 @@ export const EventTypeKey = {
   FreeItemTaken: 'FREE_ITEM_TAKEN',
   FreeItemConfirmedTaken: 'FREE_ITEM_CONFIRMED_TAKEN',
   FreeItemNotTaken: 'FREE_ITEM_NOT_TAKEN',
+  FreeItemExtended: 'FREE_ITEM_EXTENDED',
   FreeItemReported: 'FREE_ITEM_REPORTED',
   FreeItemUnreported: 'FREE_ITEM_UNREPORTED',
   ReportedFreeItemRemoved: 'REPORTED_FREE_ITEM_REMOVED',
   ReportedFreeItemRestored: 'REPORTED_FREE_ITEM_RESTORED',
-  FreeItemExtended: 'FREE_ITEM_EXTENDED',
+  ReportedFreeItemRemovalReversed: 'REPORTED_FREE_ITEM_REMOVAL_REVERSED', // New - Needs to be added to db
 
   // Other Events
   FeedbackRequested: 'FEEDBACK_REQUESTED',

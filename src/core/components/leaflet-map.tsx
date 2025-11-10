@@ -1,5 +1,6 @@
 'use client';
 
+import { cn } from '@core/utils';
 import 'leaflet/dist/leaflet.css';
 import { MapPinIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -9,9 +10,10 @@ import { useCurbyMarker } from './curby-marker';
 interface LeafletMapProps {
   location: GeoPoint;
   useCustomMarker?: boolean;
+  containerClassName?: string;
 }
 
-export function LeafletMap({ location, useCustomMarker = false }: LeafletMapProps) {
+export function LeafletMap({ location, useCustomMarker = false, containerClassName }: LeafletMapProps) {
   const [isClient, setIsClient] = useState(false);
   const [MapComponents, setMapComponents] = useState<{
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -77,7 +79,12 @@ export function LeafletMap({ location, useCustomMarker = false }: LeafletMapProp
 
   if (!isClient || !MapComponents) {
     return (
-      <div className="w-full h-64 rounded-lg overflow-hidden border border-border bg-muted/20 flex items-center justify-center">
+      <div
+        className={cn(
+          'w-full h-full rounded-lg overflow-hidden border border-border bg-muted/20 flex items-center justify-center',
+          containerClassName
+        )}
+      >
         <div className="text-center">
           <MapPinIcon className="w-8 h-8 mx-auto text-muted-foreground mb-2 animate-pulse" />
           <p className="text-sm text-muted-foreground">Loading map...</p>
@@ -89,7 +96,7 @@ export function LeafletMap({ location, useCustomMarker = false }: LeafletMapProp
   const { MapContainer, TileLayer, Marker, Popup } = MapComponents;
 
   return (
-    <div className="w-full h-64 rounded-lg overflow-hidden border border-border">
+    <div className={cn('w-full h-full rounded-lg overflow-hidden border border-border', containerClassName)}>
       <MapContainer
         center={[latitude, longitude]}
         zoom={15}

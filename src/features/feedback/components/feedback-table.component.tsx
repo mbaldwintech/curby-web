@@ -1,21 +1,29 @@
 'use client';
 
-import { Badge, buildColumnDef, CurbyTable, CurbyTableProps, CurbyTableRef, CustomColumnDef } from '@core/components';
+import {
+  buildColumnDef,
+  buildEnumFilterComponentOptions,
+  CurbyTable,
+  CurbyTableProps,
+  CurbyTableRef,
+  CustomColumnDef
+} from '@core/components';
+import { FeedbackType } from '@core/enumerations';
 import { FeedbackService } from '@core/services';
 import { Feedback } from '@core/types';
 import { ProfileCell } from '@features/users/components';
 import { createClientService } from '@supa/utils/client';
 import { forwardRef, useCallback, useMemo, useRef } from 'react';
+import { FeedbackTypeBadge } from './feedback-type-badge.component';
 
-export interface FeedbackTableProps extends Omit<CurbyTableProps<Feedback>, 'service' | 'columns'> {
-  extraColumns?: CustomColumnDef<Feedback>[];
-}
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface FeedbackTableProps extends Omit<CurbyTableProps<Feedback>, 'service' | 'columns'> {}
 
 export const FeedbackTable = forwardRef<CurbyTableRef<Feedback>, FeedbackTableProps>(function FeedbackTable(
   props: FeedbackTableProps,
   ref
 ) {
-  const { extraColumns = [], ...rest } = props;
+  const { ...rest } = props;
   const service = useRef(createClientService(FeedbackService)).current;
 
   const buildColumn = useCallback(
@@ -26,27 +34,19 @@ export const FeedbackTable = forwardRef<CurbyTableRef<Feedback>, FeedbackTablePr
   );
 
   const columns: CustomColumnDef<Feedback>[] = useMemo(
-    () => [
-      buildColumn('userId', 'User', { cell: ({ row }) => <ProfileCell userId={row.original.userId} /> }),
-      buildColumn('type', 'Type', {
-        cell: ({ row }) =>
-          row.original.type === 'general' ? (
-            <Badge className="bg-blue-100 text-blue-600 px-1.5">General</Badge>
-          ) : row.original.type === 'bug' ? (
-            <Badge className="bg-red-100 text-red-600 px-1.5">Bug Report</Badge>
-          ) : row.original.type === 'feature' ? (
-            <Badge className="bg-green-100 text-green-600 px-1.5">Feature Request</Badge>
-          ) : row.original.type === 'question' ? (
-            <Badge className="bg-yellow-100 text-yellow-600 px-1.5">Question</Badge>
-          ) : (
-            row.original.type || '-'
-          )
-      }),
-      buildColumn('message', 'Message', { cell: ({ row }) => <div className="max-w-lg">{row.original.message}</div> }),
-      buildColumn('resolved', 'Resolved'),
-      ...extraColumns
-    ],
-    [buildColumn, extraColumns]
+    () =>
+      [
+        buildColumn('userId', 'User', { cell: ({ row }) => <ProfileCell userId={row.original.userId} /> }),
+        buildColumn('type', 'Type', {
+          cell: ({ row }) => <FeedbackTypeBadge type={row.original.type} />,
+          filterComponentOptions: buildEnumFilterComponentOptions(FeedbackType)
+        }),
+        buildColumn('message', 'Message', {
+          cell: ({ row }) => <div className="max-w-lg">{row.original.message}</div>
+        }),
+        buildColumn('resolved', 'Resolved')
+      ].filter((c) => c !== undefined),
+    [buildColumn]
   );
 
   return <CurbyTable ref={ref} service={service} columns={columns} {...rest} />;
