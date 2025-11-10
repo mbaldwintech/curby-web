@@ -5,11 +5,11 @@ import { ImageService } from '@core/services';
 import { createClientService } from '@supa/utils/client';
 import { useEffect, useRef, useState } from 'react';
 
-export interface FileExistsCellProps {
+export interface FileExistsBadgeProps {
   path?: string | null;
 }
 
-export const FileExistsCell = ({ path }: FileExistsCellProps) => {
+export const FileExistsBadge = ({ path }: FileExistsBadgeProps) => {
   const fileService = useRef(createClientService(ImageService)).current;
   const [exists, setExists] = useState<boolean | null>(null);
 
@@ -26,12 +26,12 @@ export const FileExistsCell = ({ path }: FileExistsCellProps) => {
   }, [path, fileService]);
 
   if (exists === null) {
-    return <span>Checking...</span>;
+    return <Badge variant="outline">Checking...</Badge>;
   }
 
-  return exists ? (
-    <Badge className="bg-accent text-accent-foreground">Yes</Badge>
-  ) : (
-    <Badge className="bg-destructive text-foreground">No</Badge>
-  );
+  if (exists) {
+    return <Badge>Yes</Badge>;
+  }
+
+  return <Badge variant="destructive">No</Badge>;
 };

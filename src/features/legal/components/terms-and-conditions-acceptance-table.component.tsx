@@ -8,16 +8,15 @@ import { createClientService } from '@supa/utils/client';
 import { forwardRef, useCallback, useMemo, useRef } from 'react';
 import { TermsAndConditionsCell } from './terms-and-conditions-cell.component';
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface TermsAndConditionsAcceptanceTableProps
-  extends Omit<CurbyTableProps<TermsAndConditionsAcceptance>, 'service' | 'columns'> {
-  extraColumns?: CustomColumnDef<TermsAndConditionsAcceptance>[];
-}
+  extends Omit<CurbyTableProps<TermsAndConditionsAcceptance>, 'service' | 'columns'> {}
 
 export const TermsAndConditionsAcceptanceTable = forwardRef<
   CurbyTableRef<TermsAndConditionsAcceptance>,
   TermsAndConditionsAcceptanceTableProps
 >(function TermsAndConditionsAcceptanceTable(props: TermsAndConditionsAcceptanceTableProps, ref) {
-  const { extraColumns = [], ...rest } = props;
+  const { ...rest } = props;
   const service = useRef(createClientService(TermsAndConditionsAcceptanceService)).current;
 
   const buildColumn = useCallback(
@@ -32,22 +31,22 @@ export const TermsAndConditionsAcceptanceTable = forwardRef<
   );
 
   const columns: CustomColumnDef<TermsAndConditionsAcceptance>[] = useMemo(
-    () => [
-      buildColumn('termsAndConditionsId', 'Privacy Policy', {
-        cell: ({ row }) => <TermsAndConditionsCell termsAndConditionsId={row.original.termsAndConditionsId} />
-      }),
-      buildColumn('userId', 'User', {
-        enableHiding: false,
-        cell: ({ row }) => <ProfileCell userId={row.original.userId} />
-      }),
-      buildColumn('acceptedAt', 'Accepted At', {
-        cell: ({ row }) => new Date(row.original.acceptedAt).toLocaleString(),
-        sortingFn: 'datetime',
-        enableHiding: false
-      }),
-      ...extraColumns
-    ],
-    [buildColumn, extraColumns]
+    () =>
+      [
+        buildColumn('termsAndConditionsId', 'Privacy Policy', {
+          cell: ({ row }) => <TermsAndConditionsCell termsAndConditionsId={row.original.termsAndConditionsId} />
+        }),
+        buildColumn('userId', 'User', {
+          enableHiding: false,
+          cell: ({ row }) => <ProfileCell userId={row.original.userId} />
+        }),
+        buildColumn('acceptedAt', 'Accepted At', {
+          cell: ({ row }) => new Date(row.original.acceptedAt).toLocaleString(),
+          sortingFn: 'datetime',
+          enableHiding: false
+        })
+      ].filter((c) => c !== undefined),
+    [buildColumn]
   );
 
   return <CurbyTable ref={ref} service={service} columns={columns} {...rest} />;

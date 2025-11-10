@@ -1,10 +1,11 @@
+import { TutorialViewStatus } from '@core/enumerations';
 import { GenericRecord, GenericRecordMetadata, GenericRecordMetadataBase } from '@supa/types';
 
 export interface TutorialView extends GenericRecord {
   tutorialId: string;
   userId?: string;
   deviceId?: string;
-  status: 'not-started' | 'viewed' | 'skipped' | 'completed';
+  status: TutorialViewStatus;
 }
 
 export const TutorialViewMetadata: GenericRecordMetadata<TutorialView> = {

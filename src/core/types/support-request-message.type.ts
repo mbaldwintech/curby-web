@@ -1,11 +1,12 @@
+import { SupportRequestMessageSenderType, SupportRequestMessageType } from '@core/enumerations';
 import { GenericRecord } from '@supa/types';
 
 export interface SupportRequestMessage extends GenericRecord {
   supportRequestId: string;
   senderId?: string | null;
-  senderType: 'user' | 'support_agent' | 'system';
+  senderType: SupportRequestMessageSenderType;
   message: string;
-  messageType: 'reply' | 'internal_note' | 'status_change' | 'assignment_change';
+  messageType: SupportRequestMessageType;
   isInternal: boolean;
   readAt?: Date | null;
 }

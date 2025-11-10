@@ -1,8 +1,8 @@
 'use client';
 
-import { Badge, Button, Card, CardContent, CardHeader, CardTitle, CopyableStringCell } from '@core/components';
-import { ItemType } from '@core/enumerations';
-import { ExtendedItemService, FalseTakingService, SavedItemService } from '@core/services';
+import { Button, Card, CardContent, CardHeader, CardTitle, CopyableStringCell } from '@core/components';
+import { ItemStatus, ItemType, ReviewStatus, ReviewTriggerType, UserRole } from '@core/enumerations';
+import { ExtendedItemService, FalseTakingService, ItemReviewService, SavedItemService } from '@core/services';
 import { ExtendedItem, FalseTaking, Item, SavedItem } from '@core/types';
 import { formatDateTime } from '@core/utils';
 import { useProfile } from '@features/users/hooks';
@@ -13,13 +13,12 @@ import {
   CheckCircleIcon,
   CircleAlertIcon,
   EyeIcon,
+  FileSearch2,
   FlagIcon,
-  GiftIcon,
   InfoIcon,
   MapPinIcon,
   PackageIcon,
   ShieldCheckIcon,
-  TagIcon,
   UserIcon
 } from 'lucide-react';
 import Image from 'next/image';
@@ -28,9 +27,13 @@ import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 
 import { Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@core/components';
+import { useConfirmDialog } from '@core/providers';
 import { ProfileCell } from '@features/users/components';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { ItemLocationMap } from './item-location-map.component';
+import { ItemStatusBadge } from './item-status-badge.component';
+import { ItemTypeBadge } from './item-type-badge.component';
 
 const itemSchema = z.object({
   title: z
@@ -38,7 +41,7 @@ const itemSchema = z.object({
     .min(1, { message: 'Title is required' })
     .max(100, { message: 'Title must be 100 characters or less' }),
   type: z.nativeEnum(ItemType),
-  status: z.enum(['active', 'extended', 'expired', 'removed', 'under_review', 'restored']),
+  status: z.enum(ItemStatus),
   geoLocation: z.string().optional(),
   posterCurbyCoinCount: z.number().min(0),
   taken: z.boolean(),
@@ -52,9 +55,11 @@ export interface ItemDetailsProps {
 }
 
 export function ItemDetails({ id }: ItemDetailsProps) {
+  const router = useRouter();
   const extendedItemService = useRef(createClientService(ExtendedItemService)).current;
   const savedItemService = useRef(createClientService(SavedItemService)).current;
   const falseTakingService = useRef(createClientService(FalseTakingService)).current;
+  const itemReviewService = useRef(createClientService(ItemReviewService)).current;
 
   const { user } = useAuth();
   const { profile: userProfile } = useProfile();
@@ -70,7 +75,7 @@ export function ItemDetails({ id }: ItemDetailsProps) {
     defaultValues: {
       title: '',
       type: ItemType.Free,
-      status: 'active',
+      status: ItemStatus.Active,
       geoLocation: '',
       posterCurbyCoinCount: 0,
       taken: false,
@@ -89,8 +94,11 @@ export function ItemDetails({ id }: ItemDetailsProps) {
   } = formInstance;
 
   const isItemOwner = useMemo(() => user?.id === item?.postedBy, [user, item]);
-  const isAdmin = useMemo(() => userProfile?.role === 'admin', [userProfile]);
+  const isAdmin = useMemo(() => userProfile?.role === UserRole.Admin, [userProfile]);
+  const isModerator = useMemo(() => userProfile?.role === UserRole.Moderator, [userProfile]);
   const canEdit = useMemo(() => isItemOwner || isAdmin, [isItemOwner, isAdmin]);
+
+  const { open: openConfirmDialog } = useConfirmDialog();
 
   const loadItem = useCallback(async () => {
     if (!id) return;
@@ -104,7 +112,7 @@ export function ItemDetails({ id }: ItemDetailsProps) {
       reset({
         title: itemResult.title || '',
         type: (itemResult.type as ItemType) || ItemType.Free,
-        status: itemResult.status || 'active',
+        status: itemResult.status || ItemStatus.Active,
         geoLocation: itemResult.geoLocation || '',
         posterCurbyCoinCount: itemResult.posterCurbyCoinCount || 0,
         taken: itemResult.taken || false,
@@ -177,52 +185,6 @@ export function ItemDetails({ id }: ItemDetailsProps) {
     await loadItem();
   }, [loadItem]);
 
-  // Helper to render status badge
-  const renderStatusBadge = (item?: ExtendedItem | null) => {
-    if (!item) return null;
-    switch (item.status) {
-      case 'active':
-        return <Badge className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">Active</Badge>;
-      case 'extended':
-        return <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">Extended</Badge>;
-      case 'expired':
-        return <Badge variant="secondary">Expired</Badge>;
-      case 'removed':
-        return <Badge variant="destructive">Removed</Badge>;
-      case 'under_review':
-        return (
-          <Badge className="bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400">Under Review</Badge>
-        );
-      case 'restored':
-        return (
-          <Badge className="bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400">
-            Restored
-          </Badge>
-        );
-      default:
-        return <Badge>{item.status}</Badge>;
-    }
-  };
-
-  const renderItemType = (type: string) => {
-    switch (type) {
-      case 'free':
-        return (
-          <div className="flex items-center gap-2">
-            <GiftIcon className="w-4 h-4 text-green-600 dark:text-green-400" />
-            <span className="text-green-700 dark:text-green-300">Free</span>
-          </div>
-        );
-      default:
-        return (
-          <div className="flex items-center gap-2">
-            <TagIcon className="w-4 h-4" />
-            <span>{type}</span>
-          </div>
-        );
-    }
-  };
-
   return (
     <div className="@container/main flex flex-1 flex-col p-4 md:p-6 space-y-6">
       {/* Enhanced Header */}
@@ -246,8 +208,8 @@ export function ItemDetails({ id }: ItemDetailsProps) {
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">{item?.title ?? 'Loading...'}</h1>
             <div className="flex items-center gap-2 mt-1">
-              {renderStatusBadge(item)}
-              {item && renderItemType(item.type)}
+              <ItemStatusBadge status={item?.status} />
+              <ItemTypeBadge type={item?.type} />
             </div>
             {/* Item Status Subtext */}
             {item && (
@@ -302,6 +264,58 @@ export function ItemDetails({ id }: ItemDetailsProps) {
               'Refresh'
             )}
           </Button>
+
+          {item && (isAdmin || isModerator) && (
+            <Button
+              variant="outline"
+              onClick={() => {
+                openConfirmDialog({
+                  title: 'Launch Item Review',
+                  message: `Are you sure you want to launch an item review for ${item?.title}?`,
+                  initialData: { reason: '' },
+                  Body: ({ formState, setFormState }) => {
+                    return (
+                      <div className="space-y-4">
+                        <p>Please enter the reason for triggering this review.</p>
+                        <div>
+                          <Label htmlFor="reason">Reason</Label>
+                          <Input
+                            id="reason"
+                            value={formState.reason || ''}
+                            onChange={(e) => setFormState({ ...formState, reason: e.target.value })}
+                            placeholder="Enter reason"
+                            className="mt-1"
+                          />
+                        </div>
+                      </div>
+                    );
+                  },
+                  confirmButtonText: 'Launch',
+                  variant: 'default',
+                  onConfirm: (data) => {
+                    if (!item) return;
+                    itemReviewService
+                      .create({
+                        itemId: item.id,
+                        triggerType: ReviewTriggerType.Manual,
+                        triggerReason: data.reason || 'No reason provided',
+                        triggerData: {},
+                        status: ReviewStatus.Pending,
+                        appealable: true
+                      })
+                      .then((newReview) => {
+                        router.push(`/admin/moderation/item-reviews/${newReview.id}`);
+                      });
+                  }
+                });
+              }}
+              className="min-w-[120px]"
+              disabled={!item}
+            >
+              <FileSearch2 className="w-4 h-4 mr-2" />
+              Launch Review
+            </Button>
+          )}
 
           {canEdit ? (
             <Button
@@ -621,7 +635,21 @@ export function ItemDetails({ id }: ItemDetailsProps) {
             </Card>
 
             {/* Location Map */}
-            {item.geoLocation && <ItemLocationMap location={item.location} />}
+            <Card className="overflow-hidden">
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-2">
+                  <MapPinIcon className="w-4 h-4 text-green-600 dark:text-green-400" />
+                  {item.title}
+                </CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  Location: {item?.location?.coordinates?.[1]?.toFixed(6)},{' '}
+                  {item?.location?.coordinates?.[0].toFixed(6)}
+                </p>
+              </CardHeader>
+              <CardContent>
+                {item.location && <ItemLocationMap location={item.location} containerClassName="h-64" />}
+              </CardContent>
+            </Card>
 
             {isAdmin && (
               <Card>

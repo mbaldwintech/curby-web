@@ -5,7 +5,7 @@ import { ChevronRight, CircleUserRound, EllipsisVertical, LogOut } from 'lucide-
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Avatar,
   AvatarFallback,
@@ -24,6 +24,7 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
+  SidebarGroupContent,
   SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
@@ -77,21 +78,25 @@ function filterSidebarItems(items: AdminSidebarItem[], canAccess: (path: string)
 export interface SidebarConfig {
   profilePageUrl?: string;
   items: AdminSidebarItem[];
+  footerItems?: AdminSidebarItem[];
 }
 
 const SidebarSection = ({
   section,
-  isActive
+  isActive,
+  open,
+  onOpenChange
 }: {
   section: AdminSidebarItem;
   isActive: (path?: string, children?: AdminSidebarItem[]) => boolean;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }) => {
-  const [open, setOpen] = useState(section.defaultOpen ?? false);
   const isSectionActive = isActive(section.url, section.items);
   const isChildActive = section.items?.some((sub) => isActive(sub.url)) ?? false;
 
   return (
-    <Collapsible asChild defaultOpen={section.defaultOpen} open={open} onOpenChange={setOpen}>
+    <Collapsible asChild defaultOpen={section.defaultOpen} open={open} onOpenChange={onOpenChange}>
       <SidebarMenuItem>
         <SidebarMenuButton asChild tooltip={section.tooltip} isActive={open ? false : isSectionActive || isChildActive}>
           {section.url ? (
@@ -149,6 +154,30 @@ export function AdminSidebar({
   const pathname = usePathname();
   const { isMobile } = useSidebar();
 
+  // --- Sidebar section open state persistence ---
+  const [sectionOpen, setSectionOpen] = useState<Record<string, boolean>>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = localStorage.getItem('adminSidebarSectionOpen');
+        if (stored) return JSON.parse(stored);
+      } catch {
+        // Ignore errors
+      }
+    }
+    return {};
+  });
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('adminSidebarSectionOpen', JSON.stringify(sectionOpen));
+    }
+  }, [sectionOpen]);
+
+  function handleSectionToggle(title: string, open: boolean) {
+    setSectionOpen((prev) => ({ ...prev, [title]: open }));
+  }
+  // --- END persistence ---
+
   function isActive(url?: string, children?: AdminSidebarItem[]) {
     if (!url) return false;
     if (pathname === url) {
@@ -166,6 +195,12 @@ export function AdminSidebar({
 
   // Filter sidebar data based on user permissions
   const filteredData = filterSidebarItems(config.items, canAccess);
+
+  // --- Helper for section open state ---
+  function getSectionOpen(title: string, defaultOpen?: boolean) {
+    return sectionOpen[title] ?? defaultOpen ?? false;
+  }
+  // --- END helper ---
 
   return (
     <Sidebar variant="inset" collapsible="icon">
@@ -212,11 +247,34 @@ export function AdminSidebar({
               <SidebarGroupLabel>{section.title}</SidebarGroupLabel>
               <SidebarMenu>
                 {section.items?.map((item) => (
-                  <SidebarSection key={item.title} section={item} isActive={isActive} />
+                  <SidebarSection
+                    key={item.title}
+                    section={item}
+                    isActive={isActive}
+                    open={getSectionOpen(item.title, item.defaultOpen)}
+                    onOpenChange={(open: boolean) => handleSectionToggle(item.title, open)}
+                  />
                 ))}
               </SidebarMenu>
             </SidebarGroup>
           )
+        )}
+        {config.footerItems && config.footerItems.length > 0 && (
+          <SidebarGroup className="mt-auto">
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {config.footerItems.map((item) => (
+                  <SidebarSection
+                    key={item.title}
+                    section={item}
+                    isActive={isActive}
+                    open={getSectionOpen(item.title, item.defaultOpen)}
+                    onOpenChange={(open: boolean) => handleSectionToggle(item.title, open)}
+                  />
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
         )}
       </SidebarContent>
       <SidebarFooter>

@@ -1,18 +1,26 @@
+import {
+  AppealReviewOutcome,
+  ReviewOutcome,
+  ReviewStatus,
+  ReviewTriggerType,
+  UserReviewAppealReviewOutcomeAction,
+  UserReviewOutcomeAction
+} from '@core/enumerations';
 import { GenericRecord, GenericRecordMetadata, GenericRecordMetadataBase } from '@supa/types';
 
 export interface UserReview extends GenericRecord {
   userId: string;
-  status: 'pending' | 'in_review' | 'review_completed' | 'appeal_pending' | 'appeal_in_review' | 'appeal_completed';
-  triggerType: 'reports' | 'auto_flag' | 'manual';
+  status: ReviewStatus;
+  triggerType: ReviewTriggerType;
   triggerData: Record<string, unknown>;
   triggerReason?: string | null;
   reviewerId?: string | null;
   reviewStartedAt?: Date | null;
   reviewCompletedAt?: Date | null;
   reviewNotes?: string | null;
-  reviewOutcome?: 'resolved' | 'dismissed' | null;
+  reviewOutcome?: ReviewOutcome | null;
   reviewOutcomeReason?: string | null;
-  reviewOutcomeAction?: 'no_action' | 'user_warning' | 'user_suspension' | 'user_ban' | null;
+  reviewOutcomeAction?: UserReviewOutcomeAction | null;
   reviewOutcomeActionTakenAt?: Date | null;
   reviewOutcomeComments?: string | null;
   reviewOutcomeMessageToUser?: string | null;
@@ -25,9 +33,9 @@ export interface UserReview extends GenericRecord {
   appealReviewStartedAt?: Date | null;
   appealReviewCompletedAt?: Date | null;
   appealReviewNotes?: string | null;
-  appealReviewOutcome?: 'appeal_granted' | 'appeal_denied' | 'partial_relief' | null;
+  appealReviewOutcome?: AppealReviewOutcome | null;
   appealReviewOutcomeReason?: string | null;
-  appealReviewOutcomeAction?: 'no_action' | 'user_warning' | 'user_suspension_lifted' | 'user_ban_lifted' | null;
+  appealReviewOutcomeAction?: UserReviewAppealReviewOutcomeAction | null;
   appealReviewOutcomeActionTakenAt?: Date | null;
   appealReviewOutcomeComments?: string | null;
   appealReviewOutcomeMessageToUser?: string | null;

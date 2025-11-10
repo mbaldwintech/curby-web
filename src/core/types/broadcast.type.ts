@@ -1,3 +1,4 @@
+import { BroadcastMediaType } from '@core/enumerations';
 import { GenericRecord, GenericRecordMetadata, GenericRecordMetadataBase } from '@supa/types';
 
 export interface Broadcast extends GenericRecord {
@@ -13,7 +14,7 @@ export interface Broadcast extends GenericRecord {
   ctaLabel?: string | null;
   ctaUrl?: string | null;
   mediaId?: string | null;
-  mediaType?: 'lottie' | 'image' | 'icon' | null;
+  mediaType?: BroadcastMediaType | null;
   mediaProps?: Record<string, unknown> | null;
   useMediaInNotification: boolean;
   isDismissible: boolean;

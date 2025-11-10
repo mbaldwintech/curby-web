@@ -24,6 +24,7 @@ import {
   TabsList,
   TabsTrigger
 } from '@core/components';
+import { UserStatus } from '@core/enumerations';
 import {
   FrequentFalseTaker,
   ModerationOverview,
@@ -207,7 +208,12 @@ export default function ModerationDashboard() {
                         <Badge variant={getPriorityColor(item.priority)}>{item.priority.toUpperCase()}</Badge>
                       </TableCell>
                       <TableCell>
-                        <Badge variant="outline">{item.queueType.replace('_', ' ')}</Badge>
+                        <Badge variant="outline">
+                          {item.queueType
+                            .split('_')
+                            .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                            .join(' ')}
+                        </Badge>
                       </TableCell>
                       <TableCell className="max-w-xs truncate">{item.description}</TableCell>
                       <TableCell>
@@ -312,7 +318,7 @@ export default function ModerationDashboard() {
                       </TableCell>
                       <TableCell>{reporter.reportsLast7Days}</TableCell>
                       <TableCell>
-                        <Badge variant={reporter.status === 'active' ? 'default' : 'destructive'}>
+                        <Badge variant={reporter.status === UserStatus.Active ? 'default' : 'destructive'}>
                           {reporter.status}
                         </Badge>
                       </TableCell>
@@ -348,9 +354,7 @@ export default function ModerationDashboard() {
                       <TableCell>
                         <div>
                           <div className="font-medium">{content.contentTitle}</div>
-                          <Badge variant="outline" className="text-xs">
-                            {content.itemType}
-                          </Badge>
+                          <Badge variant="outline">{content.itemType}</Badge>
                         </div>
                       </TableCell>
                       <TableCell>
@@ -421,7 +425,9 @@ export default function ModerationDashboard() {
                           : 'N/A'}
                       </TableCell>
                       <TableCell>
-                        <Badge variant={taker.status === 'active' ? 'default' : 'destructive'}>{taker.status}</Badge>
+                        <Badge variant={taker.status === UserStatus.Active ? 'default' : 'destructive'}>
+                          {taker.status}
+                        </Badge>
                       </TableCell>
                     </TableRow>
                   ))}

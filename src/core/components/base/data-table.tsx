@@ -35,6 +35,8 @@ import {
   IconSearch
 } from '@tabler/icons-react';
 import {
+  AccessorFnColumnDef,
+  AccessorKeyColumnDef,
   ColumnDef,
   ColumnFiltersState,
   ColumnMeta,
@@ -84,6 +86,9 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './tool
 export interface PagedAutocompleteFilterComponentOptions {
   getCount: (query: string) => Promise<number>;
   fetchOptions: (query: string, page: number, pageSize: number) => Promise<{ id: string; label: string }[]>;
+  fetchSelectedItem: (id: string) => Promise<{ id: string; label: string } | null>;
+  nullable?: boolean;
+  nullValueLabel?: string;
 }
 
 export interface DistinctFilterComponentOptions<T> {
@@ -106,6 +111,7 @@ export type BaseCustomColumnDef<TData, TValue = unknown> = ColumnDef<TData, TVal
   filterComponent?: FilterComponent<TData, TValue>;
   filterComponentOptions?: never; // <-- if you provide a raw function, you shouldn't pass options
   meta?: CustomColumnMeta<TData, TValue>;
+  defaultHidden?: boolean;
 };
 
 // Column with autocomplete
@@ -114,6 +120,7 @@ export type PagedAutocompleteColumnDef<TData, TValue = unknown> = ColumnDef<TDat
   enableReordering?: boolean; // Whether this column can be reordered (default: true)
   filterComponent: 'paged-autocomplete';
   filterComponentOptions: PagedAutocompleteFilterComponentOptions;
+  defaultHidden?: boolean;
 };
 
 // Column with distinct select
@@ -122,6 +129,7 @@ export type DistinctColumnDef<TData, TValue = unknown> = ColumnDef<TData, TValue
   enableReordering?: boolean; // Whether this column can be reordered (default: true)
   filterComponent: 'distinct';
   filterComponentOptions: DistinctFilterComponentOptions<TValue>;
+  defaultHidden?: boolean;
 };
 
 // Discriminated union of all
@@ -413,9 +421,12 @@ function getPagedAutocompleteFilterComponent<TData, TValue>(
         pageSize={10}
         getCount={options.getCount}
         fetchItems={options.fetchOptions}
+        fetchSelectedItem={options.fetchSelectedItem}
         onSelect={(value) => {
-          column.setFilterValue(value ?? null);
+          column.setFilterValue(value === null ? 'null' : value || undefined);
         }}
+        nullable={options.nullable}
+        nullValueLabel={options.nullValueLabel}
       />
     );
   };
@@ -679,7 +690,7 @@ function DataTableInternal<T extends { id: string }>(
   // Helper function to get content-based column width
   const getContentBasedWidth = React.useCallback(
     (column: CustomColumnDef<T>, columnId: string, isFirstColumn: boolean): number => {
-      if (!data || data.length === 0) return 150; // Default if no data
+      if (!data) return 150; // Default if no data
 
       const sampleSize = Math.min(data.length, 10); // Sample first 10 rows for performance
       let maxWidth = 0;
@@ -711,22 +722,20 @@ function DataTableInternal<T extends { id: string }>(
         let cellContent = '';
 
         try {
-          // Type-cast to access column properties safely
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const accessorColumn = column as any;
+          const accessorColumn = column as CustomColumnDef<T> & AccessorKeyColumnDef<T> & AccessorFnColumnDef<T>;
 
-          if (accessorColumn.accessorKey) {
+          if (accessorColumn.accessorKey && typeof accessorColumn.accessorKey === 'string') {
             // Handle nested accessors like 'user.name'
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const value = accessorColumn.accessorKey.split('.').reduce((obj: any, key: string) => obj?.[key], row);
+            const value = accessorColumn.accessorKey
+              .split('.')
+              .reduce((obj: unknown, key: string) => obj?.[key as keyof typeof obj], row);
             cellContent = value?.toString() || '';
           } else if (accessorColumn.accessorFn) {
             cellContent = accessorColumn.accessorFn(row, i)?.toString() || '';
           } else if (column.id) {
             // Try to access the row data by column id
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const rowData = row as any;
-            cellContent = rowData[column.id]?.toString() || '';
+            const rowData = row;
+            cellContent = rowData[column.id as keyof typeof rowData]?.toString() || '';
           }
         } catch {
           // If we can't access the data, just use empty string
@@ -756,7 +765,7 @@ function DataTableInternal<T extends { id: string }>(
 
       // First, set all column sizes from their config, auto-size, or default
       columns.forEach((column, index) => {
-        const columnId = column.id || (column as CustomColumnDef<T> & { accessorKey?: string }).accessorKey;
+        const columnId = column.id || ((column as CustomColumnDef<T> & AccessorKeyColumnDef<T>).accessorKey as string);
         if (columnId) {
           if (column.size) {
             // Use explicit size if provided
@@ -775,7 +784,9 @@ function DataTableInternal<T extends { id: string }>(
       // If we have a container width, adjust the last column to fill remaining space
       if (containerWidth > 0) {
         // Use columnOrder to get the correct visual order, fallback to Object.keys if columnOrder is empty
-        const orderedColumnIds = columnOrder.length > 0 ? columnOrder : Object.keys(sizing);
+        const orderedColumnIds = (columnOrder.length > 0 ? columnOrder : Object.keys(sizing)).filter(
+          (col) => columnVisibility[col] === undefined || columnVisibility[col]
+        );
         if (orderedColumnIds.length > 0) {
           const lastColumnId = orderedColumnIds[orderedColumnIds.length - 1];
           const otherColumnIds = orderedColumnIds.slice(0, -1);
@@ -796,7 +807,7 @@ function DataTableInternal<T extends { id: string }>(
 
       return sizing;
     },
-    [containerWidth, getContentBasedWidth, enableAutoSizing, columnOrder]
+    [containerWidth, getContentBasedWidth, enableAutoSizing, columnOrder, columnVisibility]
   );
   const [searchActive, setSearchActive] = React.useState<boolean>(false);
   const [search, setSearch] = React.useState<string>('');
@@ -804,7 +815,7 @@ function DataTableInternal<T extends { id: string }>(
     () =>
       inputColumns
         .filter((c) => c.enableSearching)
-        .map((c) => (c as { accessorKey: string }).accessorKey || c.id)
+        .map((c) => (c as AccessorKeyColumnDef<T>).accessorKey || c.id)
         .filter(Boolean) as string[],
     [inputColumns]
   );
@@ -850,7 +861,9 @@ function DataTableInternal<T extends { id: string }>(
     setColumnFilters((old) => {
       const newState = typeof updater === 'function' ? updater(old) : updater;
       if (onFiltersChange) {
-        onFiltersChange(newState);
+        onFiltersChange(
+          newState.map((filter) => ({ id: filter.id, value: filter.value === 'null' ? null : filter.value }))
+        );
       }
       return newState;
     });
@@ -863,7 +876,9 @@ function DataTableInternal<T extends { id: string }>(
       // Apply intelligent column sizing to ensure table always fills container
       if (enableColumnResizing && containerWidth > 0) {
         // Use columnOrder to get the correct visual order, fallback to Object.keys if columnOrder is empty
-        const orderedColumnIds = columnOrder.length > 0 ? columnOrder : Object.keys(newState);
+        const orderedColumnIds = (columnOrder.length > 0 ? columnOrder : Object.keys(newState)).filter(
+          (col) => columnVisibility[col] === undefined || columnVisibility[col]
+        );
         if (orderedColumnIds.length === 0) return newState;
 
         const lastColumnId = orderedColumnIds[orderedColumnIds.length - 1];
@@ -1023,7 +1038,7 @@ function DataTableInternal<T extends { id: string }>(
     // Initialize column order if not set or if columns changed
     setColumnOrder((currentOrder) => {
       const newColumnIds = _cols
-        .map((col) => col.id || (col as CustomColumnDef<T> & { accessorKey?: string }).accessorKey)
+        .map((col) => col.id || (col as CustomColumnDef<T> & AccessorKeyColumnDef<T>).accessorKey)
         .filter(Boolean) as string[];
 
       // If current order is empty or doesn't match new columns, reset it
@@ -1051,6 +1066,35 @@ function DataTableInternal<T extends { id: string }>(
       setColumnSizing(calculateIntelligentColumnSizing(columns));
     }
   }, [containerWidth, calculateIntelligentColumnSizing, columns, data]);
+
+  useEffect(() => {
+    setColumnFilters(
+      controlledFilters
+        ? controlledFilters.map((filter) => ({
+            id: filter.id,
+            value: filter.value === null ? 'null' : filter.value
+          }))
+        : []
+    );
+  }, [controlledFilters]);
+
+  useEffect(() => {
+    setColumnVisibility(
+      inputColumns.reduce((acc, col) => {
+        const colId = col.id || ((col as CustomColumnDef<T> & AccessorKeyColumnDef<T>).accessorKey as string);
+        if (colId) {
+          if (col.enableHiding === false) {
+            if (colId) {
+              acc[colId] = true;
+            }
+          } else if (col.defaultHidden) {
+            acc[colId] = false;
+          }
+        }
+        return acc;
+      }, {} as VisibilityState)
+    );
+  }, [inputColumns]);
 
   const restrictedGlobalFilter: FilterFn<T> = (row, _columnId, filterValue) => {
     if (!filterValue) return true;
