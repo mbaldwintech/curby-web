@@ -137,14 +137,6 @@ export function ItemActivityTable({ itemId }: { itemId: string }) {
                 details: {}
               });
             }
-            if (r.reviewOutcomeAction === ItemReviewOutcomeAction.OpenUserReview) {
-              activities.push({
-                id: r.id,
-                type: ActivityItemType.UserReviewOpened,
-                occurredAt: toDate(r.reviewOutcomeActionTakenAt),
-                details: {}
-              });
-            }
           }
           if (r.reviewCompletedAt) {
             activities.push({
@@ -176,7 +168,7 @@ export function ItemActivityTable({ itemId }: { itemId: string }) {
                     occurredAt: toDate(r.appealReviewOutcomeActionTakenAt),
                     details: {}
                   });
-                  if (r.appealReviewOutcomeAction === ItemReviewAppealReviewOutcomeAction.ItemRestored) {
+                  if (r.appealReviewOutcomeAction === ItemReviewAppealReviewOutcomeAction.ItemRemovalReversed) {
                     activities.push({
                       id: r.id,
                       type: ActivityItemType.ItemRestored,
