@@ -1094,7 +1094,8 @@ function DataTableInternal<T extends { id: string }>(
         return acc;
       }, {} as VisibilityState)
     );
-  }, [inputColumns]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const restrictedGlobalFilter: FilterFn<T> = (row, _columnId, filterValue) => {
     if (!filterValue) return true;

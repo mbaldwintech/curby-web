@@ -40,6 +40,7 @@ export * from './profile.type';
 export * from './saved_item.type';
 export * from './schedule.type';
 export * from './support-request-message-media.type';
+export * from './support-request-message-read.type';
 export * from './support-request-message.type';
 export * from './support-request.type';
 export * from './support-sla-config.type';

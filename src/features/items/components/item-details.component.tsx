@@ -31,7 +31,6 @@ import { useConfirmDialog } from '@core/providers';
 import { ProfileCell } from '@features/users/components';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { ItemLocationMap } from './item-location-map.component';
 import { ItemStatusBadge } from './item-status-badge.component';
 import { ItemTypeBadge } from './item-type-badge.component';
 
@@ -647,7 +646,7 @@ export function ItemDetails({ id }: ItemDetailsProps) {
                 </p>
               </CardHeader>
               <CardContent>
-                {item.location && <ItemLocationMap location={item.location} containerClassName="h-64" />}
+                {/* {item.location && <ItemLocationMap location={item.location} containerClassName="h-64" />} */}
               </CardContent>
             </Card>
 

@@ -16,6 +16,7 @@ export class MediaService extends BaseService<Media> {
 
   async upload(file: FileAssetCreate, makeThumbnail: true): Promise<[Media, Media]>;
   async upload(file: FileAssetCreate, makeThumbnail: false): Promise<[Media]>;
+  async upload(file: FileAssetCreate, makeThumbnail: boolean): Promise<[Media, Media?]>;
   async upload(file: FileAssetCreate, makeThumbnail: boolean = false): Promise<[Media, Media?]> {
     let thumbnailImage: Media | undefined;
     if (makeThumbnail) {
@@ -42,6 +43,16 @@ export class MediaService extends BaseService<Media> {
     }
 
     return [media];
+  }
+
+  async uploadMany(files: FileAssetCreate[], makeThumbnails: true): Promise<[Media, Media][]>;
+  async uploadMany(files: FileAssetCreate[], makeThumbnails: false): Promise<[Media][]>;
+  async uploadMany(files: FileAssetCreate[], makeThumbnails = false): Promise<Media[][]> {
+    const uploadPromises = files.map(async (file) => {
+      const result = await this.upload(file, makeThumbnails);
+      return result as Media[];
+    });
+    return Promise.all(uploadPromises);
   }
 
   async download(id: string): Promise<Blob> {

@@ -2,6 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@core/components/base/card';
 import { Skeleton } from '@core/components/base/skeleton';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@core/components/base/tooltip';
 import { CurbyCoinTransactionService, ProfileService } from '@core/services';
 import { Profile } from '@core/types';
 import { formatDateTime } from '@core/utils';
@@ -99,7 +100,7 @@ export function ProfileCard({ userId }: { userId: string }) {
   }
 
   return (
-    <Card className="max-w-md mx-auto">
+    <Card>
       <CardHeader className="flex flex-col items-center gap-2">
         <div className="w-20 h-20 rounded-full overflow-hidden bg-muted/20">
           {profile.avatarUrl ? (
@@ -120,20 +121,35 @@ export function ProfileCard({ userId }: { userId: string }) {
           <Link href={`/admin/users/${profile.userId}`}>{profile.username}</Link>
         </CardTitle>
         <UserStatusBadge status={profile.status} />
-        <span className="text-sm text-muted-foreground">{profile.role}</span>
       </CardHeader>
-      <CardContent className="space-y-2">
-        <div>
-          <span className="font-medium">Email: </span>
-          <span>{profile.email}</span>
+      <CardContent className="space-y-2 grid grid-cols-1 md:grid-cols-2 gap-x-6">
+        <div className="w-full flex flex-col items-center min-w-0">
+          <h3 className="text-sm text-foreground/70">Email</h3>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <p className="font-medium truncate w-full text-center">{profile.email || '-'}</p>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{profile.email}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
-        <div className="flex items-center gap-1">
-          <CoinsIcon className="w-4 h-4" />
-          <span className="font-medium">{balance.toLocaleString()} CC</span>
+        <div className="w-full flex flex-col items-center">
+          <h3 className="text-sm text-foreground/70">Role</h3>
+          <p className="font-medium">{profile.role}</p>
         </div>
-        <div>
-          <span className="font-medium">Joined: </span>
-          <span>{profile.createdAt ? formatDateTime(profile.createdAt) : '-'}</span>
+        <div className="w-full flex flex-col items-center">
+          <h3 className="text-sm text-foreground/70">Balance</h3>
+          <div className="flex items-center gap-1">
+            <CoinsIcon className="w-4 h-4" />
+            <p className="font-medium">{balance.toLocaleString()} CC</p>
+          </div>
+        </div>
+        <div className="w-full flex flex-col items-center">
+          <h3 className="text-sm text-foreground/70">Joined: </h3>
+          <p className="font-medium">{profile.createdAt ? formatDateTime(profile.createdAt) : '-'}</p>
         </div>
       </CardContent>
     </Card>
