@@ -10,7 +10,7 @@ import { UserReviewTable } from '@features/moderation/user-reviews/components';
 import { UserSelect } from '@features/users/components';
 import { createClientService } from '@supa/utils/client';
 import { Row } from '@tanstack/react-table';
-import { InfoIcon } from 'lucide-react';
+import { InfoIcon, UserCheck } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useCallback, useRef } from 'react';
 
@@ -81,6 +81,7 @@ export default function UserReviewsPage() {
         },
         {
           label: 'Assign',
+          icon: UserCheck,
           onClick: () => assignUserReviewToUser(row)
         }
       ];

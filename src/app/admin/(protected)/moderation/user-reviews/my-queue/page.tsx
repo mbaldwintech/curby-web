@@ -217,7 +217,7 @@ export default function MyUserReviewQueuePage() {
         </div>
       ) : (
         <div className="space-y-4">
-          <ItemGroup>
+          <ItemGroup className="space-y-4">
             {userReviews.map((review, index) => {
               const StatusIcon = getStatusIcon(review.status);
               const TriggerIcon = getTriggerIcon(review.triggerType);

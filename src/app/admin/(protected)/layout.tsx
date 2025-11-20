@@ -23,6 +23,7 @@ import {
   FileText,
   Gauge,
   Gavel,
+  HeartHandshake,
   Home,
   Image as ImageIcon,
   Inbox,
@@ -229,6 +230,39 @@ const sidebarConfig: SidebarConfig = {
               title: 'All Reviews',
               tooltip: 'All Reviews',
               url: '/admin/moderation/user-reviews',
+              icon: List
+            }
+          ]
+        }
+      ]
+    },
+    {
+      title: 'Support',
+      tooltip: 'Support Queue & History',
+      items: [
+        {
+          title: 'Support Dashboard',
+          tooltip: 'Support Dashboard',
+          url: '/admin/support',
+          icon: HeartHandshake
+        },
+        {
+          title: 'Support Requests',
+          tooltip: 'Support Requests',
+          defaultOpen: false,
+          url: '/admin/support/requests',
+          icon: MessageSquare,
+          items: [
+            {
+              title: 'My Queue',
+              tooltip: 'My Support Request Queue',
+              url: '/admin/support/requests/my-queue',
+              icon: Inbox
+            },
+            {
+              title: 'All Requests',
+              tooltip: 'All Support Requests',
+              url: '/admin/support/requests',
               icon: List
             }
           ]
