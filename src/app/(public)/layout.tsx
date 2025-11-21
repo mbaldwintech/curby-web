@@ -1,4 +1,5 @@
 import { LinkButton, LogoHorizontal, ThemeToggle } from '@core/components';
+import Image from 'next/image';
 import Link from 'next/link';
 
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
@@ -31,7 +32,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
 
       <section className="max-w-md mx-auto mt-20 mb-12 px-2">
         <div className="rounded-2xl border border-border bg-muted/30 backdrop-blur-sm shadow-sm p-8 text-center flex flex-col items-center gap-4">
-          <h3 className="text-xl font-semibold text-foreground">Love what we're building at Curby?</h3>
+          <h3 className="text-xl font-semibold text-foreground">Love what we&apos;re building at Curby?</h3>
           <p className="text-sm text-secondary-foreground max-w-md">
             Help us keep Curby growing and supporting local neighborhoods ❤️
           </p>
@@ -41,13 +42,13 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
             rel="noopener noreferrer"
             className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors mt-2"
           >
-            <img
+            <Image
               className=""
               height={20}
               width={20}
               src="https://storage.ko-fi.com/cdn/logomarkLogo.png"
               alt="Ko-fi Logo"
-            ></img>
+            />
             Support Curby on Ko-fi
           </a>
         </div>
