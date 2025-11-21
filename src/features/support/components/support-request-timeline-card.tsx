@@ -48,7 +48,7 @@ export function SupportRequestTimelineCard({ supportRequest }: SupportRequestTim
           color: 'text-green-500'
         }
       : null
-  ].filter((event): event is TimelineEvent => event !== null);
+  ].filter((event) => event !== null) as TimelineEvent[];
 
   return (
     <Card>
