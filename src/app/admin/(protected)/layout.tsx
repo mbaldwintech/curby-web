@@ -21,14 +21,14 @@ import {
   Coins,
   Eye,
   FileText,
-  Flag,
+  Gauge,
   Gavel,
+  HeartHandshake,
   Home,
   Image as ImageIcon,
   Inbox,
   LayoutPanelTop,
   List,
-  ListCheck,
   Megaphone,
   MessageSquare,
   Monitor,
@@ -36,13 +36,10 @@ import {
   Scale,
   Send,
   Settings,
-  Shield,
   ShieldCheck,
   Tags,
   Tv,
   UserCog,
-  UserLock,
-  UserRoundX,
   Users
 } from 'lucide-react';
 import Link from 'next/link';
@@ -99,51 +96,6 @@ const sidebarConfig: SidebarConfig = {
               tooltip: 'Manage Media',
               url: '/admin/media',
               icon: ImageIcon
-            }
-          ]
-        },
-        {
-          title: 'Moderation',
-          tooltip: 'Moderation Queue & History',
-          defaultOpen: false,
-          url: '/admin/moderation',
-          icon: Shield,
-          items: [
-            {
-              title: 'My Queue',
-              tooltip: 'My Moderation Queue',
-              url: '/admin/moderation/my-queue',
-              icon: Inbox
-            },
-            {
-              title: 'Pending Reported Items',
-              tooltip: 'Pending Reported Items',
-              url: '/admin/moderation/unassigned/reported-items',
-              icon: List
-            },
-            {
-              title: 'Pending Flagged Users',
-              tooltip: 'Pending Flagged Users',
-              url: '/admin/moderation/unassigned/flagged-users',
-              icon: Flag
-            },
-            {
-              title: 'Resolved Reports',
-              tooltip: 'Resolved Reports',
-              url: '/admin/moderation/resolved-reports',
-              icon: ListCheck
-            },
-            {
-              title: 'Suspended Users',
-              tooltip: 'Suspended Users',
-              url: '/admin/moderation/suspended-users',
-              icon: UserLock
-            },
-            {
-              title: 'Banned Users',
-              tooltip: 'Banned Users',
-              url: '/admin/moderation/banned-users',
-              icon: UserRoundX
             }
           ]
         },
@@ -225,6 +177,93 @@ const sidebarConfig: SidebarConfig = {
                   icon: Eye
                 }
               ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      title: 'Moderation',
+      tooltip: 'Moderation Queue & History',
+      items: [
+        {
+          title: 'Moderation Dashboard',
+          tooltip: 'Moderation Dashboard',
+          url: '/admin/moderation',
+          icon: Gauge
+        },
+        {
+          title: 'Item Moderation',
+          tooltip: 'Item Moderation',
+          defaultOpen: false,
+          url: '/admin/moderation/item-reviews',
+          icon: Package,
+          items: [
+            {
+              title: 'My Queue',
+              tooltip: 'My Moderation Queue',
+              url: '/admin/moderation/item-reviews/my-queue',
+              icon: Inbox
+            },
+            {
+              title: 'All Reviews',
+              tooltip: 'All Reviews',
+              url: '/admin/moderation/item-reviews',
+              icon: List
+            }
+          ]
+        },
+        {
+          title: 'User Moderation',
+          tooltip: 'User Moderation',
+          defaultOpen: false,
+          url: '/admin/moderation/user-reviews',
+          icon: Users,
+          items: [
+            {
+              title: 'My Queue',
+              tooltip: 'My User Moderation Queue',
+              url: '/admin/moderation/user-reviews/my-queue',
+              icon: Inbox
+            },
+            {
+              title: 'All Reviews',
+              tooltip: 'All Reviews',
+              url: '/admin/moderation/user-reviews',
+              icon: List
+            }
+          ]
+        }
+      ]
+    },
+    {
+      title: 'Support',
+      tooltip: 'Support Queue & History',
+      items: [
+        {
+          title: 'Support Dashboard',
+          tooltip: 'Support Dashboard',
+          url: '/admin/support',
+          icon: HeartHandshake
+        },
+        {
+          title: 'Support Requests',
+          tooltip: 'Support Requests',
+          defaultOpen: false,
+          url: '/admin/support/requests',
+          icon: MessageSquare,
+          items: [
+            {
+              title: 'My Queue',
+              tooltip: 'My Support Request Queue',
+              url: '/admin/support/requests/my-queue',
+              icon: Inbox
+            },
+            {
+              title: 'All Requests',
+              tooltip: 'All Support Requests',
+              url: '/admin/support/requests',
+              icon: List
             }
           ]
         }

@@ -780,6 +780,10 @@ export abstract class BaseService<T extends GenericRecord> {
   }
 
   subscribeToRowById(id: string, callback: (data: T | null) => void): () => void {
+    this.getById(id).then((data) => {
+      callback(data);
+    });
+
     const channel = this.supabase
       .channel(`row:${this.table}:${id}`)
       .on(

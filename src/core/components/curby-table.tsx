@@ -2,10 +2,23 @@
 
 import { BaseService, Filter, Filters, OrderBy, Pagination } from '@supa/services';
 import { GenericRecord } from '@supa/types';
-import { CellContext, ColumnDefTemplate, ColumnFiltersState, SortingState } from '@tanstack/react-table';
+import {
+  AccessorKeyColumnDef,
+  CellContext,
+  ColumnDefTemplate,
+  ColumnFiltersState,
+  SortingState
+} from '@tanstack/react-table';
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useState } from 'react';
 import { useDebounce } from '../hooks';
-import { CustomColumnDef, DataTable, DataTableProps, DataTableRef, RowMenuItem } from './base';
+import {
+  CustomColumnDef,
+  DataTable,
+  DataTableProps,
+  DataTableRef,
+  PagedAutocompleteFilterComponentOptions,
+  RowMenuItem
+} from './base';
 
 const convertToFilters = <T,>(filters: Filters<T>): ColumnFiltersState =>
   filters.map((f) => ({
@@ -17,7 +30,7 @@ const convertFromFilters = <T,>(filters: ColumnFiltersState): Filters<T> =>
   filters.map(({ id, value }): Filter<T> => {
     return {
       column: id as keyof T,
-      operator: 'eq',
+      operator: value === null ? 'is' : 'eq',
       value: value as T[keyof T]
     } as Filter<T>;
   });
@@ -70,7 +83,19 @@ export const buildColumnDef = <T extends GenericRecord, K extends keyof T & stri
           [] as { id: string; label: string }[]
         );
         return res;
-      }
+      },
+      fetchSelectedItem: async (id: string) => {
+        const res = await service
+          .getOneOrNull([{ column: key, operator: 'eq', value: id }] as Filters<T>)
+          .then((item) => {
+            if (item && item[key]) {
+              return { id: item[key] as string, label: item[key] as string };
+            }
+            return null;
+          });
+        return res;
+      },
+      ...((columnDef?.filterComponentOptions ?? {}) as Partial<PagedAutocompleteFilterComponentOptions>)
     }
   };
 
@@ -97,6 +122,33 @@ export const buildColumnDef = <T extends GenericRecord, K extends keyof T & stri
   }
 
   return def;
+};
+
+export const buildEnumFilterComponentOptions = (enumObj: Record<string, string | number>) => {
+  const options = Object.values(enumObj)
+    .filter((v) => typeof v === 'string' || typeof v === 'number')
+    .map((v) => ({
+      id: v.toString(),
+      label: v
+        .toString()
+        .split('_')
+        .map((n) => n.charAt(0).toUpperCase() + n.substring(1))
+        .join(' ')
+    }));
+  return {
+    getCount: async (query: string) => {
+      return options.filter((option) => option.label.toLowerCase().includes(query.toLowerCase())).length;
+    },
+    fetchOptions: async (query: string, pageIndex: number, pageSize: number) => {
+      const filtered = options.filter((option) => option.label.toLowerCase().includes(query.toLowerCase()));
+      const paged = filtered.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize);
+      return paged;
+    },
+    fetchSelectedItem: async (id: string) => {
+      const found = options.find((option) => option.id === id);
+      return found || null;
+    }
+  };
 };
 
 export interface ImplementedCurbyTableProps<T extends GenericRecord>
@@ -134,12 +186,29 @@ export interface CurbyTableProps<T extends GenericRecord>
     | 'error'
   > {
   service: BaseService<T>;
-  defaultFilters?: Filters<T>;
+  restrictiveFilters?: Filters<T>;
+  initialFilters?: Filters<T>;
   columns: CustomColumnDef<T>[];
+  overrideColumns?: CustomColumnDef<T>[];
+  extraColumns?: CustomColumnDef<T>[];
+  omitColumns?: (keyof T)[];
+  defaultHiddenColumns?: (keyof T)[];
 }
 
 function CurbyTableInternal<T extends GenericRecord>(
-  { service, defaultFilters, columns, getRowContextMenuItems, getRowActionMenuItems, ...rest }: CurbyTableProps<T>,
+  {
+    service,
+    restrictiveFilters,
+    initialFilters,
+    columns,
+    getRowContextMenuItems,
+    getRowActionMenuItems,
+    overrideColumns,
+    extraColumns,
+    omitColumns,
+    defaultHiddenColumns,
+    ...rest
+  }: CurbyTableProps<T>,
   ref: React.Ref<CurbyTableRef<T>>
 ) {
   const dataTableRef = React.useRef<DataTableRef<T>>(null);
@@ -147,14 +216,14 @@ function CurbyTableInternal<T extends GenericRecord>(
   const debouncedSearchText = useDebounce(searchText, 300);
   const searchableColumns = useMemo(
     () =>
-      columns
+      (extraColumns ? [...columns, ...extraColumns] : columns)
         .filter((c) => c.enableSearching)
         .map(<K,>(c: CustomColumnDef<T, K>) => (c as { accessorKey: string }).accessorKey || c.id)
         .filter(Boolean) as (keyof T)[],
-    [columns]
+    [columns, extraColumns]
   );
-  const [filters, setFilters] = useState<Filter<T>[]>([]);
-  const memoizedDefaultFilters = useMemo(() => defaultFilters || [], [defaultFilters]);
+  const [filters, setFilters] = useState<Filter<T>[]>(initialFilters ?? []);
+  const memoizedRestrictiveFilters = useMemo(() => restrictiveFilters || [], [restrictiveFilters]);
   const debouncedFilters = useDebounce(filters, 300);
   const [sort, setSort] = useState<OrderBy<T>>({ column: 'createdAt', ascending: false });
 
@@ -171,8 +240,8 @@ function CurbyTableInternal<T extends GenericRecord>(
   const refreshCount = useCallback(async () => {
     try {
       let filters: Filters<T> = [];
-      if (memoizedDefaultFilters.length > 0) {
-        filters = [...memoizedDefaultFilters];
+      if (memoizedRestrictiveFilters.length > 0) {
+        filters = [...memoizedRestrictiveFilters];
       }
       if (debouncedFilters.length > 0) {
         filters = [...filters, ...debouncedFilters];
@@ -187,7 +256,7 @@ function CurbyTableInternal<T extends GenericRecord>(
       setError('Failed to load event count.');
       setCount(0);
     }
-  }, [service, memoizedDefaultFilters, debouncedFilters, debouncedSearchText, searchableColumns]);
+  }, [service, memoizedRestrictiveFilters, debouncedFilters, debouncedSearchText, searchableColumns]);
 
   useEffect(() => {
     refreshCount();
@@ -198,8 +267,8 @@ function CurbyTableInternal<T extends GenericRecord>(
     setError(null);
     try {
       let filters: Filters<T> = [];
-      if (memoizedDefaultFilters.length > 0) {
-        filters = [...memoizedDefaultFilters];
+      if (memoizedRestrictiveFilters.length > 0) {
+        filters = [...memoizedRestrictiveFilters];
       }
       if (debouncedFilters.length > 0) {
         filters = [...filters, ...debouncedFilters];
@@ -216,7 +285,7 @@ function CurbyTableInternal<T extends GenericRecord>(
     } finally {
       setLoading(false);
     }
-  }, [service, memoizedDefaultFilters, debouncedFilters, sort, pagination, debouncedSearchText, searchableColumns]);
+  }, [service, memoizedRestrictiveFilters, debouncedFilters, sort, pagination, debouncedSearchText, searchableColumns]);
 
   useEffect(() => {
     getData();
@@ -233,7 +302,29 @@ function CurbyTableInternal<T extends GenericRecord>(
     <DataTable
       ref={dataTableRef}
       data={data}
-      columns={columns}
+      columns={(extraColumns ? [...columns, ...extraColumns] : columns)
+        .map((col) => {
+          const overrideCol = overrideColumns?.find(
+            (overrideCol) =>
+              (overrideCol as CustomColumnDef<T> & AccessorKeyColumnDef<T>).accessorKey ===
+              (col as CustomColumnDef<T> & AccessorKeyColumnDef<T>).accessorKey
+          );
+          const _col = overrideCol ? overrideCol : col;
+          return {
+            ..._col,
+            defaultHidden:
+              _col.defaultHidden ??
+              defaultHiddenColumns?.includes(
+                (_col as CustomColumnDef<T> & AccessorKeyColumnDef<T>).accessorKey as keyof T
+              ) ??
+              false
+          };
+        })
+        .filter((column) => {
+          return !omitColumns?.includes(
+            (column as CustomColumnDef<T> & AccessorKeyColumnDef<T>).accessorKey as keyof T
+          );
+        })}
       refresh={getData}
       getRowActionMenuItems={getRowActionMenuItems}
       getRowContextMenuItems={getRowContextMenuItems ?? getRowActionMenuItems}

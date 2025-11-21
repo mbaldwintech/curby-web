@@ -1,3 +1,4 @@
+import { TutorialViewStatus } from '@core/enumerations';
 import { BaseService } from '@supa/services';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { Tutorial, TutorialMetadata, TutorialView } from '../types';
@@ -30,7 +31,7 @@ export class TutorialService extends BaseService<Tutorial> {
     const tutorialView = await this.tutorialViewService.getByTutorialId(tutorial.id);
     if (!tutorialView) return false;
 
-    return ['skipped', 'completed'].includes(tutorialView.status);
+    return [TutorialViewStatus.Skipped, TutorialViewStatus.Completed].includes(tutorialView.status);
   }
 
   async startTutorial(id: string): Promise<TutorialView | null> {
@@ -38,10 +39,10 @@ export class TutorialService extends BaseService<Tutorial> {
   }
 
   async skipTutorial(id: string): Promise<TutorialView | null> {
-    return this.tutorialViewService.updateStatus(id, 'skipped');
+    return this.tutorialViewService.updateStatus(id, TutorialViewStatus.Skipped);
   }
 
   async completeTutorial(id: string): Promise<TutorialView | null> {
-    return this.tutorialViewService.updateStatus(id, 'completed');
+    return this.tutorialViewService.updateStatus(id, TutorialViewStatus.Completed);
   }
 }

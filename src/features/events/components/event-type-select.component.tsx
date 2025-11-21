@@ -3,7 +3,10 @@ import { EventTypeService } from '@core/services';
 import { createClientService } from '@supa/utils/client';
 import { useRef } from 'react';
 
-export type EventTypeSelectProps = Omit<AutocompleteProps, 'getCount' | 'fetchItems' | 'pageSize'>;
+export type EventTypeSelectProps = Omit<
+  AutocompleteProps,
+  'getCount' | 'fetchItems' | 'fetchSelectedItem' | 'pageSize'
+>;
 
 export const EventTypeSelect = ({ value, onSelect, ...rest }: EventTypeSelectProps) => {
   const eventTypeService = useRef(createClientService(EventTypeService)).current;

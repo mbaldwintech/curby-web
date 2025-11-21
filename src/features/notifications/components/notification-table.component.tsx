@@ -11,13 +11,12 @@ import { createClientService } from '@supa/utils/client';
 import { forwardRef, useCallback, useMemo, useRef } from 'react';
 import { NotificationTemplateCell } from './notification-template-cell.component';
 
-export interface NotificationTableProps extends Omit<CurbyTableProps<Notification>, 'service' | 'columns'> {
-  extraColumns?: CustomColumnDef<Notification>[];
-}
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface NotificationTableProps extends Omit<CurbyTableProps<Notification>, 'service' | 'columns'> {}
 
 export const NotificationTable = forwardRef<CurbyTableRef<Notification>, NotificationTableProps>(
   function NotificationTable(props: NotificationTableProps, ref) {
-    const { extraColumns = [], ...rest } = props;
+    const { ...rest } = props;
     const service = useRef(createClientService(NotificationService)).current;
 
     const buildColumn = useCallback(
@@ -32,30 +31,30 @@ export const NotificationTable = forwardRef<CurbyTableRef<Notification>, Notific
     );
 
     const columns: CustomColumnDef<Notification>[] = useMemo(
-      () => [
-        buildColumn('sentAt', 'Sent At', {
-          cell: ({ row }) => new Date(row.original.sentAt).toLocaleString()
-        }),
-        buildColumn('userId', 'Target User', {
-          cell: ({ row }) => <ProfileCell userId={row.original.userId} />
-        }),
-        buildColumn('deviceId', 'Target Device', {
-          cell: ({ row }) => <DeviceCell deviceId={row.original.deviceId} />
-        }),
-        buildColumn('eventId', 'Triggered By Event', {
-          cell: ({ row }) => <EventCell eventId={row.original.eventId} />
-        }),
-        buildColumn('curbyCoinTransactionId', 'Triggered By Transaction', {
-          cell: ({ row }) => <CurbyCoinTransactionCell curbyCoinTransactionId={row.original.curbyCoinTransactionId} />
-        }),
-        buildColumn('notificationTemplateId', 'Template', {
-          cell: ({ row }) => <NotificationTemplateCell notificationTemplateId={row.original.notificationTemplateId} />
-        }),
-        buildColumn('category', 'Category'),
-        buildColumn('deliveryChannel', 'Delivery Channel'),
-        ...extraColumns
-      ],
-      [buildColumn, extraColumns]
+      () =>
+        [
+          buildColumn('sentAt', 'Sent At', {
+            cell: ({ row }) => new Date(row.original.sentAt).toLocaleString()
+          }),
+          buildColumn('userId', 'Target User', {
+            cell: ({ row }) => <ProfileCell userId={row.original.userId} />
+          }),
+          buildColumn('deviceId', 'Target Device', {
+            cell: ({ row }) => <DeviceCell deviceId={row.original.deviceId} />
+          }),
+          buildColumn('eventId', 'Triggered By Event', {
+            cell: ({ row }) => <EventCell eventId={row.original.eventId} />
+          }),
+          buildColumn('curbyCoinTransactionId', 'Triggered By Transaction', {
+            cell: ({ row }) => <CurbyCoinTransactionCell curbyCoinTransactionId={row.original.curbyCoinTransactionId} />
+          }),
+          buildColumn('notificationTemplateId', 'Template', {
+            cell: ({ row }) => <NotificationTemplateCell notificationTemplateId={row.original.notificationTemplateId} />
+          }),
+          buildColumn('category', 'Category'),
+          buildColumn('deliveryChannel', 'Delivery Channel')
+        ].filter((c) => c !== undefined),
+      [buildColumn]
     );
 
     return <CurbyTable ref={ref} service={service} columns={columns} {...rest} />;

@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { BackButton } from './back-button';
 import { Separator, SidebarTrigger } from './base';
 import { ThemeToggle } from './theme-toggle';
@@ -10,13 +11,20 @@ export interface AdminHeaderProps {
 }
 
 export function AdminHeader({ title, rightContent }: AdminHeaderProps) {
+  const [showBackButton, setShowBackButton] = useState(false);
+
+  useEffect(() => {
+    // Check if we can show back button after component mounts
+    setShowBackButton(typeof window !== 'undefined' && window.history.length > 1);
+  }, []);
+
   return (
     <header className="flex shrink-0 items-center border-b-2 border-b-sidebar transition-[width,height] ease-linear">
       <div className="flex w-full h-full items-center px-4 py-2 lg:px-6">
         <div className="h-full flex items-center gap-2 lg:gap-4">
           <SidebarTrigger />
           <Separator orientation="vertical" className="data-[orientation=vertical]:h-4" />
-          {typeof window !== 'undefined' && window.history.length > 1 && (
+          {showBackButton && (
             <>
               <BackButton />
               <Separator orientation="vertical" className="data-[orientation=vertical]:h-4" />

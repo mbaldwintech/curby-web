@@ -3,7 +3,10 @@ import { CurbyCoinTransactionTypeService } from '@core/services';
 import { createClientService } from '@supa/utils/client';
 import { useRef } from 'react';
 
-export type CurbyCoinTransactionTypeSelectProps = Omit<AutocompleteProps, 'getCount' | 'fetchItems' | 'pageSize'>;
+export type CurbyCoinTransactionTypeSelectProps = Omit<
+  AutocompleteProps,
+  'getCount' | 'fetchItems' | 'fetchSelectedItem' | 'pageSize'
+>;
 
 export const CurbyCoinTransactionTypeSelect = ({ value, onSelect, ...rest }: CurbyCoinTransactionTypeSelectProps) => {
   const curbyCoinTransactionTypeService = useRef(createClientService(CurbyCoinTransactionTypeService)).current;

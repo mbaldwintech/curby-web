@@ -1,39 +1,37 @@
 'use client';
 
-import { useCallback, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-
-import { ExtendedItem } from '@core/types';
-import { AppDispatch, AppState } from '@store/store';
-import { fetchUrgentItems } from '../slices';
+import { ItemService } from '@core/services';
+import { Item } from '@core/types';
+import { createClientService } from '@supa/utils/client';
+import { useQuery } from '@tanstack/react-query';
 
 interface UrgentItemsResult {
-  urgentItems: ExtendedItem[];
+  urgentItems: Item[];
   error: string | null;
   loading: boolean;
   refetch: () => void;
 }
 
+const itemService = createClientService(ItemService);
+
 export const useUrgentItems = (): UrgentItemsResult => {
-  const dispatch = useDispatch<AppDispatch>();
-  const { urgentItems, error, loading } = useSelector((state: AppState) => state.urgentItems);
-
-  const refetch = useCallback(() => {
-    dispatch(fetchUrgentItems());
-  }, [dispatch]);
-
-  useEffect(() => {
-    refetch();
-    const interval = setInterval(() => {
-      refetch();
-    }, 10 * 1000);
-
-    return () => clearInterval(interval);
-  }, [refetch]);
+  const {
+    data: urgentItems = [],
+    error,
+    isLoading: loading,
+    refetch
+  } = useQuery<Item[], Error>({
+    queryKey: ['urgent-items'],
+    queryFn: async () => {
+      return await itemService.getMyUrgentItems();
+    },
+    refetchInterval: 10000, // 10 seconds
+    staleTime: 10000
+  });
 
   return {
     urgentItems,
-    error,
+    error: error ? error.message : null,
     loading,
     refetch
   };

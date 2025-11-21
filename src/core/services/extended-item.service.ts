@@ -1,7 +1,7 @@
 import { Cursor, Filter, Filters, OrderBy } from '@supa/services';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { PostgrestResponse, PostgrestSingleResponse, User } from '@supabase/supabase-js';
-import { EventTypeKey, ItemType } from '../enumerations';
+import { EventTypeKey, ItemStatus, ItemType } from '../enumerations';
 import { CreateItem, ExtendedItem, Item } from '../types';
 import { geoJsonPointToWkt } from '../utils';
 import { CurbyCoinTransactionService } from './curby-coin-transaction.service';
@@ -216,7 +216,7 @@ export class ExtendedItemService {
     const newItem: Omit<Item, 'id'> = {
       title,
       type: ItemType.Free,
-      status: 'active',
+      status: ItemStatus.Active,
       geoLocation: geoJsonPointToWkt({ type: 'Point', coordinates }),
       postedBy: byUser.id,
       taken: false,

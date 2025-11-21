@@ -9,4 +9,5 @@ export * from './icon.component';
 export * from './image-icon.component';
 export * from './leaflet-map';
 export * from './logo-horizontal';
+export * from './tag-input';
 export * from './theme-toggle';
