@@ -10,6 +10,7 @@ import {
   CardHeader,
   CardTitle,
   ConditionFormGroup,
+  DateTimePicker,
   Field,
   FieldContent,
   FieldDescription,
@@ -254,13 +255,12 @@ export default function CurbyCoinTransactionTypeDetailsPage() {
                     render={({ field, fieldState }) => (
                       <Field data-invalid={fieldState.invalid}>
                         <FieldLabel htmlFor="curby-coin-transaction-type-form-validFrom">Valid From</FieldLabel>
-                        <Input
-                          {...field}
+                        <DateTimePicker
                           id="curby-coin-transaction-type-form-validFrom"
-                          type="datetime-local"
-                          value={field.value ? new Date(field.value).toISOString().slice(0, 16) : ''}
-                          onChange={(e) => field.onChange(e.target.value ? new Date(e.target.value) : null)}
+                          value={field.value ? new Date(field.value) : undefined}
+                          onChange={(date) => field.onChange(date || null)}
                           aria-invalid={fieldState.invalid}
+                          name={field.name}
                         />
                         <FieldDescription>
                           The date and time when this transaction type becomes active.
@@ -275,13 +275,12 @@ export default function CurbyCoinTransactionTypeDetailsPage() {
                     render={({ field, fieldState }) => (
                       <Field data-invalid={fieldState.invalid}>
                         <FieldLabel htmlFor="curby-coin-transaction-type-form-validTo">Valid To</FieldLabel>
-                        <Input
-                          {...field}
+                        <DateTimePicker
                           id="curby-coin-transaction-type-form-validTo"
-                          type="datetime-local"
-                          value={field.value ? new Date(field.value).toISOString().slice(0, 16) : ''}
-                          onChange={(e) => field.onChange(e.target.value ? new Date(e.target.value) : null)}
+                          value={field.value ? new Date(field.value) : undefined}
+                          onChange={(date) => field.onChange(date || null)}
                           aria-invalid={fieldState.invalid}
+                          name={field.name}
                         />
                         <FieldDescription>
                           The date and time when this transaction type expires (optional).
