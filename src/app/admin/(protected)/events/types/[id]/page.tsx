@@ -10,6 +10,7 @@ import {
   CardHeader,
   CardTitle,
   ConditionFormGroup,
+  DateTimePicker,
   Field,
   FieldContent,
   FieldDescription,
@@ -153,13 +154,12 @@ export default function EventTypeDetailsPage() {
                     render={({ field, fieldState }) => (
                       <Field data-invalid={fieldState.invalid}>
                         <FieldLabel htmlFor="event-type-form-validFrom">Valid From</FieldLabel>
-                        <Input
-                          {...field}
+                        <DateTimePicker
                           id="event-type-form-validFrom"
-                          type="datetime-local"
-                          value={field.value ? new Date(field.value).toISOString().slice(0, 16) : ''}
-                          onChange={(e) => field.onChange(e.target.value ? new Date(e.target.value) : null)}
+                          value={field.value ? new Date(field.value) : undefined}
+                          onChange={(date) => field.onChange(date || null)}
                           aria-invalid={fieldState.invalid}
+                          name={field.name}
                         />
                         <FieldDescription>The date and time when this event type becomes active.</FieldDescription>
                         {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
@@ -172,13 +172,12 @@ export default function EventTypeDetailsPage() {
                     render={({ field, fieldState }) => (
                       <Field data-invalid={fieldState.invalid}>
                         <FieldLabel htmlFor="event-type-form-validTo">Valid To</FieldLabel>
-                        <Input
-                          {...field}
+                        <DateTimePicker
                           id="event-type-form-validTo"
-                          type="datetime-local"
-                          value={field.value ? new Date(field.value).toISOString().slice(0, 16) : ''}
-                          onChange={(e) => field.onChange(e.target.value ? new Date(e.target.value) : null)}
+                          value={field.value ? new Date(field.value) : undefined}
+                          onChange={(date) => field.onChange(date || null)}
                           aria-invalid={fieldState.invalid}
+                          name={field.name}
                         />
                         <FieldDescription>The date and time when this event type expires (optional).</FieldDescription>
                         {fieldState.invalid && <FieldError errors={[fieldState.error]} />}

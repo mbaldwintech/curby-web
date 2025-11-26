@@ -16,8 +16,8 @@ import {
   Bell,
   BookOpen,
   Boxes,
+  Calendar,
   CheckSquare,
-  Clock,
   Coins,
   Eye,
   FileText,
@@ -34,7 +34,6 @@ import {
   Monitor,
   Package,
   Scale,
-  Send,
   Settings,
   ShieldCheck,
   Tags,
@@ -139,44 +138,29 @@ const sidebarConfig: SidebarConfig = {
           ]
         },
         {
-          title: 'Broadcasts & Messaging',
-          tooltip: 'Manage Broadcasts & Messaging',
+          title: 'Broadcasts',
+          tooltip: 'Manage Broadcasts',
           defaultOpen: false,
           url: '/admin/broadcasts',
           icon: Megaphone,
           items: [
             {
+              title: 'Dashboard',
+              tooltip: 'Broadcasts Dashboard',
+              url: '/admin/broadcasts/dashboard',
+              icon: Home
+            },
+            {
               title: 'Broadcasts',
               tooltip: 'Manage Broadcasts',
-              defaultOpen: false,
               url: '/admin/broadcasts',
-              icon: Tv,
-              items: [
-                {
-                  title: 'Broadcasts',
-                  tooltip: 'Manage Broadcasts',
-                  url: '/admin/broadcasts',
-                  icon: Megaphone
-                },
-                {
-                  title: 'Schedules',
-                  tooltip: 'Manage Broadcast Schedules',
-                  url: '/admin/broadcasts/schedules',
-                  icon: Clock
-                },
-                {
-                  title: 'Deliveries',
-                  tooltip: 'Manage Broadcast Deliveries',
-                  url: '/admin/broadcasts/deliveries',
-                  icon: Send
-                },
-                {
-                  title: 'Delivery Views',
-                  tooltip: 'View Broadcast Delivery Views',
-                  url: '/admin/broadcasts/delivery-views',
-                  icon: Eye
-                }
-              ]
+              icon: Tv
+            },
+            {
+              title: 'Calendar',
+              tooltip: 'Manage Broadcast Calendar',
+              url: '/admin/broadcasts/calendar',
+              icon: Calendar
             }
           ]
         }

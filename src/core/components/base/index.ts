@@ -7,6 +7,7 @@ export * from './card';
 export * from './chart';
 export * from './checkbox';
 export * from './collapsible';
+export * from './color-picker';
 export * from './combobox';
 export * from './command';
 export * from './data-table';

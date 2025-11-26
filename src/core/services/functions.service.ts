@@ -110,4 +110,24 @@ export class FunctionsService {
 
     return data;
   }
+
+  async generateBroadcastDeliveries(
+    broadcastId: string,
+    scheduleId?: string,
+    scheduledFor?: Date
+  ): Promise<{ success: boolean; deliveriesCreated: number }> {
+    const { data, error } = await this.supabase.functions.invoke('generate-broadcast-deliveries', {
+      body: {
+        broadcastId,
+        scheduleId,
+        scheduledFor: scheduledFor ? scheduledFor.toISOString() : undefined
+      }
+    });
+
+    if (error) {
+      throw error;
+    }
+
+    return data as { success: boolean; deliveriesCreated: number };
+  }
 }

@@ -33,7 +33,7 @@ function TabsTrigger({ className, ...props }: React.ComponentProps<typeof TabsPr
         'focus-visible:ring-ring/50',
         'focus-visible:outline-ring',
         'dark:data-[state=active]:border-input',
-        'dark:data-[state=active]:bg-primary/30',
+        'dark:data-[state=active]:bg-primary',
         'text-foreground',
         'dark:text-muted-foreground',
         'inline-flex',
