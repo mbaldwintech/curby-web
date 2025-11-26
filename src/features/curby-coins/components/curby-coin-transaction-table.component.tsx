@@ -9,16 +9,15 @@ import { createClientService } from '@supa/utils/client';
 import { forwardRef, useCallback, useMemo, useRef } from 'react';
 import { CurbyCoinTransactionTypeCell } from './curby-coin-transaction-type-cell.component';
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface CurbyCoinTransactionTableProps
-  extends Omit<CurbyTableProps<CurbyCoinTransaction>, 'service' | 'columns'> {
-  extraColumns?: CustomColumnDef<CurbyCoinTransaction>[];
-}
+  extends Omit<CurbyTableProps<CurbyCoinTransaction>, 'service' | 'columns'> {}
 
 export const CurbyCoinTransactionTable = forwardRef<
   CurbyTableRef<CurbyCoinTransaction>,
   CurbyCoinTransactionTableProps
 >(function CurbyCoinTransactionTable(props: CurbyCoinTransactionTableProps, ref) {
-  const { extraColumns = [], ...rest } = props;
+  const { ...rest } = props;
   const service = useRef(createClientService(CurbyCoinTransactionService)).current;
 
   const buildColumn = useCallback(
@@ -33,30 +32,30 @@ export const CurbyCoinTransactionTable = forwardRef<
   );
 
   const columns: CustomColumnDef<CurbyCoinTransaction>[] = useMemo(
-    () => [
-      buildColumn('occurredAt', 'Occurred At', {
-        cell: ({ row }) => new Date(row.original.occurredAt).toLocaleString()
-      }),
-      buildColumn('eventId', 'Event', {
-        cell: ({ row }) => {
-          return <EventCell eventId={row.original.eventId} />;
-        }
-      }),
-      buildColumn('curbyCoinTransactionTypeId', 'Transaction Type', {
-        cell: ({ row }) => (
-          <CurbyCoinTransactionTypeCell curbyCoinTransactionTypeId={row.original.curbyCoinTransactionTypeId} />
-        )
-      }),
-      buildColumn('userId', 'User', {
-        cell: ({ row }) => {
-          return <ProfileCell userId={row.original.userId} />;
-        }
-      }),
-      buildColumn('amount', 'Amount'),
-      buildColumn('balanceAfter', 'Balance After'),
-      ...extraColumns
-    ],
-    [buildColumn, extraColumns]
+    () =>
+      [
+        buildColumn('occurredAt', 'Occurred At', {
+          cell: ({ row }) => new Date(row.original.occurredAt).toLocaleString()
+        }),
+        buildColumn('eventId', 'Event', {
+          cell: ({ row }) => {
+            return <EventCell eventId={row.original.eventId} />;
+          }
+        }),
+        buildColumn('curbyCoinTransactionTypeId', 'Transaction Type', {
+          cell: ({ row }) => (
+            <CurbyCoinTransactionTypeCell curbyCoinTransactionTypeId={row.original.curbyCoinTransactionTypeId} />
+          )
+        }),
+        buildColumn('userId', 'User', {
+          cell: ({ row }) => {
+            return <ProfileCell userId={row.original.userId} />;
+          }
+        }),
+        buildColumn('amount', 'Amount'),
+        buildColumn('balanceAfter', 'Balance After')
+      ].filter((c) => c !== undefined),
+    [buildColumn]
   );
 
   return <CurbyTable ref={ref} columns={columns} service={service} {...rest} />;

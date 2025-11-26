@@ -32,7 +32,7 @@ import React, { useCallback } from 'react';
 import { Controller } from 'react-hook-form';
 
 const MemoizedTutorialViewTable = React.memo(TutorialViewTable, (prevProps, nextProps) => {
-  return JSON.stringify(prevProps.defaultFilters) === JSON.stringify(nextProps.defaultFilters);
+  return JSON.stringify(prevProps.restrictiveFilters) === JSON.stringify(nextProps.restrictiveFilters);
 });
 
 export default function TutorialDetailsPage() {
@@ -218,7 +218,9 @@ export default function TutorialDetailsPage() {
                   <FieldDescription>View analytics and user engagement data for this tutorial.</FieldDescription>
                 </CardHeader>
                 <CardContent className="flex flex-col gap-2">
-                  <MemoizedTutorialViewTable defaultFilters={[{ column: 'tutorialId', operator: 'eq', value: id }]} />
+                  <MemoizedTutorialViewTable
+                    restrictiveFilters={[{ column: 'tutorialId', operator: 'eq', value: id }]}
+                  />
                 </CardContent>
               </Card>
             )}

@@ -6,13 +6,12 @@ import { PrivacyPolicy } from '@core/types';
 import { createClientService } from '@supa/utils/client';
 import { forwardRef, useCallback, useMemo, useRef } from 'react';
 
-export interface PrivacyPolicyTableProps extends Omit<CurbyTableProps<PrivacyPolicy>, 'service' | 'columns'> {
-  extraColumns?: CustomColumnDef<PrivacyPolicy>[];
-}
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface PrivacyPolicyTableProps extends Omit<CurbyTableProps<PrivacyPolicy>, 'service' | 'columns'> {}
 
 export const PrivacyPolicyTable = forwardRef<CurbyTableRef<PrivacyPolicy>, PrivacyPolicyTableProps>(
   function PrivacyPolicyTable(props: PrivacyPolicyTableProps, ref) {
-    const { extraColumns = [], ...rest } = props;
+    const { ...rest } = props;
     const service = useRef(createClientService(PrivacyPolicyService)).current;
 
     const buildColumn = useCallback(
@@ -27,14 +26,14 @@ export const PrivacyPolicyTable = forwardRef<CurbyTableRef<PrivacyPolicy>, Priva
     );
 
     const columns: CustomColumnDef<PrivacyPolicy>[] = useMemo(
-      () => [
-        buildColumn('version', 'Version'),
-        buildColumn('effectiveDate', 'Effective Date', {
-          cell: ({ row }) => <div>{new Date(row.original.effectiveDate).toLocaleDateString()}</div>
-        }),
-        ...extraColumns
-      ],
-      [buildColumn, extraColumns]
+      () =>
+        [
+          buildColumn('version', 'Version'),
+          buildColumn('effectiveDate', 'Effective Date', {
+            cell: ({ row }) => <div>{new Date(row.original.effectiveDate).toLocaleDateString()}</div>
+          })
+        ].filter((c) => c !== undefined),
+      [buildColumn]
     );
 
     return <CurbyTable ref={ref} service={service} columns={columns} {...rest} />;

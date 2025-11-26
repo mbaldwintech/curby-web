@@ -6,13 +6,13 @@ import { TermsAndConditions } from '@core/types';
 import { createClientService } from '@supa/utils/client';
 import { forwardRef, useCallback, useMemo, useRef } from 'react';
 
-export interface TermsAndConditionsTableProps extends Omit<CurbyTableProps<TermsAndConditions>, 'service' | 'columns'> {
-  extraColumns?: CustomColumnDef<TermsAndConditions>[];
-}
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface TermsAndConditionsTableProps
+  extends Omit<CurbyTableProps<TermsAndConditions>, 'service' | 'columns'> {}
 
 export const TermsAndConditionsTable = forwardRef<CurbyTableRef<TermsAndConditions>, TermsAndConditionsTableProps>(
   function TermsAndConditionsTable(props: TermsAndConditionsTableProps, ref) {
-    const { extraColumns = [], ...rest } = props;
+    const { ...rest } = props;
     const service = useRef(createClientService(TermsAndConditionsService)).current;
 
     const buildColumn = useCallback(
@@ -27,14 +27,14 @@ export const TermsAndConditionsTable = forwardRef<CurbyTableRef<TermsAndConditio
     );
 
     const columns: CustomColumnDef<TermsAndConditions>[] = useMemo(
-      () => [
-        buildColumn('version', 'Version'),
-        buildColumn('effectiveDate', 'Effective Date', {
-          cell: ({ row }) => <div>{new Date(row.original.effectiveDate).toLocaleDateString()}</div>
-        }),
-        ...extraColumns
-      ],
-      [buildColumn, extraColumns]
+      () =>
+        [
+          buildColumn('version', 'Version'),
+          buildColumn('effectiveDate', 'Effective Date', {
+            cell: ({ row }) => <div>{new Date(row.original.effectiveDate).toLocaleDateString()}</div>
+          })
+        ].filter((c) => c !== undefined),
+      [buildColumn]
     );
 
     return <CurbyTable ref={ref} service={service} columns={columns} {...rest} />;

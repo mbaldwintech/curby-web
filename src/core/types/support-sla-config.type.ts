@@ -1,4 +1,4 @@
-import { GenericRecord } from '@supa/types';
+import { GenericRecord, GenericRecordMetadata, GenericRecordMetadataBase } from '@supa/types';
 
 export interface SupportSlaConfig extends GenericRecord {
   category: string;
@@ -7,3 +7,47 @@ export interface SupportSlaConfig extends GenericRecord {
   resolutionTimeHours: number;
   active: boolean;
 }
+
+export const SupportSlaConfigMetadata: GenericRecordMetadata<SupportSlaConfig> = {
+  category: {
+    isArray: false,
+    isNullable: false,
+    type: 'string',
+    searchable: true,
+    sortable: true,
+    filterable: true
+  },
+  priority: {
+    isArray: false,
+    isNullable: false,
+    type: 'string',
+    searchable: true,
+    sortable: true,
+    filterable: true
+  },
+  responseTimeHours: {
+    isArray: false,
+    isNullable: false,
+    type: 'number',
+    searchable: false,
+    sortable: true,
+    filterable: true
+  },
+  resolutionTimeHours: {
+    isArray: false,
+    isNullable: false,
+    type: 'number',
+    searchable: false,
+    sortable: true,
+    filterable: true
+  },
+  active: {
+    isArray: false,
+    isNullable: false,
+    type: 'boolean',
+    searchable: false,
+    sortable: true,
+    filterable: true
+  },
+  ...GenericRecordMetadataBase
+};

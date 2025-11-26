@@ -1,24 +1,68 @@
+import {
+  BroadcastAudience,
+  BroadcastCategory,
+  BroadcastMediaType,
+  BroadcastPlatform,
+  BroadcastStatus
+} from '@core/enumerations';
 import { GenericRecord, GenericRecordMetadata, GenericRecordMetadataBase } from '@supa/types';
+
+export interface MediaProps {
+  lib?: 'MaterialIcons' | 'MaterialCommunityIcons' | 'Ionicons';
+  name?: string;
+  size?: number;
+  color?: string;
+  width?: number;
+  height?: number;
+  contentFit?: 'cover' | 'contain' | 'fill' | 'none' | 'scale-down';
+  style?: Record<string, unknown>;
+  containerStyle?: Record<string, unknown>;
+}
+
+export interface ImageProps extends MediaProps {
+  width: number;
+  height: number;
+  contentFit: 'cover' | 'contain' | 'fill' | 'none' | 'scale-down';
+  style: Record<string, unknown>;
+  containerStyle: Record<string, unknown>;
+}
+
+export interface IconProps extends MediaProps {
+  lib: 'MaterialIcons' | 'MaterialCommunityIcons' | 'Ionicons';
+  name: string;
+  size: number;
+  color?: string;
+  style: Record<string, unknown>;
+  containerStyle: Record<string, unknown>;
+}
+
+export interface LottieProps extends MediaProps {
+  width: number;
+  height: number;
+  style: Record<string, unknown>;
+  containerStyle: Record<string, unknown>;
+}
 
 export interface Broadcast extends GenericRecord {
   name: string;
   description?: string | null;
-  category: string;
+  category: BroadcastCategory;
   priority: number;
-  status: string;
+  status: BroadcastStatus;
   validFrom: Date;
   validTo?: Date | null;
   title: string;
   body: string;
   ctaLabel?: string | null;
   ctaUrl?: string | null;
+  ctaPath?: string | null;
   mediaId?: string | null;
-  mediaType?: 'lottie' | 'image' | 'icon' | null;
-  mediaProps?: Record<string, unknown> | null;
+  mediaType?: BroadcastMediaType | null;
+  mediaProps?: MediaProps | null;
   useMediaInNotification: boolean;
   isDismissible: boolean;
-  audience: string;
-  platform: string;
+  audience: BroadcastAudience;
+  platform: BroadcastPlatform;
   geoLocation?: string | null;
   radius?: number | null;
   sendPush: boolean;

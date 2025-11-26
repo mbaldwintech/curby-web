@@ -74,7 +74,7 @@ export default function TutorialsPage() {
           return (
             <div className="flex flex-col gap-2 py-4 px-6">
               <TutorialViewTable
-                defaultFilters={[{ column: 'tutorialId', operator: 'eq', value: row.id }]}
+                restrictiveFilters={[{ column: 'tutorialId', operator: 'eq', value: row.id }]}
                 maxHeight={200}
               />
             </div>

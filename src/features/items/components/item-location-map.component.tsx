@@ -1,28 +1,18 @@
 'use client';
 
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  LeafletMap,
-  LinkButton,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger
-} from '@core/components';
+import { Button, LeafletMap, LinkButton } from '@core/components';
 import { GeoPoint } from '@core/types';
+import { cn } from '@core/utils';
 import { CopyIcon, ExternalLinkIcon, MapPinIcon } from 'lucide-react';
-import { useState } from 'react';
+import { toast } from 'sonner';
 
 interface ItemLocationMapProps {
   location?: GeoPoint | null;
-  title?: string;
+  containerClassName?: string;
+  mapContainerClassName?: string;
 }
 
-export function ItemLocationMap({ location, title = 'Item Location' }: ItemLocationMapProps) {
-  const [copied, setCopied] = useState(false);
-
+export function ItemLocationMap({ location, containerClassName, mapContainerClassName }: ItemLocationMapProps) {
   // Extract coordinates
   const coordinates = location?.coordinates;
   const longitude = coordinates?.[0];
@@ -32,37 +22,15 @@ export function ItemLocationMap({ location, title = 'Item Location' }: ItemLocat
   const googleMapsUrl =
     coordinates && latitude && longitude ? `https://www.google.com/maps?q=${latitude},${longitude}&z=15` : null;
 
-  const handleCopyCoordinates = async () => {
-    if (latitude && longitude) {
-      try {
-        await navigator.clipboard.writeText(`${latitude}, ${longitude}`);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-      } catch (err) {
-        console.error('Failed to copy coordinates:', err);
-      }
-    }
-  };
-
   // Validation
   if (!location || !coordinates || coordinates.length !== 2) {
     return (
-      <Card className="overflow-hidden">
-        <CardHeader className="pb-4">
-          <CardTitle className="flex items-center gap-2">
-            <MapPinIcon className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-            {title}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-center h-48 bg-muted/20 rounded-lg border-2 border-dashed border-border">
-            <div className="text-center">
-              <MapPinIcon className="w-8 h-8 mx-auto text-muted-foreground mb-2" />
-              <p className="text-sm text-muted-foreground">Location not available</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="flex items-center justify-center h-48 bg-muted/20 rounded-lg border-2 border-dashed border-border">
+        <div className="text-center">
+          <MapPinIcon className="w-8 h-8 mx-auto text-muted-foreground mb-2" />
+          <p className="text-sm text-muted-foreground">Location not available</p>
+        </div>
+      </div>
     );
   }
 
@@ -76,84 +44,66 @@ export function ItemLocationMap({ location, title = 'Item Location' }: ItemLocat
 
   if (!isValidCoordinates) {
     return (
-      <Card className="overflow-hidden">
-        <CardHeader className="pb-4">
-          <CardTitle className="flex items-center gap-2">
-            <MapPinIcon className="w-4 h-4 text-red-600 dark:text-red-400" />
-            {title}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-center h-48 bg-muted/20 rounded-lg border-2 border-dashed border-border">
-            <div className="text-center">
-              <MapPinIcon className="w-8 h-8 mx-auto text-muted-foreground mb-2" />
-              <p className="text-sm text-muted-foreground">Invalid coordinates</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      <div
+        className={cn(
+          'flex items-center justify-center h-48 bg-muted/20 rounded-lg border-2 border-dashed border-border',
+          containerClassName
+        )}
+      >
+        <div className="text-center">
+          <MapPinIcon className="w-8 h-8 mx-auto text-muted-foreground mb-2" />
+          <p className="text-sm text-muted-foreground">Invalid coordinates</p>
+        </div>
+      </div>
     );
   }
 
   return (
-    <Card className="overflow-hidden">
-      <CardHeader className="pb-4">
-        <CardTitle className="flex items-center gap-2">
-          <MapPinIcon className="w-4 h-4 text-green-600 dark:text-green-400" />
-          {title}
-        </CardTitle>
-        <p className="text-sm text-muted-foreground">
-          Location: {latitude.toFixed(6)}, {longitude.toFixed(6)}
-        </p>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          {/* Interactive Leaflet Map */}
-          <LeafletMap location={location} useCustomMarker={true} />
+    <div className={cn('flex flex-col relative bg-muted/30 rounded-lg h-full w-full', containerClassName)}>
+      {/* Interactive Leaflet Map */}
+      <LeafletMap location={location} useCustomMarker={true} containerClassName={mapContainerClassName} />
 
-          {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-2">
-            {googleMapsUrl && (
-              <Tooltip>
-                <TooltipTrigger>
-                  <LinkButton
-                    variant="ghost"
-                    size="icon"
-                    href={googleMapsUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <ExternalLinkIcon size="sm" />
-                  </LinkButton>
-                </TooltipTrigger>
-                <TooltipContent className="z-[1001]">
-                  <p>Open in Google Maps</p>
-                </TooltipContent>
-              </Tooltip>
-            )}
+      {/* Action Buttons */}
+      <div className="absolute top-2 right-2 flex items-center gap-2 z-50 rounded-lg bg-muted/70 p-1">
+        {googleMapsUrl && (
+          <LinkButton variant="ghost" size="icon-sm" href={googleMapsUrl} target="_blank" rel="noopener noreferrer">
+            <ExternalLinkIcon size="sm" />
+          </LinkButton>
+        )}
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (latitude && longitude) {
+              navigator.clipboard
+                .writeText(`${latitude}, ${longitude}`)
+                .then(() => {
+                  toast.success('Coordinates copied to clipboard!');
+                })
+                .catch((err) => {
+                  console.error('Failed to copy coordinates:', err);
+                  toast.error('Failed to copy coordinates.');
+                });
+            }
+          }}
+        >
+          <CopyIcon size="sm" />
+        </Button>
+      </div>
 
-            <button
-              onClick={handleCopyCoordinates}
-              className="flex items-center justify-center gap-2 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-md text-sm font-medium transition-colors"
-            >
-              <CopyIcon className="w-4 h-4" />
-              {copied ? 'Copied!' : 'Copy Coordinates'}
-            </button>
-          </div>
-
-          {/* Coordinate Details */}
-          <div className="grid grid-cols-2 gap-4 text-sm bg-muted/30 p-3 rounded-lg">
-            <div>
-              <div className="font-medium text-muted-foreground">Latitude</div>
-              <div className="font-mono">{latitude.toFixed(6)}</div>
-            </div>
-            <div>
-              <div className="font-medium text-muted-foreground">Longitude</div>
-              <div className="font-mono">{longitude.toFixed(6)}</div>
-            </div>
-          </div>
+      {/* Coordinate Details */}
+      <div className="absolute bottom-0 left-0 right-0 grid grid-cols-2 gap-4 text-sm p-3 pt-5 z-50 bg-gradient-to-t from-muted to-transparent rounded-b-lg">
+        <div>
+          <div className="font-medium">Latitude</div>
+          <div className="font-mono">{latitude.toFixed(6)}</div>
         </div>
-      </CardContent>
-    </Card>
+        <div>
+          <div className="font-medium">Longitude</div>
+          <div className="font-mono">{longitude.toFixed(6)}</div>
+        </div>
+      </div>
+    </div>
   );
 }

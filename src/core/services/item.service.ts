@@ -1,3 +1,4 @@
+import { ItemStatus } from '@core/enumerations';
 import { BaseService } from '@supa/services';
 import type { PostgrestResponse, SupabaseClient } from '@supabase/supabase-js';
 import { Item, ItemMetadata } from '../types';
@@ -78,5 +79,17 @@ export class ItemService extends BaseService<Item> {
     }
 
     return data || [];
+  }
+
+  async removeItem(itemId: string): Promise<Item> {
+    return this.update(itemId, {
+      status: ItemStatus.Removed
+    });
+  }
+
+  async restoreItem(itemId: string): Promise<Item> {
+    return this.update(itemId, {
+      status: ItemStatus.Restored
+    });
   }
 }

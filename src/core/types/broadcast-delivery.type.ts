@@ -1,3 +1,4 @@
+import { BroadcastDeliveryStatus } from '@core/enumerations';
 import { GenericRecord, GenericRecordMetadata, GenericRecordMetadataBase } from '@supa/types';
 
 export interface BroadcastDelivery extends GenericRecord {
@@ -5,7 +6,7 @@ export interface BroadcastDelivery extends GenericRecord {
   scheduleId?: string | null;
   scheduledFor: Date;
   sentAt?: Date | null;
-  status: 'pending' | 'processing' | 'sent' | 'failed' | 'canceled' | 'active' | 'archived';
+  status: BroadcastDeliveryStatus;
   error?: string | null;
 }
 

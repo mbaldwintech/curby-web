@@ -11,9 +11,11 @@ import {
 } from '@features/curby-coins/components';
 import { createClientService } from '@supa/utils/client';
 import { InfoIcon, PlusIcon, TrashIcon } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useRef } from 'react';
 
 export default function CurbyCoinTransactionTypesPage() {
+  const router = useRouter();
   const curbyCoinTransactionTypeService = useRef(createClientService(CurbyCoinTransactionTypeService)).current;
   const curbyCoinTransactionService = useRef(createClientService(CurbyCoinTransactionService)).current;
   const curbyCoinTransactionTypeTableRef = useRef<CurbyTableRef<CurbyCoinTransactionType>>(null);
@@ -45,12 +47,12 @@ export default function CurbyCoinTransactionTypesPage() {
         getRowActionMenuItems={async (row) => {
           const menuItems: RowMenuItem<CurbyCoinTransactionType>[] = [
             {
-              label: 'View Details',
+              label: 'Go to details',
               icon: InfoIcon,
-              onClick: ({ id }) => curbyCoinTransactionTypePanelRef.current?.open(id)
+              onClick: ({ id }) => router.push(`/admin/curby-coins/transactions/types/${id}`)
             },
             {
-              label: 'Edit in Panel',
+              label: 'Edit in panel',
               icon: InfoIcon,
               onClick: ({ id }) => curbyCoinTransactionTypePanelRef.current?.open(id)
             }
