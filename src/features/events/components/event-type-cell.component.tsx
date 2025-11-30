@@ -3,10 +3,11 @@
 import { LinkButton } from '@core/components';
 import { EventTypeService } from '@core/services';
 import { EventType } from '@core/types';
+import { cn } from '@core/utils';
 import { createClientService } from '@supa/utils/client';
 import { useEffect, useRef, useState } from 'react';
 
-export const EventTypeCell = ({ eventTypeId }: { eventTypeId?: string | null }) => {
+export const EventTypeCell = ({ eventTypeId, className }: { eventTypeId?: string | null; className?: string }) => {
   const eventTypeService = useRef(createClientService(EventTypeService)).current;
   const [eventType, setEventType] = useState<EventType | null>(null);
 
@@ -34,9 +35,10 @@ export const EventTypeCell = ({ eventTypeId }: { eventTypeId?: string | null }) 
   return (
     <LinkButton
       variant="link"
+      size="link"
       href={`/admin/events/types/${eventType.id}`}
       onClick={(e) => e.stopPropagation()}
-      className="p-0"
+      className={cn('p-0', className)}
     >
       {eventType.name}
     </LinkButton>

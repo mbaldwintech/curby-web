@@ -70,10 +70,10 @@ export const ProfileCell = ({ userId, className }: { userId?: string | null; cla
       <TooltipTrigger>
         <LinkButton
           variant="link"
+          size="link"
           href={`/admin/users/${profile.userId}`}
           onClick={(e) => e.stopPropagation()}
           className={cn('p-0', className)}
-          size="link"
         >
           {profile.username}
         </LinkButton>
