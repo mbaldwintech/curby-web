@@ -2,6 +2,7 @@
 
 import {
   AdminPageContainer,
+  Badge,
   Button,
   Card,
   CardContent,
@@ -9,6 +10,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
+  CopyableStringCell,
   Field,
   FieldContent,
   FieldDescription,
@@ -22,11 +24,15 @@ import {
   InputGroupTextarea,
   LoadingSpinner,
   MultiSelect,
+  Separator,
   Switch
 } from '@core/components';
 import { UserRole } from '@core/enumerations';
+import { cn } from '@core/utils';
 import { TutorialViewTable } from '@features/tutorials/components';
 import { useTutorialForm } from '@features/tutorials/hooks';
+import { format } from 'date-fns';
+import { Activity, BookOpen, CheckCircle2, Eye, InfoIcon, Key, ShieldCheck, Users, XCircle } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import React, { useCallback } from 'react';
 import { Controller } from 'react-hook-form';
@@ -59,13 +65,104 @@ export default function TutorialDetailsPage() {
           </div>
         ) : (
           <>
+            {/* Tutorial Overview - Only show for existing tutorials */}
+            {tutorial && (
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center gap-3">
+                    <div
+                      className={cn(
+                        'flex items-center justify-center w-12 h-12 rounded-full border-2',
+                        tutorial.active
+                          ? 'bg-green-100 dark:bg-green-900/20 text-green-600 dark:text-green-400 border-green-200 dark:border-green-800'
+                          : 'bg-gray-100 dark:bg-gray-900/20 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-800'
+                      )}
+                    >
+                      {tutorial.active ? <CheckCircle2 className="h-6 w-6" /> : <XCircle className="h-6 w-6" />}
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <CardTitle className="text-xl">{tutorial.title}</CardTitle>
+                        <Badge variant={tutorial.active ? 'default' : 'secondary'} className="h-6">
+                          {tutorial.active ? 'Active' : 'Inactive'}
+                        </Badge>
+                      </div>
+                      <CardDescription>{tutorial.description || 'No description provided'}</CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <p className="text-sm font-medium text-muted-foreground mb-2 flex items-center gap-2">
+                          <Key className="h-4 w-4" />
+                          Tutorial Key
+                        </p>
+                        <CopyableStringCell value={tutorial.key} />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-muted-foreground mb-2 flex items-center gap-2">
+                          <Activity className="h-4 w-4" />
+                          Tutorial ID
+                        </p>
+                        <CopyableStringCell value={tutorial.id} />
+                      </div>
+                    </div>
+
+                    {tutorial.roles && tutorial.roles.length > 0 && (
+                      <>
+                        <Separator />
+                        <div>
+                          <p className="text-sm font-medium text-muted-foreground mb-3 flex items-center gap-2">
+                            <Users className="h-4 w-4" />
+                            Target Roles ({tutorial.roles.length})
+                          </p>
+                          <div className="flex flex-wrap gap-2">
+                            {tutorial.roles.map((role) => (
+                              <Badge key={role} variant="outline" className="font-normal">
+                                <ShieldCheck className="h-3 w-3 mr-1" />
+                                {role}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                      </>
+                    )}
+
+                    <Separator />
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <p className="text-sm font-medium text-muted-foreground mb-2">Created At</p>
+                        <p className="text-sm">{format(new Date(tutorial.createdAt), 'PPpp')}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-muted-foreground mb-2">Last Updated</p>
+                        <p className="text-sm">{format(new Date(tutorial.updatedAt), 'PPpp')}</p>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Tutorial Form Section */}
             <Card>
               <CardHeader>
-                <CardTitle>{tutorial ? tutorial.title : 'Create New Tutorial'}</CardTitle>
-                <CardDescription>
-                  {tutorial ? tutorial.description : 'Fill out the form below to create a new tutorial.'}
-                </CardDescription>
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/10">
+                    <BookOpen className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <CardTitle>{tutorial ? 'Edit Tutorial' : 'Create New Tutorial'}</CardTitle>
+                    <CardDescription>
+                      {tutorial
+                        ? 'Update the tutorial information below'
+                        : 'Fill out the form below to create a new tutorial'}
+                    </CardDescription>
+                  </div>
+                </div>
               </CardHeader>
               <CardContent>
                 <form id="tutorial-form" onSubmit={form.handleSubmit(handleSubmit)}>
@@ -214,12 +311,31 @@ export default function TutorialDetailsPage() {
             {id && (
               <Card>
                 <CardHeader>
-                  <CardTitle>Tutorial Views & Analytics</CardTitle>
-                  <FieldDescription>View analytics and user engagement data for this tutorial.</FieldDescription>
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/20">
+                      <Eye className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                    </div>
+                    <div>
+                      <CardTitle>Tutorial Views & Analytics</CardTitle>
+                      <CardDescription>View analytics and user engagement data for this tutorial</CardDescription>
+                    </div>
+                  </div>
                 </CardHeader>
                 <CardContent className="flex flex-col gap-2">
                   <MemoizedTutorialViewTable
                     restrictiveFilters={[{ column: 'tutorialId', operator: 'eq', value: id }]}
+                    onRowClick={(tutorialView: { id: string }) => {
+                      router.push(`/admin/tutorials/views/${tutorialView.id}`);
+                    }}
+                    getRowActionMenuItems={() => [
+                      {
+                        label: 'View Details',
+                        icon: InfoIcon,
+                        onClick: (tutorialView: { id: string }) => {
+                          router.push(`/admin/tutorials/views/${tutorialView.id}`);
+                        }
+                      }
+                    ]}
                   />
                 </CardContent>
               </Card>
