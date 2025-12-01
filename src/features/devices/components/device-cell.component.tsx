@@ -3,11 +3,12 @@
 import { Button, LinkButton, Tooltip, TooltipContent, TooltipTrigger } from '@core/components';
 import { DeviceService } from '@core/services';
 import { Device } from '@core/types';
+import { cn } from '@core/utils';
 import { createClientService } from '@supa/utils/client';
 import { CopyIcon } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
-export const DeviceCell = ({ deviceId }: { deviceId?: string | null }) => {
+export const DeviceCell = ({ deviceId, className }: { deviceId?: string | null; className?: string }) => {
   const deviceService = useRef(createClientService(DeviceService)).current;
   const [device, setDevice] = useState<Device | null>(null);
 
@@ -40,7 +41,7 @@ export const DeviceCell = ({ deviceId }: { deviceId?: string | null }) => {
             variant="link"
             href={`/admin/devices/${device.id}`}
             onClick={(e) => e.stopPropagation()}
-            className="p-0 w-full"
+            className={cn('p-0 w-full', className)}
           >
             <p className="truncate w-full overflow-hidden whitespace-nowrap">{device.deviceId}</p>
           </LinkButton>

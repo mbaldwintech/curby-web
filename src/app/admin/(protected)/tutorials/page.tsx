@@ -7,9 +7,11 @@ import { Tutorial } from '@core/types';
 import { TutorialPanel, TutorialPanelRef, TutorialTable, TutorialViewTable } from '@features/tutorials/components';
 import { createClientService } from '@supa/utils/client';
 import { EyeIcon, InfoIcon, PlusIcon, TrashIcon } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useRef } from 'react';
 
 export default function TutorialsPage() {
+  const router = useRouter();
   const tutorialService = useRef(createClientService(TutorialService)).current;
   const tutorialViewService = useRef(createClientService(TutorialViewService)).current;
   const tutorialTableRef = useRef<CurbyTableRef<Tutorial>>(null);
@@ -76,6 +78,18 @@ export default function TutorialsPage() {
               <TutorialViewTable
                 restrictiveFilters={[{ column: 'tutorialId', operator: 'eq', value: row.id }]}
                 maxHeight={200}
+                onRowClick={(tutorialView: { id: string }) => {
+                  router.push(`/admin/tutorials/views/${tutorialView.id}`);
+                }}
+                getRowActionMenuItems={() => [
+                  {
+                    label: 'View Details',
+                    icon: InfoIcon,
+                    onClick: (tutorialView: { id: string }) => {
+                      router.push(`/admin/tutorials/views/${tutorialView.id}`);
+                    }
+                  }
+                ]}
               />
             </div>
           );
