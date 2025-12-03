@@ -145,7 +145,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
               <nav className="flex flex-col gap-2">
                 <LinkButton
                   variant="link"
-                  href="mailto:hello@curby.app"
+                  href="mailto:support@getcurby.app"
                   className="justify-start p-0 h-auto text-muted-foreground"
                 >
                   Contact Us

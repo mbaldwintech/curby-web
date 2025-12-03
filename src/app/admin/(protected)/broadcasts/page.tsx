@@ -37,17 +37,17 @@ export default function BroadcastsPage() {
           getRowActionMenuItems={(row) =>
             [
               {
-                label: 'Go to broadcast',
-                icon: ArrowRight,
-                onClick: () => {
-                  router.push(`/admin/broadcasts/${row.original.id}`);
-                }
-              },
-              {
                 label: 'View Details',
                 icon: Info,
                 onClick: () => {
                   panelRef.current?.open(row.original.id);
+                }
+              },
+              {
+                label: 'Go to broadcast',
+                icon: ArrowRight,
+                onClick: () => {
+                  router.push(`/admin/broadcasts/${row.original.id}`);
                 }
               },
               row.original.status === BroadcastStatus.Archived && {

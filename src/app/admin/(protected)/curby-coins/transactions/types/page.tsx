@@ -10,7 +10,7 @@ import {
   CurbyCoinTransactionTypeTable
 } from '@features/curby-coins/components';
 import { createClientService } from '@supa/utils/client';
-import { InfoIcon, PlusIcon, TrashIcon } from 'lucide-react';
+import { ArrowRight, InfoIcon, PlusIcon, TrashIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useRef } from 'react';
 
@@ -47,14 +47,14 @@ export default function CurbyCoinTransactionTypesPage() {
         getRowActionMenuItems={async (row) => {
           const menuItems: RowMenuItem<CurbyCoinTransactionType>[] = [
             {
-              label: 'Go to details',
-              icon: InfoIcon,
-              onClick: ({ id }) => router.push(`/admin/curby-coins/transactions/types/${id}`)
-            },
-            {
-              label: 'Edit in panel',
+              label: 'View Details',
               icon: InfoIcon,
               onClick: ({ id }) => curbyCoinTransactionTypePanelRef.current?.open(id)
+            },
+            {
+              label: 'Go to transaction type',
+              icon: ArrowRight,
+              onClick: ({ id }) => router.push(`/admin/curby-coins/transactions/types/${id}`)
             }
           ];
 

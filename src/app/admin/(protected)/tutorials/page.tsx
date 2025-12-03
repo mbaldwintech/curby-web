@@ -6,7 +6,7 @@ import { TutorialService, TutorialViewService } from '@core/services';
 import { Tutorial } from '@core/types';
 import { TutorialPanel, TutorialPanelRef, TutorialTable, TutorialViewTable } from '@features/tutorials/components';
 import { createClientService } from '@supa/utils/client';
-import { EyeIcon, InfoIcon, PlusIcon, TrashIcon } from 'lucide-react';
+import { ArrowRight, EyeIcon, InfoIcon, PlusIcon, TrashIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useRef } from 'react';
 
@@ -41,6 +41,11 @@ export default function TutorialsPage() {
               label: 'View Details',
               icon: InfoIcon,
               onClick: ({ id }) => tutorialPanelRef.current?.open(id)
+            },
+            {
+              label: 'Go to tutorial',
+              icon: ArrowRight,
+              onClick: ({ id }) => router.push(`/admin/tutorials/${id}`)
             },
             {
               label: 'View Tutorial Views',

@@ -11,10 +11,12 @@ import {
 import { EventType } from '@core/types';
 import { EventTypePanel, EventTypePanelRef, EventTypeTable } from '@features/events/components';
 import { createClientService } from '@supa/utils/client';
-import { InfoIcon, PlusIcon, TrashIcon } from 'lucide-react';
+import { ArrowRight, InfoIcon, PlusIcon, TrashIcon } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useRef } from 'react';
 
 export default function EventTypesPage() {
+  const router = useRouter();
   const eventTypeService = useRef(createClientService(EventTypeService)).current;
   const eventService = useRef(createClientService(EventService)).current;
   const curbyCoinTransactionTypeService = useRef(createClientService(CurbyCoinTransactionTypeService)).current;
@@ -51,6 +53,13 @@ export default function EventTypesPage() {
               label: 'View Details',
               icon: InfoIcon,
               onClick: ({ id }) => eventTypePanelRef.current?.open(id)
+            },
+            {
+              label: 'Go to event type',
+              icon: ArrowRight,
+              onClick: ({ id }) => {
+                router.push(`/admin/events/types/${id}`);
+              }
             }
           ];
 

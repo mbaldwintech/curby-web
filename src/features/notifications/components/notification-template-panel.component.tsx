@@ -1,14 +1,7 @@
 'use client';
 
 import {
-  AdminPageContainer,
   Button,
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
   ConditionFormGroup,
   DateTimePicker,
   Field,
@@ -21,93 +14,109 @@ import {
   InputGroup,
   InputGroupTextarea,
   LoadingSpinner,
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
   Switch
 } from '@core/components';
-import { useNotificationTemplateForm } from '@features/notifications/hooks';
-import { useParams, useRouter } from 'next/navigation';
-import { useCallback } from 'react';
+import { PanelRef } from '@core/types';
+import { CurbyCoinTransactionTypeSelect } from '@features/curby-coins/components';
+import { EventTypeSelect } from '@features/events/components';
+import { forwardRef, useCallback, useImperativeHandle, useState } from 'react';
 import { Controller } from 'react-hook-form';
+import { useNotificationTemplateForm } from '../hooks';
 
-export default function NotificationTemplateDetailsPage() {
-  const { id } = useParams<{ id: string }>();
-  const router = useRouter();
+export type NotificationTemplatePanelRef = PanelRef<string | undefined>;
 
-  const { form, notificationTemplate, loading, submitting, handleSubmit, clear } = useNotificationTemplateForm({
-    notificationTemplateId: id,
-    onSubmitSuccess: () => {
-      handleClose();
-    }
-  });
+export interface NotificationTemplatePanelProps {
+  onClose?: () => void;
+}
 
-  const handleClose = useCallback(() => {
-    router.push('/admin/notifications/templates');
-    clear();
-  }, [router, clear]);
+export const NotificationTemplatePanel = forwardRef<NotificationTemplatePanelRef, NotificationTemplatePanelProps>(
+  function NotificationTemplatePanel({ onClose }: NotificationTemplatePanelProps, ref) {
+    const [open, setOpen] = useState(false);
+    const [notificationTemplateId, setNotificationTemplateId] = useState<string | null>(null);
+    const { form, notificationTemplate, loading, submitting, handleSubmit, clear } = useNotificationTemplateForm({
+      notificationTemplateId,
+      onSubmitSuccess: () => {
+        handleClose();
+      }
+    });
 
-  const isNew = !id || id === 'new';
+    const handleClose = useCallback(() => {
+      setNotificationTemplateId(null);
+      setOpen(false);
+      onClose?.();
+      clear();
+    }, [clear, onClose]);
 
-  if (loading) {
+    useImperativeHandle<
+      NotificationTemplatePanelRef,
+      NotificationTemplatePanelRef
+    >(ref, (): NotificationTemplatePanelRef => {
+      return {
+        isOpen: open,
+        open: (notificationTemplateId?: string) => {
+          setNotificationTemplateId(notificationTemplateId || null);
+          setOpen(true);
+        },
+        close: handleClose
+      };
+    }, [handleClose, open]);
+
     return (
-      <AdminPageContainer title="Loading...">
-        <div className="flex h-96 items-center justify-center">
-          <LoadingSpinner />
-        </div>
-      </AdminPageContainer>
-    );
-  }
+      <Sheet open={open} onOpenChange={handleClose}>
+        <SheetContent>
+          <SheetHeader>
+            <SheetTitle>{notificationTemplate ? notificationTemplate.key : 'New Notification Template'}</SheetTitle>
+            <SheetDescription>
+              {notificationTemplate
+                ? notificationTemplate.category
+                : 'Fill out the form below to create a new notification template.'}
+            </SheetDescription>
+          </SheetHeader>
 
-  return (
-    <AdminPageContainer
-      title={isNew ? 'Create Notification Template' : `Edit ${notificationTemplate?.key || 'Notification Template'}`}
-    >
-      <div className="flex flex-col gap-6 px-4 overflow-auto max-w-6xl mx-auto w-full">
-        {loading ? (
-          <div className="flex items-center justify-center h-48">
-            <LoadingSpinner loading={true} />
-          </div>
-        ) : (
-          <Card>
-            <CardHeader>
-              <CardTitle>
-                {isNew ? 'Create Notification Template' : `Edit ${notificationTemplate?.key || 'Template'}`}
-              </CardTitle>
-              <CardDescription>
-                {isNew
-                  ? 'Create a new notification template by filling out the form below.'
-                  : 'Edit the details of the notification template below.'}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form id="notification-template-form" onSubmit={form.handleSubmit(handleSubmit)}>
-                <FieldGroup className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid flex-1 auto-rows-min gap-6 px-4 overflow-auto">
+            {loading ? (
+              <div className="flex items-center justify-center h-48">
+                <LoadingSpinner loading={true} />
+              </div>
+            ) : (
+              <form id="notificationTemplate-form" onSubmit={form.handleSubmit(handleSubmit)}>
+                <FieldGroup className="grid grid-cols-1 gap-6">
                   <Controller
                     name="key"
                     control={form.control}
                     render={({ field, fieldState }) => (
                       <Field data-invalid={fieldState.invalid}>
-                        <FieldLabel htmlFor="notification-template-form-key">Key</FieldLabel>
+                        <FieldLabel htmlFor="notificationTemplate-form-key">Key</FieldLabel>
                         <Input
                           {...field}
-                          id="notification-template-form-key"
+                          id="notificationTemplate-form-key"
                           aria-invalid={fieldState.invalid}
-                          placeholder="Enter a unique key..."
+                          placeholder="Enter a key for the notification template..."
                           autoComplete="off"
                         />
-                        <FieldDescription>Unique identifier with no spaces.</FieldDescription>
+                        <FieldDescription>
+                          A unique key to identify the notification template (e.g., &quot;item-posted&quot;,
+                          &quot;item-taken&quot;).
+                        </FieldDescription>
                         {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                       </Field>
                     )}
                   />
-
                   <Controller
                     name="version"
                     control={form.control}
                     render={({ field, fieldState }) => (
                       <Field data-invalid={fieldState.invalid}>
-                        <FieldLabel htmlFor="notification-template-form-version">Version</FieldLabel>
+                        <FieldLabel htmlFor="notificationTemplate-form-version">Version</FieldLabel>
                         <Input
                           {...field}
-                          id="notification-template-form-version"
+                          id="notificationTemplate-form-version"
                           type="number"
                           min="1"
                           value={field.value || ''}
@@ -120,211 +129,225 @@ export default function NotificationTemplateDetailsPage() {
                       </Field>
                     )}
                   />
-
                   <Controller
                     name="eventTypeId"
                     control={form.control}
                     render={({ field, fieldState }) => (
                       <Field data-invalid={fieldState.invalid}>
-                        <FieldLabel htmlFor="notification-template-form-eventTypeId">Event Type ID</FieldLabel>
-                        <Input
+                        <FieldLabel htmlFor="notificationTemplate-form-eventTypeId">Event Type</FieldLabel>
+                        <EventTypeSelect
                           {...field}
-                          id="notification-template-form-eventTypeId"
+                          id="notificationTemplate-panel-eventTypeId"
                           aria-invalid={fieldState.invalid}
-                          placeholder="Enter event type ID (optional)..."
-                          autoComplete="off"
+                          placeholder="Select event type..."
+                          value={field.value}
+                          onSelect={field.onChange}
                         />
-                        <FieldDescription>Triggering event type (optional).</FieldDescription>
+                        <FieldDescription>The event type that triggers this notification (optional).</FieldDescription>
                         {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                       </Field>
                     )}
                   />
-
                   <Controller
                     name="curbyCoinTransactionTypeId"
                     control={form.control}
                     render={({ field, fieldState }) => (
                       <Field data-invalid={fieldState.invalid}>
-                        <FieldLabel htmlFor="notification-template-form-curbyCoinTransactionTypeId">
-                          Curby Coin Transaction Type ID
+                        <FieldLabel htmlFor="notificationTemplate-form-curbyCoinTransactionTypeId">
+                          Curby Coin Transaction Type
                         </FieldLabel>
-                        <Input
+                        <CurbyCoinTransactionTypeSelect
                           {...field}
-                          id="notification-template-form-curbyCoinTransactionTypeId"
+                          id="notificationTemplate-panel-curbyCoinTransactionTypeId"
                           aria-invalid={fieldState.invalid}
-                          placeholder="Enter curby coin transaction type ID (optional)..."
-                          autoComplete="off"
+                          placeholder="Select the curby coin transaction type..."
+                          value={field.value}
+                          onSelect={field.onChange}
                         />
-                        <FieldDescription>Triggering transaction type (optional).</FieldDescription>
+                        <FieldDescription>
+                          The Curby Coin transaction type that triggers this notification (optional).
+                        </FieldDescription>
                         {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                       </Field>
                     )}
                   />
-
                   <Controller
                     name="recipient"
                     control={form.control}
                     render={({ field, fieldState }) => (
                       <Field data-invalid={fieldState.invalid}>
-                        <FieldLabel htmlFor="notification-template-form-recipient">Recipient</FieldLabel>
+                        <FieldLabel htmlFor="notificationTemplate-form-recipient">Recipient</FieldLabel>
                         <Input
                           {...field}
-                          id="notification-template-form-recipient"
+                          id="notificationTemplate-form-recipient"
                           aria-invalid={fieldState.invalid}
-                          placeholder="e.g., user, admin"
+                          placeholder="Enter recipient type..."
                           autoComplete="off"
                         />
-                        <FieldDescription>Who receives this notification.</FieldDescription>
+                        <FieldDescription>
+                          Who should receive this notification (e.g., &quot;user&quot;, &quot;admin&quot;).
+                        </FieldDescription>
                         {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                       </Field>
                     )}
                   />
-
                   <Controller
                     name="deliveryChannel"
                     control={form.control}
                     render={({ field, fieldState }) => (
                       <Field data-invalid={fieldState.invalid}>
-                        <FieldLabel htmlFor="notification-template-form-deliveryChannel">Delivery Channel</FieldLabel>
+                        <FieldLabel htmlFor="notificationTemplate-form-deliveryChannel">Delivery Channel</FieldLabel>
                         <Input
                           {...field}
-                          id="notification-template-form-deliveryChannel"
+                          id="notificationTemplate-form-deliveryChannel"
                           aria-invalid={fieldState.invalid}
-                          placeholder="e.g., push, email, in-app"
+                          placeholder="Enter delivery channel..."
                           autoComplete="off"
                         />
-                        <FieldDescription>How the notification is delivered.</FieldDescription>
+                        <FieldDescription>
+                          How the notification should be delivered (e.g., &quot;push&quot;, &quot;email&quot;,
+                          &quot;in-app&quot;).
+                        </FieldDescription>
                         {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                       </Field>
                     )}
                   />
-
                   <Controller
                     name="category"
                     control={form.control}
                     render={({ field, fieldState }) => (
                       <Field data-invalid={fieldState.invalid}>
-                        <FieldLabel htmlFor="notification-template-form-category">Category</FieldLabel>
+                        <FieldLabel htmlFor="notificationTemplate-form-category">Category</FieldLabel>
                         <Input
                           {...field}
-                          id="notification-template-form-category"
+                          id="notificationTemplate-form-category"
                           aria-invalid={fieldState.invalid}
-                          placeholder="Enter a category..."
+                          placeholder="Enter a category for the notification template..."
                           autoComplete="off"
                         />
-                        <FieldDescription>Grouping category for this template.</FieldDescription>
+                        <FieldDescription>
+                          A category to group similar notifications (e.g., &quot;items&quot;, &quot;social&quot;).
+                        </FieldDescription>
                         {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                       </Field>
                     )}
                   />
-
                   <Controller
                     name="titleTemplate"
                     control={form.control}
                     render={({ field, fieldState }) => (
                       <Field data-invalid={fieldState.invalid}>
-                        <FieldLabel htmlFor="notification-template-form-titleTemplate">Title Template</FieldLabel>
+                        <FieldLabel htmlFor="notificationTemplate-form-titleTemplate">Title Template</FieldLabel>
                         <Input
                           {...field}
-                          id="notification-template-form-titleTemplate"
+                          id="notificationTemplate-form-titleTemplate"
                           aria-invalid={fieldState.invalid}
-                          placeholder="Use placeholders like {userName}"
+                          placeholder="Enter notification title template (optional)..."
                           autoComplete="off"
                         />
-                        <FieldDescription>Template for the notification title.</FieldDescription>
+                        <FieldDescription>
+                          Template for the notification title. Use placeholders like {'{'}
+                          {'{'}userName{'}'}
+                          {'}'}.
+                        </FieldDescription>
                         {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                       </Field>
                     )}
                   />
-
                   <Controller
                     name="bodyTemplate"
                     control={form.control}
                     render={({ field, fieldState }) => (
-                      <Field data-invalid={fieldState.invalid} className="md:col-span-2">
-                        <FieldLabel htmlFor="notification-template-form-bodyTemplate">Body Template</FieldLabel>
+                      <Field data-invalid={fieldState.invalid}>
+                        <FieldLabel htmlFor="notificationTemplate-form-bodyTemplate">Body Template</FieldLabel>
                         <InputGroup>
                           <InputGroupTextarea
                             {...field}
-                            id="notification-template-form-bodyTemplate"
-                            placeholder="Use placeholders like {itemTitle}"
-                            rows={6}
+                            id="notificationTemplate-form-bodyTemplate"
+                            placeholder="Enter notification body template (optional)..."
+                            rows={4}
                             className="min-h-24 resize-none"
                             aria-invalid={fieldState.invalid}
                           />
                         </InputGroup>
-                        <FieldDescription>Template for the notification body.</FieldDescription>
+                        <FieldDescription>
+                          Template for the notification body. Use placeholders like {'{'}
+                          {'{'}itemTitle{'}'}
+                          {'}'}.
+                        </FieldDescription>
                         {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                       </Field>
                     )}
                   />
-
                   <Controller
                     name="targetRoute"
                     control={form.control}
                     render={({ field, fieldState }) => (
                       <Field data-invalid={fieldState.invalid}>
-                        <FieldLabel htmlFor="notification-template-form-targetRoute">Target Route</FieldLabel>
+                        <FieldLabel htmlFor="notificationTemplate-form-targetRoute">Target Route</FieldLabel>
                         <Input
                           {...field}
-                          id="notification-template-form-targetRoute"
+                          id="notificationTemplate-form-targetRoute"
                           aria-invalid={fieldState.invalid}
-                          placeholder="e.g., /items/{itemId}"
+                          placeholder="Enter target route (optional)..."
                           autoComplete="off"
                         />
-                        <FieldDescription>Route to navigate on tap (optional).</FieldDescription>
+                        <FieldDescription>
+                          Where to navigate when notification is tapped (e.g., &quot;/items/{'{'}itemId{'}'}&quot;).
+                        </FieldDescription>
                         {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                       </Field>
                     )}
                   />
-
                   <Controller
                     name="validFrom"
                     control={form.control}
                     render={({ field, fieldState }) => (
                       <Field data-invalid={fieldState.invalid}>
-                        <FieldLabel htmlFor="notification-template-form-validFrom">Valid From</FieldLabel>
+                        <FieldLabel htmlFor="notificationTemplate-form-validFrom">Valid From</FieldLabel>
                         <DateTimePicker
-                          id="notification-template-form-validFrom"
+                          id="notificationTemplate-form-validFrom"
                           value={field.value ? new Date(field.value) : undefined}
-                          onChange={(date) => field.onChange(date || null)}
+                          onChange={(date: Date | undefined) => field.onChange(date || null)}
                           aria-invalid={fieldState.invalid}
                           name={field.name}
                         />
-                        <FieldDescription>When this template becomes active.</FieldDescription>
+                        <FieldDescription>
+                          The date and time when this notification template becomes active.
+                        </FieldDescription>
                         {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                       </Field>
                     )}
                   />
-
                   <Controller
                     name="validTo"
                     control={form.control}
                     render={({ field, fieldState }) => (
                       <Field data-invalid={fieldState.invalid}>
-                        <FieldLabel htmlFor="notification-template-form-validTo">Valid To</FieldLabel>
+                        <FieldLabel htmlFor="notificationTemplate-form-validTo">Valid To</FieldLabel>
                         <DateTimePicker
-                          id="notification-template-form-validTo"
+                          id="notificationTemplate-form-validTo"
                           value={field.value ? new Date(field.value) : undefined}
-                          onChange={(date) => field.onChange(date || null)}
+                          onChange={(date: Date | undefined) => field.onChange(date || null)}
                           aria-invalid={fieldState.invalid}
                           name={field.name}
                         />
-                        <FieldDescription>Expiration (optional).</FieldDescription>
+                        <FieldDescription>
+                          The date and time when this notification template expires (optional).
+                        </FieldDescription>
                         {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                       </Field>
                     )}
                   />
-
                   <Controller
                     name="max"
                     control={form.control}
                     render={({ field, fieldState }) => (
                       <Field data-invalid={fieldState.invalid}>
-                        <FieldLabel htmlFor="notification-template-form-max">Max Occurrences</FieldLabel>
+                        <FieldLabel htmlFor="notificationTemplate-form-max">Max Occurrences</FieldLabel>
                         <Input
                           {...field}
-                          id="notification-template-form-max"
+                          id="notificationTemplate-form-max"
                           type="number"
                           min="1"
                           value={field.value || ''}
@@ -332,21 +355,22 @@ export default function NotificationTemplateDetailsPage() {
                           aria-invalid={fieldState.invalid}
                           placeholder="Unlimited"
                         />
-                        <FieldDescription>Maximum number of times this can be sent (optional).</FieldDescription>
+                        <FieldDescription>
+                          Maximum number of times this notification can be sent (optional).
+                        </FieldDescription>
                         {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                       </Field>
                     )}
                   />
-
                   <Controller
                     name="maxPerDay"
                     control={form.control}
                     render={({ field, fieldState }) => (
                       <Field data-invalid={fieldState.invalid}>
-                        <FieldLabel htmlFor="notification-template-form-maxPerDay">Max Per Day</FieldLabel>
+                        <FieldLabel htmlFor="notificationTemplate-form-maxPerDay">Max Per Day</FieldLabel>
                         <Input
                           {...field}
-                          id="notification-template-form-maxPerDay"
+                          id="notificationTemplate-form-maxPerDay"
                           type="number"
                           min="1"
                           value={field.value || ''}
@@ -354,37 +378,35 @@ export default function NotificationTemplateDetailsPage() {
                           aria-invalid={fieldState.invalid}
                           placeholder="Unlimited"
                         />
-                        <FieldDescription>Daily limit (optional).</FieldDescription>
+                        <FieldDescription>
+                          Maximum number of times this notification can be sent per day (optional).
+                        </FieldDescription>
                         {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                       </Field>
                     )}
                   />
-
-                  <div className="md:col-span-2">
-                    <ConditionFormGroup
-                      control={form.control}
-                      namePrefix="condition"
-                      setValue={form.setValue}
-                      formId="notification-template-form"
-                    />
-                  </div>
-
+                  <ConditionFormGroup
+                    control={form.control}
+                    namePrefix="condition"
+                    setValue={form.setValue}
+                    formId="notificationTemplate-form"
+                  />
                   <Controller
                     name="active"
                     control={form.control}
                     render={({ field, fieldState }) => (
-                      <Field orientation="horizontal" data-invalid={fieldState.invalid} className="md:col-span-2">
+                      <Field orientation="horizontal" data-invalid={fieldState.invalid}>
                         <FieldContent>
-                          <FieldLabel htmlFor="notification-template-form-active">Status</FieldLabel>
+                          <FieldLabel htmlFor="notificationTemplate-form-active">Status</FieldLabel>
                           <FieldDescription>
                             {field.value
-                              ? 'Notification Template is active and can be used'
-                              : 'Notification Template is inactive and hidden from users'}
+                              ? 'Notification template is active and can be used'
+                              : 'Notification template is inactive and will not be used'}
                           </FieldDescription>
                           {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                         </FieldContent>
                         <Switch
-                          id="notification-template-form-active"
+                          id="notificationTemplate-form-active"
                           name={field.name}
                           checked={field.value}
                           onCheckedChange={field.onChange}
@@ -395,25 +417,26 @@ export default function NotificationTemplateDetailsPage() {
                   />
                 </FieldGroup>
               </form>
-            </CardContent>
-            <CardFooter>
-              <Field orientation="horizontal" className="justify-end">
-                <Button type="button" variant="outline" onClick={handleClose} disabled={submitting}>
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  form="notification-template-form"
-                  disabled={!form.formState.isDirty || !form.formState.isValid || submitting}
-                >
-                  {submitting && <LoadingSpinner loading={true} />}
-                  {isNew ? 'Create Notification Template' : 'Update Notification Template'}
-                </Button>
-              </Field>
-            </CardFooter>
-          </Card>
-        )}
-      </div>
-    </AdminPageContainer>
-  );
-}
+            )}
+          </div>
+
+          <SheetFooter>
+            <Field orientation="horizontal" className="w-full justify-end">
+              <Button type="button" variant="outline" onClick={handleClose}>
+                Close
+              </Button>
+              <Button
+                type="submit"
+                form="notificationTemplate-form"
+                disabled={!form.formState.isDirty || !form.formState.isValid || submitting}
+              >
+                {submitting && <LoadingSpinner loading={true} />}
+                Submit
+              </Button>
+            </Field>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
+    );
+  }
+);
