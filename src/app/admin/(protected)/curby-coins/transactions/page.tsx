@@ -16,7 +16,7 @@ export default function CurbyCoinTransactionsPage() {
         }}
         getRowActionMenuItems={() => [
           {
-            label: 'View Details',
+            label: 'View details',
             icon: InfoIcon,
             onClick: (tx) => {
               router.push(`/admin/curby-coins/transactions/${tx.id}`);

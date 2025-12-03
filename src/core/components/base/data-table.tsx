@@ -310,11 +310,7 @@ function DraggableRow<T extends { id: string }>({
           {contextMenuItems.map((item, index) => (
             <React.Fragment key={index}>
               {item.separator && <hr className="my-1" />}
-              <ContextMenuItem
-                onClick={() => item.onClick(row)}
-                disabled={item.disabled}
-                className={cn(item.variant === 'destructive' && 'text-destructive focus:text-destructive')}
-              >
+              <ContextMenuItem onClick={() => item.onClick(row)} disabled={item.disabled} variant={item.variant}>
                 {item.icon && <item.icon className="mr-2 h-4 w-4" />}
                 {item.label}
               </ContextMenuItem>
@@ -496,7 +492,8 @@ const ActionsCell = <T,>({
           <React.Fragment key={`menuItem-${i}`}>
             {menuItem.separator && <DropdownMenuSeparator />}
             <DropdownMenuItem
-              className={cn(menuItem.variant === 'destructive' ? 'text-destructive' : '', 'whitespace-nowrap')}
+              variant={menuItem.variant === 'destructive' ? 'destructive' : 'default'}
+              className="whitespace-nowrap"
               disabled={menuItem.disabled}
               onClick={(e) => {
                 e.preventDefault();

@@ -37,7 +37,7 @@ export default function BroadcastsPage() {
           getRowActionMenuItems={(row) =>
             [
               {
-                label: 'View Details',
+                label: 'View details',
                 icon: Info,
                 onClick: () => {
                   panelRef.current?.open(row.original.id);
@@ -72,7 +72,7 @@ export default function BroadcastsPage() {
           }
         />
       </AdminPageContainer>
-      <BroadcastPanel ref={panelRef} onClose={() => window.location.reload()} />
+      <BroadcastPanel ref={panelRef} onClose={() => tableRef.current?.refresh()} />
     </>
   );
 }

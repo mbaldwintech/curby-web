@@ -63,7 +63,7 @@ export default function SupportRequestsPage() {
     (row: SupportRequest) => {
       return [
         {
-          label: 'View Details',
+          label: 'View details',
           icon: InfoIcon,
           onClick: (row: Row<SupportRequest>) => {
             router.push(`/admin/support/requests/${row.id}`);

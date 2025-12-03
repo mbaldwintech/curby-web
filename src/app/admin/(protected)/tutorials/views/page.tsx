@@ -16,7 +16,7 @@ export default function TutorialViewsPage() {
         }}
         getRowActionMenuItems={() => [
           {
-            label: 'View Details',
+            label: 'View details',
             icon: InfoIcon,
             onClick: (tutorialView: { id: string }) => {
               router.push(`/admin/tutorials/views/${tutorialView.id}`);

@@ -16,7 +16,7 @@ export default function TermsAndConditionsPage() {
         }}
         getRowActionMenuItems={() => [
           {
-            label: 'View Details',
+            label: 'View details',
             icon: InfoIcon,
             onClick: (terms) => {
               router.push(`/admin/legal/terms/versions/${terms.id}`);

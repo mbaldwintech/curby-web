@@ -38,7 +38,7 @@ export default function TutorialsPage() {
         getRowActionMenuItems={async (row) => {
           const menuItems: RowMenuItem<Tutorial>[] = [
             {
-              label: 'View Details',
+              label: 'View details',
               icon: InfoIcon,
               onClick: ({ id }) => tutorialPanelRef.current?.open(id)
             },
@@ -48,7 +48,7 @@ export default function TutorialsPage() {
               onClick: ({ id }) => router.push(`/admin/tutorials/${id}`)
             },
             {
-              label: 'View Tutorial Views',
+              label: 'View tutorial views',
               icon: EyeIcon,
               onClick: ({ id }) => tutorialTableRef.current?.toggleExpand(id)
             }
@@ -88,7 +88,7 @@ export default function TutorialsPage() {
                 }}
                 getRowActionMenuItems={() => [
                   {
-                    label: 'View Details',
+                    label: 'View details',
                     icon: InfoIcon,
                     onClick: (tutorialView: { id: string }) => {
                       router.push(`/admin/tutorials/views/${tutorialView.id}`);

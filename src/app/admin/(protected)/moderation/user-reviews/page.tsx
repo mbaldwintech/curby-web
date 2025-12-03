@@ -73,7 +73,7 @@ export default function UserReviewsPage() {
     (row: UserReview) => {
       return [
         {
-          label: 'View Details',
+          label: 'View details',
           icon: InfoIcon,
           onClick: (row: Row<UserReview>) => {
             router.push(`/admin/moderation/user-reviews/${row.id}`);

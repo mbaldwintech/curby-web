@@ -140,8 +140,8 @@ export const NotificationTemplatePanel = forwardRef<NotificationTemplatePanelRef
                           id="notificationTemplate-panel-eventTypeId"
                           aria-invalid={fieldState.invalid}
                           placeholder="Select event type..."
-                          value={field.value}
-                          onSelect={field.onChange}
+                          value={field.value ?? undefined}
+                          onSelect={(val) => field.onChange(val ?? undefined)}
                         />
                         <FieldDescription>The event type that triggers this notification (optional).</FieldDescription>
                         {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
@@ -160,9 +160,9 @@ export const NotificationTemplatePanel = forwardRef<NotificationTemplatePanelRef
                           {...field}
                           id="notificationTemplate-panel-curbyCoinTransactionTypeId"
                           aria-invalid={fieldState.invalid}
-                          placeholder="Select the curby coin transaction type..."
-                          value={field.value}
-                          onSelect={field.onChange}
+                          placeholder="Select the transaction type..."
+                          value={field.value ?? null}
+                          onSelect={(val) => field.onChange(val ?? undefined)}
                         />
                         <FieldDescription>
                           The Curby Coin transaction type that triggers this notification (optional).

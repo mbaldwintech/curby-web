@@ -16,7 +16,7 @@ export default function DevicesPage() {
         }}
         getRowActionMenuItems={() => [
           {
-            label: 'View Details',
+            label: 'View details',
             icon: InfoIcon,
             onClick: (device) => {
               router.push(`/admin/devices/${device.id}`);
