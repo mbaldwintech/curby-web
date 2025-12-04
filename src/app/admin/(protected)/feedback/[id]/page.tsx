@@ -28,7 +28,8 @@ export default function FeedbackDetailsPage() {
   const {
     data: feedback,
     loading,
-    error
+    error,
+    refresh
   } = useDataQuery(async () => {
     return feedbackService.getById(id);
   }, [id]);
@@ -42,7 +43,11 @@ export default function FeedbackDetailsPage() {
   }
 
   if (!feedback) {
-    return <AdminPageContainer title="Feedback Details">Feedback not found.</AdminPageContainer>;
+    return (
+      <AdminPageContainer title="Feedback Details" retry={refresh}>
+        Feedback not found.
+      </AdminPageContainer>
+    );
   }
 
   const getTypeIcon = (type?: FeedbackType) => {

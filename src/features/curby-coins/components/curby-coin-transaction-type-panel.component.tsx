@@ -121,11 +121,11 @@ export const CurbyCoinTransactionTypePanel = forwardRef<
                         {...field}
                         id="curby-coin-transaction-type-panel-eventTypeId"
                         aria-invalid={fieldState.invalid}
-                        placeholder="Enter event type ID..."
+                        placeholder="Select the event type..."
                         value={field.value}
                         onSelect={field.onChange}
                       />
-                      <FieldDescription>The ID of the event type this transaction type belongs to.</FieldDescription>
+                      <FieldDescription>The event type this transaction type is triggered by.</FieldDescription>
                       {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                     </Field>
                   )}

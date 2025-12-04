@@ -16,7 +16,7 @@ export default function FeedbackPage() {
         }}
         getRowActionMenuItems={() => [
           {
-            label: 'View Details',
+            label: 'View details',
             icon: InfoIcon,
             onClick: (feedback) => {
               router.push(`/admin/feedback/${feedback.id}`);

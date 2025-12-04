@@ -1,6 +1,15 @@
 'use client';
 
-import { AdminPageContainer, Button, CurbyTableRef, RowMenuItem } from '@core/components';
+import {
+  AdminPageContainer,
+  Button,
+  CurbyTableRef,
+  RowMenuItem,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger
+} from '@core/components';
 import { useConfirmDialog } from '@core/providers';
 import {
   CurbyCoinTransactionTypeService,
@@ -9,12 +18,16 @@ import {
   NotificationTemplateService
 } from '@core/services';
 import { EventType } from '@core/types';
+import { CurbyCoinTransactionTypeTable } from '@features/curby-coins/components';
 import { EventTypePanel, EventTypePanelRef, EventTypeTable } from '@features/events/components';
+import { NotificationTemplateTable } from '@features/notifications/components';
 import { createClientService } from '@supa/utils/client';
-import { InfoIcon, PlusIcon, TrashIcon } from 'lucide-react';
+import { ArrowRight, InfoIcon, PlusIcon, TrashIcon } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useRef } from 'react';
 
 export default function EventTypesPage() {
+  const router = useRouter();
   const eventTypeService = useRef(createClientService(EventTypeService)).current;
   const eventService = useRef(createClientService(EventService)).current;
   const curbyCoinTransactionTypeService = useRef(createClientService(CurbyCoinTransactionTypeService)).current;
@@ -48,9 +61,16 @@ export default function EventTypesPage() {
         getRowActionMenuItems={async (row) => {
           const menuItems: RowMenuItem<EventType>[] = [
             {
-              label: 'View Details',
+              label: 'View details',
               icon: InfoIcon,
               onClick: ({ id }) => eventTypePanelRef.current?.open(id)
+            },
+            {
+              label: 'Go to event type',
+              icon: ArrowRight,
+              onClick: ({ id }) => {
+                router.push(`/admin/events/types/${id}`);
+              }
             }
           ];
 
@@ -85,6 +105,29 @@ export default function EventTypesPage() {
             </Button>
           </>
         )}
+        getExpandedContent={(row) => {
+          return (
+            <Tabs defaultValue="notif-templates" className="w-full py-4 px-6">
+              <TabsList>
+                <TabsTrigger value="notif-templates">Notification Templates</TabsTrigger>
+                <TabsTrigger value="tx-types">Transaction Types</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="notif-templates" className="flex flex-col gap-2">
+                <NotificationTemplateTable
+                  restrictiveFilters={[{ column: 'eventTypeId', operator: 'eq', value: row.id }]}
+                  maxHeight={200}
+                />
+              </TabsContent>
+              <TabsContent value="tx-types" className="flex flex-col gap-2">
+                <CurbyCoinTransactionTypeTable
+                  restrictiveFilters={[{ column: 'eventTypeId', operator: 'eq', value: row.id }]}
+                  maxHeight={200}
+                />
+              </TabsContent>
+            </Tabs>
+          );
+        }}
       />
 
       <EventTypePanel ref={eventTypePanelRef} onClose={eventTypeTableRef.current?.refresh} />

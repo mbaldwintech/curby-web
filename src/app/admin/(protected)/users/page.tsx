@@ -16,7 +16,7 @@ export default function UsersPage() {
         }}
         getRowActionMenuItems={() => [
           {
-            label: 'View Details',
+            label: 'View details',
             icon: InfoIcon,
             onClick: (row) => {
               router.push(`/admin/users/${row.original.userId}`);

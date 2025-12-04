@@ -16,7 +16,7 @@ export default function ItemsPage() {
         }}
         getRowActionMenuItems={() => [
           {
-            label: 'View Details',
+            label: 'View details',
             icon: InfoIcon,
             onClick: (item) => {
               router.push(`/admin/items/${item.id}`);

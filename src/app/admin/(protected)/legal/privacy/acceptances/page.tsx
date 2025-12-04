@@ -16,7 +16,7 @@ export default function PrivacyPolicyAcceptancesPage() {
         }}
         getRowActionMenuItems={() => [
           {
-            label: 'View Details',
+            label: 'View details',
             icon: InfoIcon,
             onClick: (acceptance) => {
               router.push(`/admin/legal/privacy/acceptances/${acceptance.id}`);
