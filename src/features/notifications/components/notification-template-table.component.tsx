@@ -33,7 +33,7 @@ export const NotificationTemplateTable = forwardRef<
   const columns: CustomColumnDef<NotificationTemplate>[] = useMemo(
     () =>
       [
-        buildColumn('key', 'Event Key', { enableHiding: false }),
+        buildColumn('key', 'Key', { enableHiding: false }),
         buildColumn('version', 'Version'),
         buildColumn('category', 'Category'),
         buildColumn('eventTypeId', 'Event Trigger', {
