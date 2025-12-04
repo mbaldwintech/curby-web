@@ -364,8 +364,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4">
-                <LinkButton variant="link" href="mailto:hello@curby.app">
-                  hello@curby.app
+                <LinkButton variant="link" href="mailto:support@getcurby.app">
+                  support@getcurby.app
                 </LinkButton>
                 <LinkButton variant="link" href="/legal/privacy">
                   Privacy

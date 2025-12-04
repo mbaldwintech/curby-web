@@ -14,7 +14,7 @@ export const EventTypeSelect = ({ value, onSelect, ...rest }: EventTypeSelectPro
   return (
     <Autocomplete
       {...rest}
-      value={value}
+      value={value ?? null}
       pageSize={10}
       getCount={async (query: string) => {
         return eventTypeService.count(undefined, query ? { text: query, columns: ['name'] } : undefined);
@@ -38,8 +38,8 @@ export const EventTypeSelect = ({ value, onSelect, ...rest }: EventTypeSelectPro
         }
         return null;
       }}
-      onSelect={(value) => {
-        onSelect(value ?? null);
+      onSelect={(selected) => {
+        onSelect(selected ?? undefined);
       }}
     />
   );

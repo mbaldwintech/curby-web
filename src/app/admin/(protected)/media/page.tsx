@@ -16,7 +16,7 @@ export default function MediaPage() {
         }}
         getRowActionMenuItems={() => [
           {
-            label: 'View Details',
+            label: 'View details',
             icon: InfoIcon,
             onClick: (media) => {
               router.push(`/admin/media/${media.id}`);
