@@ -18,7 +18,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
           const scrollY = window.scrollY;
 
           // Use hysteresis to prevent infinite loops
-          if (scrollY > 120 && !isScrolled) {
+          if (scrollY > 130 && !isScrolled) {
             setIsScrolled(true);
           } else if (scrollY < 40 && isScrolled) {
             setIsScrolled(false);
@@ -91,15 +91,14 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
 
       <footer id="contact" className="border-t border-border bg-muted/30">
         <div className="max-w-7xl mx-auto px-6 py-12">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             {/* Brand Section */}
             <div className="md:col-span-2 space-y-4">
               <Link href="/">
                 <LogoHorizontal className="h-12 w-auto" />
               </Link>
               <p className="text-sm text-muted-foreground max-w-md">
-                The simplest way to share and discover free stuff in your neighborhood. Built with ❤️ to reduce waste
-                and strengthen communities.
+                Built with ❤️ to reduce waste and strengthen communities.
               </p>
               <a
                 href="https://ko-fi.com/noahjamessmith"
@@ -110,6 +109,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
                 <Heart className="h-4 w-4 fill-current" />
                 Support Curby on Ko-fi
               </a>
+              <p className="text-sm text-muted-foreground">© {new Date().getFullYear()} Curby. All rights reserved.</p>
             </div>
 
             {/* Quick Links */}
@@ -169,12 +169,6 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
                 </LinkButton>
               </nav>
             </div>
-          </div>
-
-          {/* Bottom Bar */}
-          <div className="pt-8 border-t border-border flex flex-col sm:flex-row justify-between items-center gap-4">
-            <p className="text-sm text-muted-foreground">© {new Date().getFullYear()} Curby. All rights reserved.</p>
-            <p className="text-sm text-muted-foreground">Made with 💚 for sustainable neighborhoods</p>
           </div>
         </div>
       </footer>
