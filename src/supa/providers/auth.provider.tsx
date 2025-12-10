@@ -11,6 +11,7 @@ export interface AuthServiceInterface {
   authDeepLinks: Record<string, string>;
 
   getUser(): Promise<User>;
+  getSession(): Promise<Session | null>;
   validateEmail(email: string): AuthValidationStatus;
   validateUsername(username: string): Promise<AuthValidationStatus>;
   validatePassword(password: string): AuthValidationStatus;
@@ -116,6 +117,7 @@ export interface AuthContextProps {
   updateUsername: (params: UpdateUsernameParams) => Promise<void>;
   resetPassword: (params: ResetPasswordParams) => Promise<void>;
   fetchUser: () => Promise<void>;
+  refreshAuthState: () => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextProps>({
@@ -144,7 +146,8 @@ export const AuthContext = createContext<AuthContextProps>({
   updateEmail: async () => {},
   updateUsername: async () => {},
   resetPassword: async () => {},
-  fetchUser: async () => {}
+  fetchUser: async () => {},
+  refreshAuthState: async () => {}
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -174,32 +177,67 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ authService, authRou
 
   const readyCalled = useRef(false);
 
-  useEffect(() => {
+  const refreshAuthState = useCallback(async () => {
     try {
-      return authService.onAuthChange(async (newSession) => {
-        setIsInitialized(true);
-        setSession(newSession);
+      await Promise.all([
         authService
           .getUser()
           .then((u) => {
             setUser(u);
             setIsAuthenticated(!!u);
+            return u;
           })
-          .catch(() => {
-            setUser(null);
-            setIsAuthenticated(false);
-          })
-          .finally(() => {
-            if (!readyCalled.current) {
-              readyCalled.current = true;
-              onReady?.();
-            }
-          });
-      });
+          .catch(() => null),
+        authService
+          .getSession()
+          .then(setSession)
+          .catch(() => null)
+      ]);
     } catch (error) {
-      console.error('Error setting up auth change listener:', error);
+      console.error('Error refreshing auth state:', error);
     }
-  }, [onReady, authService]);
+  }, [authService]);
+
+  useEffect(() => {
+    let unsub: (() => void) | null = null;
+    const init = async () => {
+      try {
+        // Initialize state from current session/user (covers server-side logins)
+        await refreshAuthState();
+        setIsInitialized(true);
+
+        // Subscribe to future auth changes
+        unsub = authService.onAuthChange(async () => {
+          refreshAuthState()
+            .catch((error) => {
+              console.error('Error handling auth change:', error);
+            })
+            .finally(() => {
+              if (!readyCalled.current) {
+                readyCalled.current = true;
+                onReady?.();
+              }
+            });
+        });
+
+        if (!readyCalled.current) {
+          readyCalled.current = true;
+          onReady?.();
+        }
+      } catch (error) {
+        console.error('Error initializing auth provider:', error);
+      }
+    };
+
+    init();
+    return () => {
+      try {
+        unsub?.();
+      } catch (error) {
+        console.error('Error cleaning up auth change listener:', error);
+      }
+    };
+  }, [onReady, authService, refreshAuthState]);
 
   const fetchUser = useCallback(async (): Promise<void> => {
     try {
@@ -456,7 +494,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ authService, authRou
         updateEmail,
         updateUsername,
         resetPassword,
-        fetchUser
+        fetchUser,
+        refreshAuthState
       }}
     >
       {children}

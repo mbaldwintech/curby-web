@@ -415,7 +415,15 @@ export class AuthService<T extends Record<keyof typeof AuthEventTypeKey, string>
     const response = this.supabase.auth.onAuthStateChange((event, session) => {
       callback(session);
     });
-    return response.data.subscription.unsubscribe;
+    return () => response.data.subscription.unsubscribe();
+  }
+
+  async getSession(): Promise<Session | null> {
+    const { data, error } = await this.supabase.auth.getSession();
+    if (error) {
+      return null;
+    }
+    return data.session ?? null;
   }
 
   async updateEmail(email: string): Promise<User> {
