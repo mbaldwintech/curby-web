@@ -9,7 +9,12 @@ if (!apiUrl || !apiKey) {
 }
 
 export function createClient() {
-  return createBrowserClient(apiUrl!, apiKey!);
+  return createBrowserClient(apiUrl!, apiKey!, {
+    auth: {
+      persistSession: true,
+      storage: typeof window !== 'undefined' ? window.localStorage : undefined
+    }
+  });
 }
 
 /**

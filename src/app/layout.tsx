@@ -20,9 +20,31 @@ const robotoMono = Roboto_Mono({
 
 export const metadata: Metadata = {
   title: 'Curby',
-  description: 'Curby',
+  description:
+    'The simplest way to share and discover free stuff in your neighborhood. Reduce waste and strengthen communities.',
   icons: {
     icon: '/favicon.png'
+  },
+  openGraph: {
+    title: 'Curby',
+    description:
+      'The simplest way to share and discover free stuff in your neighborhood. Reduce waste and strengthen communities.',
+    images: [
+      {
+        url: '/curby_app_icon_dark.png',
+        width: 1024,
+        height: 1024,
+        alt: 'Curby App Icon'
+      }
+    ],
+    type: 'website'
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Curby',
+    description:
+      'The simplest way to share and discover free stuff in your neighborhood. Reduce waste and strengthen communities.',
+    images: ['/curby_app_icon_dark.png']
   }
 };
 

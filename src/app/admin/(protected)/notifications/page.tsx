@@ -16,7 +16,7 @@ export default function NotificationsPage() {
         }}
         getRowActionMenuItems={() => [
           {
-            label: 'View Details',
+            label: 'View details',
             icon: InfoIcon,
             onClick: (template) => {
               router.push(`/admin/notifications/${template.id}`);

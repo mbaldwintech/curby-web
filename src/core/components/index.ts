@@ -1,6 +1,7 @@
 export * from './admin-header';
 export * from './admin-page-container';
 export * from './admin-sidebar';
+export * from './app-preview.component';
 export * from './base';
 export * from './color-editor';
 export * from './condition-form-group';

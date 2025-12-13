@@ -17,8 +17,10 @@ import {
 import { cn } from '@core/utils';
 import { login } from '@features/auth/actions';
 import { zodResolver } from '@hookform/resolvers/zod';
+import Image from 'next/image';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 import z from 'zod';
 
 const loginSchema = z.object({
@@ -43,6 +45,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
   return (
     <div className={cn('flex flex-col gap-6', className)} {...props}>
       <Card>
+        <Image src="/Curby-Logo-Reverse.png" alt="Curby Logo" width={150} height={50} className="mx-auto mt-6" />
         <CardHeader>
           <CardTitle className="text-2xl">Login</CardTitle>
           <CardDescription>Enter your email below to login to your account</CardDescription>
@@ -51,10 +54,22 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
           <form
             id="login-form"
             onSubmit={form.handleSubmit(async ({ email, password }) => {
-              setSubmitting(true);
-              await login(email, password);
-              setSubmitting(false);
-              form.reset();
+              try {
+                setSubmitting(true);
+                await login(email, password).catch((error) => {
+                  if (error instanceof Error && error.message === 'NEXT_REDIRECT') {
+                    return;
+                  }
+                  throw error;
+                });
+                form.reset();
+                toast.success('Login successful!');
+              } catch (error) {
+                console.error('Login failed:', error);
+                toast.error('Login failed. Please check your credentials and try again.');
+              } finally {
+                setSubmitting(false);
+              }
             })}
           >
             <FieldGroup>

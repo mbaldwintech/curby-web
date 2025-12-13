@@ -1,95 +1,174 @@
+'use client';
+
 import { LinkButton, LogoHorizontal, ThemeToggle } from '@core/components';
-import Image from 'next/image';
+import { cn } from '@core/utils';
+import { Heart } from 'lucide-react';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    let ticking = false;
+
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const scrollY = window.scrollY;
+
+          // Use hysteresis to prevent infinite loops
+          if (scrollY > 130 && !isScrolled) {
+            setIsScrolled(true);
+          } else if (scrollY < 40 && isScrolled) {
+            setIsScrolled(false);
+          }
+
+          ticking = false;
+        });
+
+        ticking = true;
+      }
+    };
+
+    // Set initial state
+    if (window.scrollY > 120) {
+      setIsScrolled(true);
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [isScrolled]);
+
   return (
     <>
-      <header className="max-w-7xl mx-auto px-6 py-8 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-4">
-          <LogoHorizontal className="h12 w-auto" />
-        </Link>
+      <header
+        className={cn(
+          'sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-all duration-300',
+          isScrolled ? 'py-4 border-b border-border' : 'py-6 md:py-8'
+        )}
+      >
+        <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-4">
+            <LogoHorizontal
+              className={cn('w-auto transition-all duration-300', isScrolled ? 'h-10' : 'h-20 md:h-26')}
+            />
+          </Link>
 
-        <nav className="flex items-center gap-4">
-          <LinkButton href="#features" variant="link">
-            Features
-          </LinkButton>
-          <LinkButton href="#pricing" variant="link">
-            Pricing
-          </LinkButton>
-          <LinkButton href="#contact" variant="link">
-            Contact
-          </LinkButton>
+          <nav className="hidden md:flex items-center gap-2">
+            <LinkButton href="#features" variant="ghost" className="scroll-smooth">
+              Features
+            </LinkButton>
+            <LinkButton href="#how-it-works" variant="ghost" className="scroll-smooth">
+              How it works
+            </LinkButton>
+            <LinkButton href="#support-us" variant="ghost" className="scroll-smooth">
+              Support Us
+            </LinkButton>
+            <LinkButton href="#contact" variant="ghost" className="scroll-smooth">
+              Contact
+            </LinkButton>
 
-          <ThemeToggle />
+            <div className="ml-2">
+              <ThemeToggle />
+            </div>
 
-          <LinkButton href="/app" variant="default">
-            Get Curby
-          </LinkButton>
-        </nav>
+            <LinkButton href="/app" variant="default" className="ml-2">
+              Get Curby
+            </LinkButton>
+          </nav>
+
+          {/* Mobile Navigation */}
+          <div className="flex md:hidden items-center gap-2">
+            <ThemeToggle />
+            <LinkButton href="/app" variant="default" size="sm">
+              Get Curby
+            </LinkButton>
+          </div>
+        </div>
       </header>
       {children}
 
-      <section className="max-w-md mx-auto mt-20 mb-12 px-2">
-        <div className="rounded-2xl border border-border bg-muted/30 backdrop-blur-sm shadow-sm p-8 text-center flex flex-col items-center gap-4">
-          <h3 className="text-xl font-semibold text-foreground">Love what we&apos;re building at Curby?</h3>
-          <p className="text-sm text-secondary-foreground max-w-md">
-            Help us keep Curby growing and supporting local neighborhoods ❤️
-          </p>
-          <a
-            href="https://ko-fi.com/noahjamessmith"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors mt-2"
-          >
-            <Image
-              className=""
-              height={20}
-              width={20}
-              src="https://storage.ko-fi.com/cdn/logomarkLogo.png"
-              alt="Ko-fi Logo"
-            />
-            Support Curby on Ko-fi
-          </a>
-        </div>
-      </section>
+      <footer id="contact" className="border-t border-border bg-muted/30">
+        <div className="max-w-7xl mx-auto px-6 py-12">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            {/* Brand Section */}
+            <div className="md:col-span-2 space-y-4">
+              <Link href="/">
+                <LogoHorizontal className="h-12 w-auto" />
+              </Link>
+              <p className="text-sm text-muted-foreground max-w-md">
+                Built with ❤️ to reduce waste and strengthen communities.
+              </p>
+              <a
+                href="https://ko-fi.com/noahjamessmith"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:text-primary/80 transition-colors"
+              >
+                <Heart className="h-4 w-4 fill-current" />
+                Support Curby on Ko-fi
+              </a>
+              <p className="text-sm text-muted-foreground">© {new Date().getFullYear()} Curby. All rights reserved.</p>
+            </div>
 
-      <footer id="contact" className="mt-16 border-t border-border bg-background">
-        <div className="max-w-7xl mx-auto px-6 py-8 flex flex-col md:flex-row justify-between items-start gap-6">
-          <div className="flex flex-col items-start justify-start gap-2">
-            <Link href="/">
-              <LogoHorizontal className="h-10 w-auto mb-4" />
-            </Link>
-            <p className="text-sm text-secondary-foreground">
-              Made with ❤️ for neighborhoods. Curby helps you keep good stuff in the community.
-            </p>
+            {/* Quick Links */}
+            <div className="space-y-4">
+              <h3 className="font-semibold text-sm uppercase tracking-wider">Product</h3>
+              <nav className="flex flex-col gap-2">
+                <LinkButton variant="link" href="#features" className="justify-start p-0 h-auto text-muted-foreground">
+                  Features
+                </LinkButton>
+                <LinkButton
+                  variant="link"
+                  href="#how-it-works"
+                  className="justify-start p-0 h-auto text-muted-foreground"
+                >
+                  How it Works
+                </LinkButton>
+                <LinkButton variant="link" href="/app" className="justify-start p-0 h-auto text-muted-foreground">
+                  Get the App
+                </LinkButton>
+                <LinkButton
+                  variant="link"
+                  href="#support-us"
+                  className="justify-start p-0 h-auto text-muted-foreground"
+                >
+                  Support Us
+                </LinkButton>
+              </nav>
+            </div>
 
-            {/* TODO: Mike update with your link here... */}
-            <a
-              href="https://ko-fi.com/noahjamessmith"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center mt-3 text-sm font-medium text-primary hover:text-primary/80 transition-colors"
-            >
-              {/* Loving Curby? Buy us a coffee ☕ on Ko-fi ❤️ */}
-              {/* Enjoying Curby? Support us on Ko-fi ❤️ */}
-              Help keep Curby brewing ☕ — support us on Ko-fi ❤️
-            </a>
-          </div>
-
-          <div className="flex flex-col sm:flex-row gap-4">
-            <LinkButton variant="link" href="mailto:hello@curby.app">
-              hello@curby.app
-            </LinkButton>
-            <LinkButton variant="link" href="/legal/privacy">
-              Privacy
-            </LinkButton>
-            <LinkButton variant="link" href="/legal/terms">
-              Terms
-            </LinkButton>
-            <LinkButton variant="link" href="/admin">
-              Admin
-            </LinkButton>
+            {/* Legal & Contact */}
+            <div className="space-y-4">
+              <h3 className="font-semibold text-sm uppercase tracking-wider">Company</h3>
+              <nav className="flex flex-col gap-2">
+                <LinkButton
+                  variant="link"
+                  href="mailto:support@getcurby.app"
+                  className="justify-start p-0 h-auto text-muted-foreground"
+                >
+                  Contact Us
+                </LinkButton>
+                <LinkButton
+                  variant="link"
+                  href="/legal/privacy"
+                  className="justify-start p-0 h-auto text-muted-foreground"
+                >
+                  Privacy Policy
+                </LinkButton>
+                <LinkButton
+                  variant="link"
+                  href="/legal/terms"
+                  className="justify-start p-0 h-auto text-muted-foreground"
+                >
+                  Terms of Service
+                </LinkButton>
+                <LinkButton variant="link" href="/admin" className="justify-start p-0 h-auto text-muted-foreground">
+                  Admin
+                </LinkButton>
+              </nav>
+            </div>
           </div>
         </div>
       </footer>

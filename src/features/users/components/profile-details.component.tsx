@@ -1010,7 +1010,7 @@ export function ProfileDetails({ id }: ProfileDetailsProps) {
                               }}
                               getRowActionMenuItems={() => [
                                 {
-                                  label: 'View Details',
+                                  label: 'View details',
                                   icon: InfoIcon,
                                   onClick: (row) => {
                                     router.push(`/admin/devices/${row.id}`);
@@ -1040,7 +1040,7 @@ export function ProfileDetails({ id }: ProfileDetailsProps) {
                               }}
                               getRowActionMenuItems={() => [
                                 {
-                                  label: 'View Details',
+                                  label: 'View details',
                                   icon: InfoIcon,
                                   onClick: (row) => {
                                     router.push(`/admin/item/${row.id}`);
@@ -1072,7 +1072,7 @@ export function ProfileDetails({ id }: ProfileDetailsProps) {
                               }}
                               getRowActionMenuItems={() => [
                                 {
-                                  label: 'View Details',
+                                  label: 'View details',
                                   icon: InfoIcon,
                                   onClick: (row) => {
                                     router.push(`/admin/item/${row.id}`);
@@ -1130,7 +1130,7 @@ export function ProfileDetails({ id }: ProfileDetailsProps) {
                               }}
                               getRowActionMenuItems={() => [
                                 {
-                                  label: 'View Details',
+                                  label: 'View details',
                                   icon: InfoIcon,
                                   onClick: (row) => {
                                     router.push(`/admin/events/${row.id}`);
@@ -1162,7 +1162,7 @@ export function ProfileDetails({ id }: ProfileDetailsProps) {
                               }}
                               getRowActionMenuItems={() => [
                                 {
-                                  label: 'View Details',
+                                  label: 'View details',
                                   icon: InfoIcon,
                                   onClick: (row) => {
                                     router.push(`/admin/transactions/${row.id}`);
@@ -1191,7 +1191,7 @@ export function ProfileDetails({ id }: ProfileDetailsProps) {
                               }}
                               getRowActionMenuItems={() => [
                                 {
-                                  label: 'View Details',
+                                  label: 'View details',
                                   icon: InfoIcon,
                                   onClick: (row) => {
                                     router.push(`/admin/notifications/${row.id}`);
@@ -1220,7 +1220,7 @@ export function ProfileDetails({ id }: ProfileDetailsProps) {
                               }}
                               getRowActionMenuItems={() => [
                                 {
-                                  label: 'View Details',
+                                  label: 'View details',
                                   icon: InfoIcon,
                                   onClick: (row) => {
                                     router.push(`/admin/moderation/item-reviews/${row.id}`);
@@ -1253,7 +1253,7 @@ export function ProfileDetails({ id }: ProfileDetailsProps) {
                               }}
                               getRowActionMenuItems={() => [
                                 {
-                                  label: 'View Details',
+                                  label: 'View details',
                                   icon: InfoIcon,
                                   onClick: (row) => {
                                     router.push(`/admin/moderation/item-reviews/${row.id}`);
@@ -1284,7 +1284,7 @@ export function ProfileDetails({ id }: ProfileDetailsProps) {
                               }}
                               getRowActionMenuItems={() => [
                                 {
-                                  label: 'View Details',
+                                  label: 'View details',
                                   icon: InfoIcon,
                                   onClick: (row) => {
                                     router.push(`/admin/moderation/item-reviews/${row.id}`);
@@ -1313,7 +1313,7 @@ export function ProfileDetails({ id }: ProfileDetailsProps) {
                               }}
                               getRowActionMenuItems={() => [
                                 {
-                                  label: 'View Details',
+                                  label: 'View details',
                                   icon: InfoIcon,
                                   onClick: (row) => {
                                     router.push(`/admin/moderation/user-reviews/${row.id}`);
@@ -1344,7 +1344,7 @@ export function ProfileDetails({ id }: ProfileDetailsProps) {
                               }}
                               getRowActionMenuItems={() => [
                                 {
-                                  label: 'View Details',
+                                  label: 'View details',
                                   icon: InfoIcon,
                                   onClick: (row) => {
                                     router.push(`/admin/tutorials/views/${row.id}`);
@@ -1373,7 +1373,7 @@ export function ProfileDetails({ id }: ProfileDetailsProps) {
                               }}
                               getRowActionMenuItems={() => [
                                 {
-                                  label: 'View Details',
+                                  label: 'View details',
                                   icon: InfoIcon,
                                   onClick: (row) => {
                                     router.push(`/admin/legal/terms/acceptances/${row.id}`);
@@ -1402,7 +1402,7 @@ export function ProfileDetails({ id }: ProfileDetailsProps) {
                               }}
                               getRowActionMenuItems={() => [
                                 {
-                                  label: 'View Details',
+                                  label: 'View details',
                                   icon: InfoIcon,
                                   onClick: (row) => {
                                     router.push(`/admin/legal/privacy/acceptances/${row.id}`);
@@ -1431,7 +1431,7 @@ export function ProfileDetails({ id }: ProfileDetailsProps) {
                               }}
                               getRowActionMenuItems={() => [
                                 {
-                                  label: 'View Details',
+                                  label: 'View details',
                                   icon: InfoIcon,
                                   onClick: (row) => {
                                     router.push(`/admin/feedback/${row.id}`);

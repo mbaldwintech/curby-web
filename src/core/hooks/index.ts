@@ -1,3 +1,4 @@
 export * from './use-async-memo.hook';
+export * from './use-data-query.hook';
 export * from './use-debounce.hook';
 export * from './use-mobile';

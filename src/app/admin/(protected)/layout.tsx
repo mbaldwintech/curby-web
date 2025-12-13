@@ -12,6 +12,7 @@ import { logout } from '@features/auth/actions';
 import { useRoutePermissions } from '@features/auth/hooks';
 import { PolicyGateProvider } from '@features/legal/hooks';
 import { useProfile } from '@features/users/hooks';
+import { useAuth } from '@supa/providers';
 import {
   Bell,
   BookOpen,
@@ -42,6 +43,7 @@ import {
   Users
 } from 'lucide-react';
 import Link from 'next/link';
+import { useEffect } from 'react';
 
 const sidebarConfig: SidebarConfig = {
   profilePageUrl: '/admin/profile',
@@ -335,8 +337,13 @@ const sidebarConfig: SidebarConfig = {
 };
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  const { refreshAuthState } = useAuth();
   const { profile } = useProfile();
   const { canAccess } = useRoutePermissions();
+
+  useEffect(() => {
+    refreshAuthState();
+  }, [refreshAuthState]);
 
   return (
     <PolicyGateProvider>
@@ -364,8 +371,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4">
-                <LinkButton variant="link" href="mailto:hello@curby.app">
-                  hello@curby.app
+                <LinkButton variant="link" href="mailto:support@getcurby.app">
+                  support@getcurby.app
                 </LinkButton>
                 <LinkButton variant="link" href="/legal/privacy">
                   Privacy

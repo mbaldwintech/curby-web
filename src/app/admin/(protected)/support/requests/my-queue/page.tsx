@@ -255,7 +255,7 @@ export default function MySupportRequestQueuePage() {
                             {profile?.username ? profile.username.charAt(0).toUpperCase() : '?'}
                           </ItemMedia>
                         ) : device ? (
-                          <ItemMedia variant="icon">{device.deviceId ?? '?'}</ItemMedia>
+                          <ItemMedia variant="icon">{device.deviceName ?? '?'}</ItemMedia>
                         ) : (
                           <ItemMedia variant="icon">
                             <MapPin className="h-7 w-7" />

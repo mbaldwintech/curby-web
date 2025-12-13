@@ -1,4 +1,12 @@
-import { Card, CardContent, CardHeader, CardTitle, CopyableStringCell, Skeleton } from '@core/components';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  CopyableStringCell,
+  Skeleton
+} from '@core/components';
 import { DeviceService } from '@core/services';
 import { Device } from '@core/types';
 import { formatDateTime } from '@core/utils';
@@ -91,10 +99,15 @@ export const DeviceCard: React.FC<DeviceCardProps> = ({ deviceId }) => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>
-          <Phone />
-          Device Details
-        </CardTitle>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center justify-center p-2.5 rounded-full bg-primary/10">
+            <Phone className="h-5 w-5 text-primary" />
+          </div>
+          <div>
+            <CardTitle>Device Details</CardTitle>
+            <CardDescription>Detailed information about the device.</CardDescription>
+          </div>
+        </div>
       </CardHeader>
       <CardContent className="space-y-2">
         <div>

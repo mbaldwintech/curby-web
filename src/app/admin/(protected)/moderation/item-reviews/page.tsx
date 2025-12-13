@@ -73,7 +73,7 @@ export default function ItemReviewsPage() {
     (row: ItemReview) => {
       return [
         {
-          label: 'View Details',
+          label: 'View details',
           icon: InfoIcon,
           onClick: (row: Row<ItemReview>) => {
             router.push(`/admin/moderation/item-reviews/${row.id}`);

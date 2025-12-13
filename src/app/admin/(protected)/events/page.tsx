@@ -16,7 +16,7 @@ export default function EventLogsPage() {
         }}
         getRowActionMenuItems={() => [
           {
-            label: 'View Details',
+            label: 'View details',
             icon: InfoIcon,
             onClick: (event) => {
               router.push(`/admin/events/${event.id}`);
