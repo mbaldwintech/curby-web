@@ -1,0 +1,52 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run lint)",
+      "Bash(npm run format)",
+      "Bash(npm run dev*)",
+      "Bash(npm run build*)",
+      "Bash(npx supabase *)",
+      "Bash(git status*)",
+      "Bash(git log*)",
+      "Bash(git diff*)",
+      "Bash(git branch*)",
+      "Bash(git stash list*)",
+      "Bash(npx tsc --noEmit*)",
+      "mcp__atlassian-curby__jira_get_all_projects",
+      "mcp__atlassian-curby__jira_get_issue",
+      "mcp__atlassian-curby__jira_search",
+      "mcp__atlassian-curby__jira_search_fields",
+      "mcp__atlassian-curby__jira_get_project_issues",
+      "mcp__atlassian-curby__jira_get_transitions",
+      "mcp__atlassian-curby__jira_get_worklog",
+      "mcp__atlassian-curby__jira_get_agile_boards",
+      "mcp__atlassian-curby__jira_get_board_issues",
+      "mcp__atlassian-curby__jira_get_sprints_from_board",
+      "mcp__atlassian-curby__jira_get_sprint_issues",
+      "mcp__atlassian-curby__jira_get_link_types",
+      "mcp__atlassian-curby__jira_get_project_versions",
+      "mcp__atlassian-curby__jira_batch_get_changelogs",
+      "mcp__atlassian-curby__jira_create_issue",
+      "mcp__atlassian-curby__jira_update_issue",
+      "mcp__atlassian-curby__jira_add_comment",
+      "mcp__atlassian-curby__jira_transition_issue",
+      "mcp__atlassian-curby__jira_create_issue_link",
+      "mcp__atlassian-curby__jira_link_to_epic"
+    ],
+    "deny": []
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/lint-fix.sh",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}
