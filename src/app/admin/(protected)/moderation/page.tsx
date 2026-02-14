@@ -35,9 +35,28 @@ import {
   TopReporter
 } from '@core/types';
 import { createClient } from '@supa/utils/client';
-import { AlertTriangle, CheckCircle, Clock, Eye, RefreshCcw, Shield, TrendingUp, Users, XCircle } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Clock, Eye, RefreshCcw, Shield, Users, XCircle } from 'lucide-react';
+import dynamic from 'next/dynamic';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+
+const ModerationTrendsChart = dynamic(
+  () => import('./moderation-trends-chart').then((mod) => ({ default: mod.ModerationTrendsChart })),
+  {
+    loading: () => (
+      <Card>
+        <CardHeader>
+          <CardTitle>Moderation Trends (30 Days)</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="h-80 flex items-center justify-center">
+            <p className="text-muted-foreground">Loading chart...</p>
+          </div>
+        </CardContent>
+      </Card>
+    ),
+    ssr: false
+  }
+);
 
 export default function ModerationDashboard() {
   const supabase = useRef(createClient()).current;
@@ -243,33 +262,7 @@ export default function ModerationDashboard() {
 
         {/* Trends */}
         <TabsContent value="trends">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="h-5 w-5" />
-                Moderation Trends (30 Days)
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="h-80">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={trends}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="trendDate" tickFormatter={(date) => new Date(date).toLocaleDateString()} />
-                    <YAxis />
-                    <Tooltip
-                      labelFormatter={(date) => new Date(date).toLocaleDateString()}
-                      labelClassName="text-background font-bold"
-                    />
-                    <Legend />
-                    <Line type="monotone" dataKey="dailyReports" stroke="#ef4444" name="Reports" />
-                    <Line type="monotone" dataKey="dailyUserFlags" stroke="#f97316" name="User Flags" />
-                    <Line type="monotone" dataKey="dailyFalseTakings" stroke="#3b82f6" name="False Takings" />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            </CardContent>
-          </Card>
+          <ModerationTrendsChart trends={trends} />
         </TabsContent>
 
         {/* Top Reporters */}
