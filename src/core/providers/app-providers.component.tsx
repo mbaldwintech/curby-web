@@ -9,7 +9,15 @@ import { Toaster } from '../components';
 import { ConfirmDialogProvider } from './confirm-dialog.provider';
 import { PortalQueueProvider } from './portal-queue.provider';
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60_000,
+      retry: 1,
+      refetchOnWindowFocus: false
+    }
+  }
+});
 
 export const AppProviders: React.FC<React.PropsWithChildren> = ({ children }) => {
   return (

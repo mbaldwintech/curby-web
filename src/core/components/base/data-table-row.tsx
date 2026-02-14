@@ -2,7 +2,7 @@
 
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { IconDotsVertical } from '@tabler/icons-react';
+import { EllipsisVertical } from 'lucide-react';
 import { flexRender, Row } from '@tanstack/react-table';
 import { ChevronRight } from 'lucide-react';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -237,7 +237,7 @@ export const ActionsCell = <T,>({
           className="data-[state=open]:bg-muted text-muted-foreground flex size-8 justify-self-end"
           size="icon"
         >
-          <IconDotsVertical />
+          <EllipsisVertical />
           <span className="sr-only">Open menu</span>
         </Button>
       </DropdownMenuTrigger>

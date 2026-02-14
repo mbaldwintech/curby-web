@@ -1,6 +1,6 @@
 'use client';
 
-import { IconChevronDown, IconFilterOff, IconLayoutColumns, IconRefresh, IconSearch } from '@tabler/icons-react';
+import { ChevronDown, Columns3, FilterX, RefreshCw, Search } from 'lucide-react';
 import { Table as TanstackTable } from '@tanstack/react-table';
 import { X } from 'lucide-react';
 import React from 'react';
@@ -42,10 +42,10 @@ export function DataTableToolbar<T>({
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="sm">
-              <IconLayoutColumns />
+              <Columns3 />
               <span className="hidden lg:inline">Customize Columns</span>
               <span className="lg:hidden">Columns</span>
-              <IconChevronDown />
+              <ChevronDown />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
@@ -102,7 +102,7 @@ export function DataTableToolbar<T>({
           className={cn(searchActive && 'bg-primary text-primary-foreground')}
           onClick={searchActive ? onSearchClose : onSearchOpen}
         >
-          <IconSearch />
+          <Search />
         </Button>
       )}
       {table.getState().columnFilters.length > 0 && (
@@ -112,7 +112,7 @@ export function DataTableToolbar<T>({
           onClick={() => table.resetColumnFilters()}
           disabled={table.getState().columnFilters.length === 0}
         >
-          <IconFilterOff />
+          <FilterX />
         </Button>
       )}
       {refresh && (
@@ -125,7 +125,7 @@ export function DataTableToolbar<T>({
             }
           }}
         >
-          <IconRefresh className={cn(loading && 'animate-spin')} />
+          <RefreshCw className={cn(loading && 'animate-spin')} />
         </Button>
       )}
     </>

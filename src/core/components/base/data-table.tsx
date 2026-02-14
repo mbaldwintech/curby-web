@@ -18,7 +18,7 @@ import {
   SortableContext,
   verticalListSortingStrategy
 } from '@dnd-kit/sortable';
-import { IconFilter, IconFilterFilled } from '@tabler/icons-react';
+import { Filter, ListFilter } from 'lucide-react';
 import {
   AccessorFnColumnDef,
   AccessorKeyColumnDef,
@@ -710,7 +710,7 @@ function DataTableInternal<T extends { id: string }>(
                     header.column.getIsFiltered() && 'opacity-100'
                   )}
                 >
-                  {header.column.getIsFiltered() ? <IconFilterFilled /> : <IconFilter />}
+                  {header.column.getIsFiltered() ? <ListFilter /> : <Filter />}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-2">{column.filterComponent(header.getContext())}</PopoverContent>

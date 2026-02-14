@@ -1,7 +1,7 @@
 'use client';
 
 import { useSortable } from '@dnd-kit/sortable';
-import { IconGripVertical } from '@tabler/icons-react';
+import { GripVertical } from 'lucide-react';
 import { Button } from './button';
 
 export function DragHandle({ id }: { id: string }) {
@@ -17,7 +17,7 @@ export function DragHandle({ id }: { id: string }) {
       size="icon"
       className="text-muted-foreground size-7 hover:bg-transparent"
     >
-      <IconGripVertical className="text-muted-foreground size-3" />
+      <GripVertical className="text-muted-foreground size-3" />
       <span className="sr-only">Drag to reorder</span>
     </Button>
   );
