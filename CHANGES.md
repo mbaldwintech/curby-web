@@ -127,3 +127,62 @@ Converted the public layout from a fully client-side component to a server compo
 
 - `src/app/(public)/layout.tsx`
 - `src/app/admin/(protected)/moderation/page.tsx`
+
+## Task #14: Web Code Quality
+
+### Sentry Setup (Phase 1.10)
+
+- Installed `@sentry/nextjs`
+- Created `sentry.client.config.ts` (with replay sampling) and `sentry.server.config.ts`
+- Wrapped `next.config.ts` with `withSentryConfig` (org: curby-llc, project: curby-web)
+- Uses `NEXT_PUBLIC_SENTRY_DSN` env var (placeholder — set before deploying)
+
+### Icon Consolidation (Phase 1.14)
+
+Standardized on `lucide-react` as the sole icon library for data-table and core components:
+
+- Replaced all `@tabler/icons-react` imports in 5 files (data-table.tsx, data-table-row.tsx, data-table-toolbar.tsx, data-table-pagination.tsx, drag-handle.tsx)
+- Replaced all `react-icons` imports in `icon.component.tsx` with `lucide-react` equivalents
+- Removed `@tabler/icons-react` from dependencies
+- Note: `react-icons` still used in 3 broadcast components (app-preview, broadcast-editor, broadcast-media) — full removal deferred
+
+### Dependency Cleanup (Phase 1.15)
+
+- Removed `react-hot-toast` from package.json (0 imports; codebase uses `sonner`)
+
+### React Query Configuration (Phase 1.1-web)
+
+Configured `QueryClient` defaults in `app-providers.component.tsx`:
+
+- `staleTime: 5 * 60_000` (5 minutes)
+- `retry: 1`
+- `refetchOnWindowFocus: false`
+
+### Structured Logger (Phase 1.13-web)
+
+Created `src/core/utils/logger.util.ts`:
+
+- `createLogger(context)` factory returning `debug`, `info`, `warn`, `error` methods
+- Structured format: `[LEVEL] [Context] message`
+- Environment-aware: debug/info suppressed in production
+- Exported via barrel at `@core/utils`
+- Note: 227 console statements remain across 78 files — migration is a follow-up task
+
+**Files added:**
+
+- `sentry.client.config.ts`
+- `sentry.server.config.ts`
+- `src/core/utils/logger.util.ts`
+
+**Files modified:**
+
+- `next.config.ts`
+- `package.json` (removed react-hot-toast, @tabler/icons-react; added @sentry/nextjs)
+- `src/core/components/base/data-table.tsx`
+- `src/core/components/base/data-table-row.tsx`
+- `src/core/components/base/data-table-toolbar.tsx`
+- `src/core/components/base/data-table-pagination.tsx`
+- `src/core/components/base/drag-handle.tsx`
+- `src/core/components/icon.component.tsx`
+- `src/core/providers/app-providers.component.tsx`
+- `src/core/utils/index.ts`
