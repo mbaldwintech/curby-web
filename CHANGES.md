@@ -186,3 +186,23 @@ Created `src/core/utils/logger.util.ts`:
 - `src/core/components/icon.component.tsx`
 - `src/core/providers/app-providers.component.tsx`
 - `src/core/utils/index.ts`
+
+## Task #15: Testing Infrastructure for Web
+
+### Vitest Setup (Phase 1.20-web)
+
+- Installed `vitest`, `@testing-library/react`, `@testing-library/jest-dom`, `jsdom`, `@vitejs/plugin-react`
+- Created `vitest.config.ts` with path aliases matching `tsconfig.json` and jsdom environment
+- Created `vitest.setup.ts` with jest-dom matchers
+- Added `test` and `test:watch` scripts to `package.json`
+- Wrote first test file: `logger.util.test.ts` (5 tests — all passing)
+
+**Files added:**
+
+- `vitest.config.ts`
+- `vitest.setup.ts`
+- `src/core/utils/logger.util.test.ts`
+
+**Files modified:**
+
+- `package.json` (added test scripts and dev dependencies)
