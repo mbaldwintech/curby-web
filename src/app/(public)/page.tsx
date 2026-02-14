@@ -13,11 +13,52 @@ import {
   Users,
   Zap
 } from 'lucide-react';
+import type { Metadata } from 'next';
 import Image from 'next/image';
+
+export const metadata: Metadata = {
+  title: 'Free Curbside Items Near You',
+  description:
+    'Discover and share free curbside items in your neighborhood. No messaging, no fees — just simple curbside pickup.',
+  alternates: {
+    canonical: '/'
+  }
+};
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: 'Curby',
+    url: 'https://getcurby.app',
+    logo: 'https://getcurby.app/curby_app_icon_dark.png',
+    description: 'Community-driven marketplace for free curbside items.',
+    contactPoint: {
+      '@type': 'ContactPoint',
+      email: 'support@getcurby.app',
+      contactType: 'customer support'
+    }
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: 'Curby',
+    applicationCategory: 'LifestyleApplication',
+    operatingSystem: 'iOS, Android',
+    offers: {
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: 'USD'
+    },
+    description:
+      'The simplest way to share and discover free stuff in your neighborhood. Reduce waste and strengthen communities.'
+  }
+];
 
 export default function PublicHomePage() {
   return (
     <main className="min-h-screen bg-background text-foreground antialiased">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       {/* Hero Section */}
       <section className="max-w-7xl mx-auto px-6 py-20 grid gap-12 md:grid-cols-3 items-center">
         <div className="md:col-span-2 space-y-6">
