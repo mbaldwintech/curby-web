@@ -99,3 +99,31 @@ All exports are re-exported through `data-table.tsx` for full backward compatibi
 - `src/features/users/components/profile-details.component.tsx`
 - `src/features/users/components/index.ts`
 - `src/core/components/base/data-table.tsx`
+
+## Task #13: Web Performance — Server Components and Code Splitting
+
+### Server Component Conversion (Phase 1.11)
+
+Converted the public layout from a fully client-side component to a server component with a client island:
+
+- Extracted scroll-tracking header into `StickyHeader` client component (`src/app/(public)/sticky-header.tsx`)
+- Made `layout.tsx` a server component (removed `'use client'` directive)
+- Footer renders server-side with client component islands (LogoHorizontal, ThemeToggle)
+
+### Code Splitting (Phase 1.12)
+
+- Lazy-loaded recharts in the moderation dashboard via `next/dynamic` with `ssr: false`
+- Extracted `ModerationTrendsChart` component to isolate the recharts dependency
+- Added `loading.tsx` skeleton at `src/app/admin/(protected)/` for route transitions
+- LeafletMap already uses internal dynamic imports — no changes needed
+
+**Files added:**
+
+- `src/app/(public)/sticky-header.tsx`
+- `src/app/admin/(protected)/loading.tsx`
+- `src/app/admin/(protected)/moderation/moderation-trends-chart.tsx`
+
+**Files modified:**
+
+- `src/app/(public)/layout.tsx`
+- `src/app/admin/(protected)/moderation/page.tsx`
