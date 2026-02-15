@@ -262,9 +262,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ authService, authRou
     try {
       if (isAuthenticated) return;
       await authService.joinAsGuest();
+      // Brief wait to allow Supabase auth state to propagate before navigation
       await wait(1000);
       router.replace(authRoutes.home);
-      wait(5 * 1000).then();
       toast.success('Successfully signed in as guest!');
     } catch (error) {
       logger.error('Error signing in as guest:', error);
@@ -277,6 +277,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ authService, authRou
       try {
         if (isAuthenticated) return;
         await authService.joinWithEmail(email, password, username);
+        // Brief wait to allow Supabase auth state to propagate before navigation
         await wait(1000);
         router.push(authRoutes.awaitingVerification);
         toast.success('Successfully signed up with email!');
@@ -301,6 +302,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ authService, authRou
   const verifySignup = async (params: ConfirmationUrlParams) => {
     if (validateConfirmationParams(params)) {
       await authService.verifyConfirmEmail(params.access_token!, params.refresh_token!);
+      // Brief wait to allow Supabase auth state to propagate before navigation
       await wait(1000);
       router.replace(authRoutes.home);
       toast.success('Email verified successfully!');
@@ -310,8 +312,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ authService, authRou
   const verifyConfirmEmailChange = async (params: ConfirmationUrlParams) => {
     if (validateConfirmationParams(params)) {
       await authService.verifyConfirmEmail(params.access_token!, params.refresh_token!);
+      // Brief wait to allow Supabase auth state to propagate before navigation
       await wait(1000);
-      router.replace('/(tabs)/free-items');
+      router.replace(authRoutes.home);
       toast.success('Email verified successfully!');
     }
   };
@@ -338,6 +341,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ authService, authRou
   const login = async ({ email, password }: LoginParams) => {
     try {
       await authService.loginWithEmail(email, password);
+      // Brief wait to allow Supabase auth state to propagate before navigation
       await wait(1000);
       toast.success('Successfully logged in!');
       router.replace(authRoutes.home);
@@ -377,6 +381,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ authService, authRou
   const resetPassword = async ({ email }: ResetPasswordParams) => {
     try {
       await authService.resetPassword(email);
+      // Brief wait to allow Supabase auth state to propagate before navigation
       await wait(1000);
       toast.success('Password reset email sent successfully!');
       router.push(authRoutes.awaitingVerification);
@@ -389,6 +394,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ authService, authRou
   const updatePassword = async ({ password }: UpdatePasswordParams) => {
     try {
       await authService.updatePassword(password);
+      // Brief wait to allow Supabase auth state to propagate before navigation
       await wait(1000);
       router.replace(authRoutes.home);
       toast.success('Password updated successfully!');
