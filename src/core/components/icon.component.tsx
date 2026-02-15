@@ -1,5 +1,6 @@
 'use client';
 
+import { createLogger } from '@core/utils';
 import {
   AlertCircle,
   AlertTriangle,
@@ -11,6 +12,8 @@ import {
   TriangleAlert,
   XCircle
 } from 'lucide-react';
+
+const logger = createLogger('Icon');
 
 export type IconProps =
   | { lib?: 'Ionicons'; name: string; size?: number; colorClass?: string; className?: string }
@@ -43,7 +46,7 @@ export function Icon(props: IconProps) {
   const IconComponent = iconMap[props.name];
 
   if (!IconComponent) {
-    console.warn(`Icon "${props.name}" not found in library "${lib}"`);
+    logger.warn(`Icon "${props.name}" not found in library "${lib}"`);
     return null;
   }
 

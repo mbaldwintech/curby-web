@@ -1,6 +1,9 @@
 // utils/location.ts
 import { Coordinates, GeoPoint } from '../types';
+import { createLogger } from './logger.util';
 import { milesToFeet } from './miles-to-feet.util';
+
+const logger = createLogger('LocationUtil');
 
 const EARTH_RADIUS_MILES = 3958.8;
 const EARTH_RADIUS_FT = EARTH_RADIUS_MILES * 5280;
@@ -74,7 +77,7 @@ export const geoJsonPointToWkt = (point?: GeoPoint): string => {
 /** Get current position in browser */
 export const getCurrentGeoJson = async (): Promise<GeoPoint | null> => {
   if (!navigator.geolocation) {
-    console.error('Geolocation not supported');
+    logger.error('Geolocation not supported');
     return null;
   }
 
@@ -87,7 +90,7 @@ export const getCurrentGeoJson = async (): Promise<GeoPoint | null> => {
         });
       },
       (err) => {
-        console.error('Error getting location:', err);
+        logger.error('Error getting location:', err);
         resolve(null);
       },
       { enableHighAccuracy: true }

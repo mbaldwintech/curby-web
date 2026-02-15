@@ -38,6 +38,9 @@ import { createClient } from '@supa/utils/client';
 import { AlertTriangle, CheckCircle, Clock, Eye, RefreshCcw, Shield, Users, XCircle } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { createLogger } from '@core/utils';
+
+const logger = createLogger('Moderation');
 
 const ModerationTrendsChart = dynamic(
   () => import('./moderation-trends-chart').then((mod) => ({ default: mod.ModerationTrendsChart })),
@@ -99,7 +102,7 @@ export default function ModerationDashboard() {
       setTrends(trendsResult.data || []);
       setModeratorPerformance(performanceResult.data || []);
     } catch (error) {
-      console.error('Error fetching moderation data:', error);
+      logger.error('Error fetching moderation data:', error);
     } finally {
       setLoading(false);
     }

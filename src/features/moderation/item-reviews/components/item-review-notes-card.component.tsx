@@ -6,6 +6,9 @@ import { useProfile } from '@features/users/hooks';
 import { createClientService } from '@supa/utils/client';
 import { Notebook } from 'lucide-react';
 import { useCallback, useMemo, useRef, useState } from 'react';
+import { createLogger } from '@core/utils';
+
+const logger = createLogger('ItemReviewNotesCard');
 
 export interface ItemReviewNotesCardProps {
   itemReview: ItemReview;
@@ -46,7 +49,7 @@ export const ItemReviewNotesCard = ({ itemReview, onSave }: ItemReviewNotesCardP
         onSave();
       }
     } catch (err) {
-      console.error('Error saving review notes:', err);
+      logger.error('Error saving review notes:', err);
       setError('Failed to save review notes.');
     } finally {
       setSubmitting(false);

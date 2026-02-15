@@ -9,10 +9,12 @@ import {
 } from '@core/components';
 import { DeviceService } from '@core/services';
 import { Device } from '@core/types';
-import { formatDateTime } from '@core/utils';
 import { createClientService } from '@supa/utils/client';
 import { Phone } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { createLogger, formatDateTime } from '@core/utils';
+
+const logger = createLogger('DeviceCard');
 
 export interface DeviceCardProps {
   deviceId: string;
@@ -31,7 +33,7 @@ export const DeviceCard: React.FC<DeviceCardProps> = ({ deviceId }) => {
       const d = await deviceService.getById(deviceId);
       setDevice(d);
     } catch (err) {
-      console.error('Error fetching device details:', err);
+      logger.error('Error fetching device details:', err);
       setError('Failed to load device details.');
     } finally {
       setLoading(false);

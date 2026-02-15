@@ -2,6 +2,9 @@ import { ExtendedItemService } from '@core/services';
 import { ExtendedItem } from '@core/types';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { AppExtra } from '@store/store';
+import { createLogger } from '@core/utils';
+
+const logger = createLogger('SavedItems');
 
 export interface SavedItemsSliceStateType {
   savedItems: ExtendedItem[];
@@ -22,7 +25,7 @@ export const fetchSavedItems = createAsyncThunk<ExtendedItem[], void, { rejectVa
       const itemService = new ExtendedItemService(extra.supabase);
       return await itemService.getMySavedItems();
     } catch (error) {
-      console.error('Error fetching saved items:', error);
+      logger.error('Error fetching saved items:', error);
       return rejectWithValue('Unable to fetch saved items');
     }
   }

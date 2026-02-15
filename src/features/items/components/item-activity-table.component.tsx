@@ -5,11 +5,13 @@ import { Skeleton } from '@core/components/base/skeleton';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@core/components/base/tooltip';
 import { ItemReviewAppealReviewOutcomeAction, ItemReviewOutcomeAction } from '@core/enumerations';
 import { ExtendedItemService, FalseTakingService, ItemReportService, ItemReviewService } from '@core/services';
-import { formatDateTime } from '@core/utils';
 import { createClientService } from '@supa/utils/client';
 import { Row } from '@tanstack/react-table';
 import { AlertCircle, CheckCircle, Flag, Package, Shield, User, XCircle } from 'lucide-react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { createLogger, formatDateTime } from '@core/utils';
+
+const logger = createLogger('ItemActivityTable');
 
 const toDate = (date: Date | string) => {
   return typeof date === 'string' ? new Date(date) : date;
@@ -200,7 +202,7 @@ export function ItemActivityTable({ itemId }: { itemId: string }) {
       });
       setActivityItems(activities.sort((a, b) => b.occurredAt.getTime() - a.occurredAt.getTime()));
     } catch (error) {
-      console.error('Failed to load review data', error);
+      logger.error('Failed to load review data', error);
       setError('Failed to load review details. Please try again.');
     } finally {
       setLoading(false);

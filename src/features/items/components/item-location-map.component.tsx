@@ -2,9 +2,11 @@
 
 import { Button, LeafletMap, LinkButton } from '@core/components';
 import { GeoPoint } from '@core/types';
-import { cn } from '@core/utils';
 import { CopyIcon, ExternalLinkIcon, MapPinIcon } from 'lucide-react';
 import { toast } from 'sonner';
+import { cn, createLogger } from '@core/utils';
+
+const logger = createLogger('ItemLocationMap');
 
 interface ItemLocationMapProps {
   location?: GeoPoint | null;
@@ -83,7 +85,7 @@ export function ItemLocationMap({ location, containerClassName, mapContainerClas
                   toast.success('Coordinates copied to clipboard!');
                 })
                 .catch((err) => {
-                  console.error('Failed to copy coordinates:', err);
+                  logger.error('Failed to copy coordinates:', err);
                   toast.error('Failed to copy coordinates.');
                 });
             }

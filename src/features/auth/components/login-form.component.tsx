@@ -14,7 +14,6 @@ import {
   Input,
   LoadingSpinner
 } from '@core/components';
-import { cn } from '@core/utils';
 import { login } from '@features/auth/actions';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Image from 'next/image';
@@ -22,6 +21,9 @@ import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import z from 'zod';
+import { cn, createLogger } from '@core/utils';
+
+const logger = createLogger('LoginForm');
 
 const loginSchema = z.object({
   email: z.string().nonempty('Email is required'),
@@ -65,7 +67,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
                 form.reset();
                 toast.success('Login successful!');
               } catch (error) {
-                console.error('Login failed:', error);
+                logger.error('Login failed:', error);
                 toast.error('Login failed. Please check your credentials and try again.');
               } finally {
                 setSubmitting(false);

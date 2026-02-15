@@ -16,6 +16,9 @@ import { useProfile } from '@features/users/hooks';
 import { createClientService } from '@supa/utils/client';
 import { BookHeart } from 'lucide-react';
 import { useCallback, useMemo, useRef, useState } from 'react';
+import { createLogger } from '@core/utils';
+
+const logger = createLogger('SupportFormCard');
 
 export interface SupportFormCardProps {
   supportRequest: SupportRequest;
@@ -91,7 +94,7 @@ export const SupportFormCard: React.FC<SupportFormCardProps> = ({ supportRequest
         onSave(updatedSupportRequest);
       }
     } catch (err) {
-      console.error('Error saving support request:', err);
+      logger.error('Error saving support request:', err);
       setError('Failed to save support request.');
     } finally {
       setSubmitting(false);

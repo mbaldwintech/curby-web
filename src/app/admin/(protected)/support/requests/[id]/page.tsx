@@ -17,6 +17,9 @@ import { ProfileCard } from '@features/users/components';
 import { createClientService } from '@supa/utils/client';
 import { useParams } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { createLogger } from '@core/utils';
+
+const logger = createLogger('SupportRequestDetailPage');
 
 export default function SupportRequestPage() {
   const { id } = useParams<{ id: string }>();
@@ -42,7 +45,7 @@ export default function SupportRequestPage() {
       });
       return unsubscribe;
     } catch (err) {
-      console.error('Failed to load support request:', err);
+      logger.error('Failed to load support request:', err);
       setError('Failed to load support request.');
       setLoading(false);
     }

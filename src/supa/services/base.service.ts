@@ -1,3 +1,4 @@
+import { createLogger } from '@core/utils';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import {
   PostgrestResponse,
@@ -6,6 +7,8 @@ import {
   User
 } from '@supabase/supabase-js';
 import { GenericRecord, GenericRecordMetadata, GenericRecordMetadataField } from '../types';
+
+const logger = createLogger('BaseService');
 
 export type StringOperators = 'eq' | 'neq' | 'like' | 'ilike' | 'in';
 export type NumberOperators = 'eq' | 'neq' | 'gt' | 'gte' | 'lt' | 'lte' | 'in';
@@ -129,13 +132,13 @@ export abstract class BaseService<T extends GenericRecord> {
 
       if (!fieldMeta) {
         // No metadata available for this column - skip it to be safe
-        console.warn(`No metadata found for column '${columnName}' - skipping in search`);
+        logger.warn(`No metadata found for column '${columnName}' - skipping in search`);
         continue;
       }
 
       if (!fieldMeta.searchable) {
         // Column is explicitly marked as non-searchable
-        console.warn(`Skipping non-searchable column '${columnName}' as defined in metadata`);
+        logger.warn(`Skipping non-searchable column '${columnName}' as defined in metadata`);
         continue;
       }
 
@@ -145,7 +148,7 @@ export abstract class BaseService<T extends GenericRecord> {
         if (arrayCondition) {
           conditions.push(arrayCondition);
         } else {
-          console.warn(`Skipping array column '${columnName}' - unsupported array type '${fieldMeta.type}' for search`);
+          logger.warn(`Skipping array column '${columnName}' - unsupported array type '${fieldMeta.type}' for search`);
         }
         continue;
       }
@@ -155,7 +158,7 @@ export abstract class BaseService<T extends GenericRecord> {
       if (regularCondition) {
         conditions.push(regularCondition);
       } else {
-        console.warn(`Skipping column '${columnName}' - unsupported type '${fieldMeta.type}' for search`);
+        logger.warn(`Skipping column '${columnName}' - unsupported type '${fieldMeta.type}' for search`);
       }
     }
 
@@ -211,7 +214,7 @@ export abstract class BaseService<T extends GenericRecord> {
 
       default:
         // Unsupported array element type - skip it
-        console.warn(`Array search not supported for type '${elementType}' - skipping`);
+        logger.warn(`Array search not supported for type '${elementType}' - skipping`);
         return null;
     }
   }
@@ -288,7 +291,7 @@ export abstract class BaseService<T extends GenericRecord> {
           try {
             (transformed as Record<string, unknown>)[key] = field.transform(transformed[key as keyof T]);
           } catch (error) {
-            console.warn(`Failed to transform ${key}:`, error);
+            logger.warn(`Failed to transform ${key}:`, error);
           }
         }
       }
@@ -303,7 +306,7 @@ export abstract class BaseService<T extends GenericRecord> {
       error
     } = await this.supabase.auth.getUser();
     if (error) {
-      console.error('Error fetching user:', error);
+      logger.error('Error fetching user:', error);
       return false;
     }
     return !!user;
@@ -315,11 +318,11 @@ export abstract class BaseService<T extends GenericRecord> {
       error
     } = await this.supabase.auth.getUser();
     if (error) {
-      console.error('Error fetching user:', error);
+      logger.error('Error fetching user:', error);
       throw error;
     }
     if (!user) {
-      console.warn('No user found');
+      logger.warn('No user found');
       throw new Error('No user found');
     }
     return user;
@@ -333,7 +336,7 @@ export abstract class BaseService<T extends GenericRecord> {
 
     // PGRST116 means no data found
     if (error && error.code !== 'PGRST116') {
-      console.error('Error fetching user:', error);
+      logger.error('Error fetching user:', error);
       throw error;
     }
 
@@ -390,7 +393,7 @@ export abstract class BaseService<T extends GenericRecord> {
     const { data, error }: PostgrestResponse<T> = await query;
 
     if (error && error.code !== 'PGRST116') {
-      console.error(`Error fetching from ${this.table}:`, error);
+      logger.error(`Error fetching from ${this.table}:`, error);
       throw error;
     }
 
@@ -445,7 +448,7 @@ export abstract class BaseService<T extends GenericRecord> {
     const { data, error }: PostgrestResponse<T> = await query;
 
     if (error && error.code !== 'PGRST116') {
-      console.error(`Error fetching from ${this.table}:`, error);
+      logger.error(`Error fetching from ${this.table}:`, error);
       throw error;
     }
 
@@ -459,7 +462,7 @@ export abstract class BaseService<T extends GenericRecord> {
     const { data, error }: PostgrestResponse<T> = await this.supabase.from(this.table).select(column as string);
 
     if (error) {
-      console.error(`Error fetching values for column ${String(column)}:`, error);
+      logger.error(`Error fetching values for column ${String(column)}:`, error);
       throw error;
     }
 
@@ -499,7 +502,7 @@ export abstract class BaseService<T extends GenericRecord> {
     const { data, error } = await query;
 
     if (error && error.code !== 'PGRST116') {
-      console.error(`Error checking existence in ${this.table}:`, error);
+      logger.error(`Error checking existence in ${this.table}:`, error);
       throw error;
     }
 
@@ -537,7 +540,7 @@ export abstract class BaseService<T extends GenericRecord> {
     const { count, error }: PostgrestSingleResponse<{ id: string }[]> = await query;
 
     if (error) {
-      console.error(`Error counting from ${this.table}:`, error);
+      logger.error(`Error counting from ${this.table}:`, error);
       throw error;
     }
 
@@ -569,12 +572,12 @@ export abstract class BaseService<T extends GenericRecord> {
 
     // PGRST116 means no data found
     if (error && error.code !== 'PGRST116') {
-      console.error(`Error fetching one from ${this.table}:`, error);
+      logger.error(`Error fetching one from ${this.table}:`, error);
       throw error;
     }
 
     if (!data) {
-      console.warn(`No data found for ${this.table} with filters:`, filters);
+      logger.warn(`No data found for ${this.table} with filters:`, filters);
       throw new Error(`No data found for ${this.table} with filters: ${JSON.stringify(filters)}`);
     }
 
@@ -606,7 +609,7 @@ export abstract class BaseService<T extends GenericRecord> {
 
     // PGRST116 means no data found
     if (error && error.code !== 'PGRST116') {
-      console.error(`Error fetching one from ${this.table}:`, error);
+      logger.error(`Error fetching one from ${this.table}:`, error);
       throw error;
     }
 
@@ -624,12 +627,12 @@ export abstract class BaseService<T extends GenericRecord> {
 
     // PGRST116 means no data found
     if (error && error.code !== 'PGRST116') {
-      console.error(`Error fetching ${this.table} by id:`, error);
+      logger.error(`Error fetching ${this.table} by id:`, error);
       throw error;
     }
 
     if (!data) {
-      console.warn(`No data found for ${this.table} with id: ${id}`);
+      logger.warn(`No data found for ${this.table} with id: ${id}`);
       throw new Error(`No data found for ${this.table} with id: ${id}`);
     }
 
@@ -643,7 +646,7 @@ export abstract class BaseService<T extends GenericRecord> {
 
     // PGRST116 means no data found
     if (error && error.code !== 'PGRST116') {
-      console.error(`Error fetching ${this.table} by id:`, error);
+      logger.error(`Error fetching ${this.table} by id:`, error);
       throw error;
     }
 
@@ -670,7 +673,7 @@ export abstract class BaseService<T extends GenericRecord> {
       .single();
 
     if (error) {
-      console.error(`Error creating ${this.table}:`, error);
+      logger.error(`Error creating ${this.table}:`, error);
       throw error;
     }
 
@@ -696,12 +699,12 @@ export abstract class BaseService<T extends GenericRecord> {
       .single();
 
     if (error) {
-      console.error(`Error updating ${this.table}:`, error);
+      logger.error(`Error updating ${this.table}:`, error);
       throw error;
     }
 
     if (!data) {
-      console.warn(`No data found for ${this.table} with id: ${id}`);
+      logger.warn(`No data found for ${this.table} with id: ${id}`);
       throw new Error(`No data found for ${this.table} with id: ${id}`);
     }
 
@@ -734,7 +737,7 @@ export abstract class BaseService<T extends GenericRecord> {
     const { data, error } = await query.select();
 
     if (error) {
-      console.error(`Error updating many in ${this.table}:`, error);
+      logger.error(`Error updating many in ${this.table}:`, error);
       throw error;
     }
 
@@ -745,7 +748,7 @@ export abstract class BaseService<T extends GenericRecord> {
     const { error } = await this.supabase.from(this.table).delete().eq('id', id);
 
     if (error) {
-      console.error(`Error deleting from ${this.table}:`, error);
+      logger.error(`Error deleting from ${this.table}:`, error);
       throw error;
     }
   }
@@ -770,7 +773,7 @@ export abstract class BaseService<T extends GenericRecord> {
     const { error } = await query;
 
     if (error) {
-      console.error(`Error deleting many from ${this.table}:`, error);
+      logger.error(`Error deleting many from ${this.table}:`, error);
       throw error;
     }
   }

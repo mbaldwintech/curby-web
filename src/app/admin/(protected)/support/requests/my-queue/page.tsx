@@ -16,7 +16,6 @@ import { Skeleton } from '@core/components/base/skeleton';
 import { SupportRequestStatus } from '@core/enumerations';
 import { DeviceService, ProfileService, SupportRequestService } from '@core/services';
 import { Device, Profile, SupportRequest } from '@core/types';
-import { formatDateTime } from '@core/utils';
 import {
   SupportRequestCategoryBadge,
   SupportRequestPriorityBadge,
@@ -28,6 +27,9 @@ import { AlertCircle, ChevronRight, Eye, FileText, MapPin, RefreshCw, Shield } f
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { createLogger, formatDateTime } from '@core/utils';
+
+const logger = createLogger('RequestsMyQueue');
 
 export default function MySupportRequestQueuePage() {
   const { user } = useAuth();
@@ -79,7 +81,7 @@ export default function MySupportRequestQueuePage() {
                 const profile = await profileService.findByUserId(supportRequest.userId!);
                 return { userId: supportRequest.userId!, profile };
               } catch (error) {
-                console.error(`Failed to load profile for user ${supportRequest.userId}`, error);
+                logger.error(`Failed to load profile for user ${supportRequest.userId}`, error);
                 return null;
               }
             })
@@ -92,7 +94,7 @@ export default function MySupportRequestQueuePage() {
                 const device = await deviceService.getById(supportRequest.deviceId!);
                 return { deviceId: supportRequest.deviceId!, device };
               } catch (error) {
-                console.error(`Failed to load device ${supportRequest.deviceId}`, error);
+                logger.error(`Failed to load device ${supportRequest.deviceId}`, error);
                 return null;
               }
             })
@@ -124,7 +126,7 @@ export default function MySupportRequestQueuePage() {
 
         setHasMore(supportRequests.length === 20);
       } catch (error) {
-        console.error('Failed to load support requests', error);
+        logger.error('Failed to load support requests', error);
         setError('Failed to load support requests. Please try again later.');
       } finally {
         setLoading(false);
@@ -144,7 +146,7 @@ export default function MySupportRequestQueuePage() {
         // Refresh the list
         await loadSupportRequests(true);
       } catch (error) {
-        console.error('Failed to start support request', error);
+        logger.error('Failed to start support request', error);
       } finally {
         setProcessingId(null);
       }

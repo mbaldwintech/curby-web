@@ -1,6 +1,9 @@
+import { createLogger } from '@core/utils';
 import { Camelize, FileObject, FileObjectV2 } from '@supabase/storage-js';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { User } from '@supabase/supabase-js';
+
+const logger = createLogger('BaseStorageService');
 
 export interface FileAssetCreate {
   file: File; // browser File object
@@ -38,7 +41,7 @@ export abstract class BaseStorageService {
     } = await this.supabase.auth.getUser();
 
     if (error) {
-      console.error('Error fetching user:', error);
+      logger.error('Error fetching user:', error);
       throw error;
     }
     if (!user) {
@@ -65,7 +68,7 @@ export abstract class BaseStorageService {
     });
 
     if (error) {
-      console.error(`Error uploading to ${this.bucket} at ${path}:`, error);
+      logger.error(`Error uploading to ${this.bucket} at ${path}:`, error);
       throw error;
     }
 
@@ -92,7 +95,7 @@ export abstract class BaseStorageService {
     const { data, error } = await this.supabase.storage.from(this.bucket).download(path);
 
     if (error) {
-      console.error(`Error downloading from ${this.bucket} at ${path}:`, error);
+      logger.error(`Error downloading from ${this.bucket} at ${path}:`, error);
       throw error;
     }
     if (!data) {
@@ -111,7 +114,7 @@ export abstract class BaseStorageService {
     });
 
     if (error) {
-      console.error(`Error listing files in ${this.bucket}:`, error);
+      logger.error(`Error listing files in ${this.bucket}:`, error);
       throw error;
     }
 
@@ -126,7 +129,7 @@ export abstract class BaseStorageService {
         if (error.message.toLowerCase().includes('not found')) {
           return false;
         }
-        console.error(`Error checking existence of ${path} in ${this.bucket}:`, error);
+        logger.error(`Error checking existence of ${path} in ${this.bucket}:`, error);
         throw error;
       }
 
@@ -144,7 +147,7 @@ export abstract class BaseStorageService {
     const { data, error } = await this.supabase.storage.from(this.bucket).info(path);
 
     if (error) {
-      console.error(`Error getting info from ${this.bucket} at ${path}:`, error);
+      logger.error(`Error getting info from ${this.bucket} at ${path}:`, error);
       throw error;
     }
 
@@ -168,7 +171,7 @@ export abstract class BaseStorageService {
 
     const { error } = await this.supabase.storage.from(this.bucket).remove(_paths);
     if (error) {
-      console.error(`Error removing files from ${this.bucket}:`, error);
+      logger.error(`Error removing files from ${this.bucket}:`, error);
       throw error;
     }
   }
@@ -189,7 +192,7 @@ export abstract class BaseStorageService {
     });
 
     if (error) {
-      console.error(`Error updating file in ${this.bucket} at ${path}:`, error);
+      logger.error(`Error updating file in ${this.bucket} at ${path}:`, error);
       throw error;
     }
 
@@ -215,7 +218,7 @@ export abstract class BaseStorageService {
   async move(fromPath: string, toPath: string): Promise<void> {
     const { error } = await this.supabase.storage.from(this.bucket).move(fromPath, toPath);
     if (error) {
-      console.error(`Error moving file from ${fromPath} to ${toPath} in ${this.bucket}:`, error);
+      logger.error(`Error moving file from ${fromPath} to ${toPath} in ${this.bucket}:`, error);
       throw error;
     }
   }
@@ -223,7 +226,7 @@ export abstract class BaseStorageService {
   async copy(fromPath: string, toPath: string): Promise<void> {
     const { error } = await this.supabase.storage.from(this.bucket).copy(fromPath, toPath);
     if (error) {
-      console.error(`Error copying file from ${fromPath} to ${toPath} in ${this.bucket}:`, error);
+      logger.error(`Error copying file from ${fromPath} to ${toPath} in ${this.bucket}:`, error);
       throw error;
     }
   }

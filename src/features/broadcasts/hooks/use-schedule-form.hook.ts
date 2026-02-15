@@ -7,6 +7,9 @@ import { createClientService } from '@supa/utils/client';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+import { createLogger } from '@core/utils';
+
+const logger = createLogger('UseScheduleForm');
 
 const baseSchema = z
   .object({
@@ -87,7 +90,7 @@ export const useScheduleForm = ({ scheduleId, broadcastId, onSubmitSuccess }: Sc
           });
         }
       } catch (error) {
-        console.error('Failed to fetch schedule', error);
+        logger.error('Failed to fetch schedule', error);
         setError('Failed to load schedule. Please try again.');
       } finally {
         setLoading(false);
@@ -136,7 +139,7 @@ export const useScheduleForm = ({ scheduleId, broadcastId, onSubmitSuccess }: Sc
           reset();
         }
       } catch (error) {
-        console.error('Failed to update schedule', error);
+        logger.error('Failed to update schedule', error);
         setError('Failed to update schedule. Please try again.');
       } finally {
         setSubmitting(false);
@@ -164,7 +167,7 @@ export const useScheduleForm = ({ scheduleId, broadcastId, onSubmitSuccess }: Sc
           reset();
         }
       } catch (error) {
-        console.error('Failed to create schedule', error);
+        logger.error('Failed to create schedule', error);
         setError('Failed to create schedule. Please try again.');
       } finally {
         setSubmitting(false);

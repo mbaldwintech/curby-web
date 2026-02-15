@@ -25,6 +25,9 @@ import { createClientService } from '@supa/utils/client';
 import { ArrowRight, InfoIcon, PlusIcon, TrashIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useRef } from 'react';
+import { createLogger } from '@core/utils';
+
+const logger = createLogger('EventsTypes');
 
 export default function EventTypesPage() {
   const router = useRouter();
@@ -45,7 +48,7 @@ export default function EventTypesPage() {
       ]);
       return !eventsExist && !curbyCoinTransactionTypesExist && !notificationTemplatesExist;
     } catch (error) {
-      console.error('Error checking tutorial views:', error);
+      logger.error('Error checking tutorial views:', error);
       return false;
     }
   };

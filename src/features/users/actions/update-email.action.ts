@@ -2,6 +2,9 @@
 
 import { ProfileService } from '@core/services';
 import { createClient, createServerService } from '@supa/utils/server';
+import { createLogger } from '@core/utils';
+
+const logger = createLogger('UpdateEmail');
 
 export async function updateEmail(userId: string, email: string) {
   const supabase = await createClient();
@@ -10,7 +13,7 @@ export async function updateEmail(userId: string, email: string) {
     error
   } = await supabase.auth.admin.updateUserById(userId, { email });
   if (error) {
-    console.error('Error updating user email:', error);
+    logger.error('Error updating user email:', error);
     throw new Error('Failed to update email');
   }
   if (!updatedUser) {

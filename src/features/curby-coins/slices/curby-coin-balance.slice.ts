@@ -1,6 +1,9 @@
 import { CurbyCoinTransactionService } from '@core/services';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { AppExtra } from '@store/store';
+import { createLogger } from '@core/utils';
+
+const logger = createLogger('CurbyCoinBalance');
 
 export interface CurbyCoinBalanceSliceStateType {
   balance: number;
@@ -21,7 +24,7 @@ export const fetchCurbyCoinBalance = createAsyncThunk<number, void, { rejectValu
       const curbyCoinTransactionService = new CurbyCoinTransactionService(extra.supabase);
       return await curbyCoinTransactionService.getMyBalance();
     } catch (error) {
-      console.error('Error fetching curbyCoin balance:', error);
+      logger.error('Error fetching curbyCoin balance:', error);
       return rejectWithValue('Unable to fetch curbyCoin balance');
     }
   }

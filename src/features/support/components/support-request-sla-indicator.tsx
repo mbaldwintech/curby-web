@@ -6,6 +6,9 @@ import { SupportRequest } from '@core/types';
 import { createClientService } from '@supa/utils/client';
 import { AlertTriangle, Clock } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { createLogger } from '@core/utils';
+
+const logger = createLogger('SupportRequestSlaIndicator');
 
 interface SupportRequestSlaIndicatorProps {
   supportRequest: SupportRequest;
@@ -34,7 +37,7 @@ export function SupportRequestSlaIndicator({ supportRequest }: SupportRequestSla
         );
         setSlaStatus(status);
       } catch (error) {
-        console.error('Failed to check SLA status:', error);
+        logger.error('Failed to check SLA status:', error);
       } finally {
         setLoading(false);
       }

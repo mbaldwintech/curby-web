@@ -1,6 +1,9 @@
 import { NotificationService } from '@core/services';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { AppExtra } from '@store/store';
+import { createLogger } from '@core/utils';
+
+const logger = createLogger('NotificationCount');
 
 export interface NotificationCountSliceStateType {
   count: number;
@@ -21,7 +24,7 @@ export const fetchNotificationCount = createAsyncThunk<number, void, { rejectVal
       const notificationService = new NotificationService(extra.supabase);
       return notificationService.getMyUnreadCount();
     } catch (error) {
-      console.error('Error fetching unread notification count:', error);
+      logger.error('Error fetching unread notification count:', error);
       return rejectWithValue('Unable to fetch unread notification count');
     }
   }

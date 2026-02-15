@@ -9,6 +9,9 @@ import { createClientService } from '@supa/utils/client';
 import { ArrowRight, EyeIcon, InfoIcon, PlusIcon, TrashIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useRef } from 'react';
+import { createLogger } from '@core/utils';
+
+const logger = createLogger('Tutorials');
 
 export default function TutorialsPage() {
   const router = useRouter();
@@ -23,7 +26,7 @@ export default function TutorialsPage() {
       const viewCount = await tutorialViewService.count({ column: 'tutorialId', operator: 'eq', value: tutorialId });
       return viewCount === 0;
     } catch (error) {
-      console.error('Error checking tutorial views:', error);
+      logger.error('Error checking tutorial views:', error);
       return false;
     }
   };

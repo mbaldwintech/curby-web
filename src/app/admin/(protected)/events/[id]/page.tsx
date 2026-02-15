@@ -28,7 +28,6 @@ import {
   Notification,
   NotificationTemplate
 } from '@core/types';
-import { cn } from '@core/utils';
 import { DeviceCard, DeviceCell } from '@features/devices/components';
 import { ProfileCard, ProfileCell } from '@features/users/components';
 import { createClientService } from '@supa/utils/client';
@@ -36,6 +35,9 @@ import { format } from 'date-fns';
 import { Activity, AlertCircle, Bell, CheckCircle2, ChevronRight, Clock, Coins, Database, XCircle } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import { useRef, useState } from 'react';
+import { cn, createLogger } from '@core/utils';
+
+const logger = createLogger('EventDetailPage');
 
 export default function EventDetailsPage() {
   const { id } = useParams<{ id: string }>();
@@ -109,7 +111,7 @@ export default function EventDetailsPage() {
         setTransactionNotifications(allTransactionNotifications);
       }
     } catch (error) {
-      console.error('Error fetching event details:', error);
+      logger.error('Error fetching event details:', error);
       setError('Failed to load event details.');
     } finally {
       setLoading(false);

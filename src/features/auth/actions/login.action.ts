@@ -6,6 +6,9 @@ import { createServerService } from '@supa/utils/server';
 import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
+import { createLogger } from '@core/utils';
+
+const logger = createLogger('Login');
 
 export async function login(email: string, password: string) {
   const deviceId = (await cookies()).get('deviceId')?.value;
@@ -14,7 +17,7 @@ export async function login(email: string, password: string) {
   try {
     await authService.loginWithEmail(email, password);
   } catch (error) {
-    console.error('Login error:', error);
+    logger.error('Login error:', error);
     throw error;
   }
 

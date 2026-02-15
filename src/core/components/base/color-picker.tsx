@@ -1,6 +1,6 @@
 'use client';
 
-import { cn } from '@core/utils';
+import { cn, createLogger } from '@core/utils';
 import Color from 'color';
 import { PipetteIcon } from 'lucide-react';
 import { Slider } from 'radix-ui';
@@ -19,6 +19,8 @@ import {
 import { Button } from './button';
 import { Input } from './input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select';
+
+const logger = createLogger('ColorPicker');
 
 interface ColorPickerContextValue {
   hue: number;
@@ -267,7 +269,7 @@ export const ColorPickerEyeDropper = ({ className, ...props }: ColorPickerEyeDro
       setLightness(l);
       setAlpha(100);
     } catch (error) {
-      console.error('EyeDropper failed:', error);
+      logger.error('EyeDropper failed:', error);
     }
   };
 

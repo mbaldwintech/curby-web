@@ -5,13 +5,15 @@ import { Skeleton } from '@core/components/base/skeleton';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@core/components/base/tooltip';
 import { CurbyCoinTransactionService, ProfileService } from '@core/services';
 import { Profile } from '@core/types';
-import { formatDateTime } from '@core/utils';
 import { createClientService } from '@supa/utils/client';
 import { CoinsIcon } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { UserStatusBadge } from './user-status-badge.component';
+import { createLogger, formatDateTime } from '@core/utils';
+
+const logger = createLogger('ProfileCard');
 
 export function ProfileCard({ userId }: { userId: string }) {
   const profileService = useRef(createClientService(ProfileService)).current;
@@ -34,7 +36,7 @@ export function ProfileCard({ userId }: { userId: string }) {
       );
       setBalance(tx?.balanceAfter || 0);
     } catch (err) {
-      console.error('Error fetching profile details:', err);
+      logger.error('Error fetching profile details:', err);
       setError('Failed to load profile details.');
     } finally {
       setLoading(false);

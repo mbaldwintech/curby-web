@@ -27,12 +27,14 @@ import {
 import { BroadcastMediaType } from '@core/enumerations';
 import { BroadcastService, MediaService } from '@core/services';
 import { Broadcast, IconProps, ImageProps, LottieProps, MediaProps } from '@core/types';
-import { cn } from '@core/utils';
 import { createClientService } from '@supa/utils/client';
 import { ArrowRight, FileJson, Image as ImageIcon, Settings as SettingsIcon, Sparkles, Upload, X } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { IoDesktopOutline, IoPhonePortraitOutline, IoTabletPortraitOutline } from 'react-icons/io5';
 import { BroadcastMedia } from './broadcast-media.component';
+import { cn, createLogger } from '@core/utils';
+
+const logger = createLogger('BroadcastEditor');
 
 const MediaEditor = ({
   broadcast,
@@ -78,7 +80,7 @@ const MediaEditor = ({
         try {
           await mediaService.remove(newMediaId);
         } catch (error) {
-          console.error('Failed to delete previous new media file:', error);
+          logger.error('Failed to delete previous new media file:', error);
         }
       }
 
@@ -167,7 +169,7 @@ const MediaEditor = ({
           setAdvancedEditing(false);
         }
       } catch (error) {
-        console.error('Failed to upload media:', error);
+        logger.error('Failed to upload media:', error);
       } finally {
         setUploadingMedia(false);
       }
@@ -181,7 +183,7 @@ const MediaEditor = ({
       try {
         await mediaService.remove(newMediaId);
       } catch (error) {
-        console.error('Failed to delete new media file:', error);
+        logger.error('Failed to delete new media file:', error);
       }
     }
 
@@ -223,7 +225,7 @@ const MediaEditor = ({
       try {
         await mediaService.remove(broadcast.mediaId);
       } catch (error) {
-        console.error('Failed to delete old media file:', error);
+        logger.error('Failed to delete old media file:', error);
       }
     }
 
@@ -244,7 +246,7 @@ const MediaEditor = ({
       try {
         await mediaService.remove(newMediaId);
       } catch (error) {
-        console.error('Failed to delete unsaved media file:', error);
+        logger.error('Failed to delete unsaved media file:', error);
       }
     }
 
@@ -786,7 +788,7 @@ export const BroadcastEditor = ({ broadcast, refresh }: BroadcastEditorProps) =>
         await broadcastService.update(broadcast.id, updates);
         refresh?.();
       } catch (error) {
-        console.error('Failed to update broadcast:', error);
+        logger.error('Failed to update broadcast:', error);
       }
     },
     [broadcast.id, broadcastService, refresh]
@@ -798,7 +800,7 @@ export const BroadcastEditor = ({ broadcast, refresh }: BroadcastEditorProps) =>
       try {
         await mediaService.remove(broadcast.mediaId);
       } catch (error) {
-        console.error('Failed to delete media file:', error);
+        logger.error('Failed to delete media file:', error);
       }
     }
 

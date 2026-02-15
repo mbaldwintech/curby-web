@@ -6,6 +6,9 @@ import { BroadcastDeliveryService, BroadcastDeliveryViewService, BroadcastServic
 import { Broadcast, BroadcastDelivery, BroadcastDeliveryView } from '@core/types';
 import { createClientService } from '@supa/utils/client';
 import { useEffect, useState } from 'react';
+import { createLogger } from '@core/utils';
+
+const logger = createLogger('BroadcastsDashboard');
 
 export default function BroadcastDashboardPage() {
   const [broadcasts, setBroadcasts] = useState<Broadcast[]>([]);
@@ -31,7 +34,7 @@ export default function BroadcastDashboardPage() {
         setDeliveries(deliveriesData);
         setViews(viewsData);
       } catch (error) {
-        console.error('Failed to fetch dashboard data:', error);
+        logger.error('Failed to fetch dashboard data:', error);
       } finally {
         setLoading(false);
       }

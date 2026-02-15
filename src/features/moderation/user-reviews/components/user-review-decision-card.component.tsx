@@ -25,6 +25,9 @@ import { UserReview } from '@core/types';
 import { useProfile } from '@features/users/hooks';
 import { createClientService } from '@supa/utils/client';
 import { useCallback, useMemo, useRef, useState } from 'react';
+import { createLogger } from '@core/utils';
+
+const logger = createLogger('UserReviewDecisionCard');
 
 interface ReviewFormProps {
   userReview: UserReview;
@@ -174,7 +177,7 @@ export function UserReviewDecisionCard({ userReview, onSave }: ReviewFormProps) 
         onSave();
       }
     } catch (err) {
-      console.error('Error submitting review form:', err);
+      logger.error('Error submitting review form:', err);
       setError('Failed to submit review form.');
     } finally {
       setSubmitting(false);

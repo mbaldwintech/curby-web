@@ -1,6 +1,9 @@
+import { createLogger } from '@core/utils';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { Session, User } from '@supabase/supabase-js';
 import { AuthValidationStatus } from '../types';
+
+const logger = createLogger('AuthService');
 
 export interface AuthRoutes {
   join: string;
@@ -96,7 +99,7 @@ export class AuthService<T extends Record<keyof typeof AuthEventTypeKey, string>
     const { data, error } = await this.supabase.auth.getUser();
 
     if (error) {
-      console.error('Error fetching Supabase user:', error);
+      logger.error('Error fetching Supabase user:', error);
       throw new Error('Failed to fetch user from Supabase');
     }
 
@@ -107,7 +110,7 @@ export class AuthService<T extends Record<keyof typeof AuthEventTypeKey, string>
     const { data, error } = await this.supabase.auth.getUser();
 
     if (error) {
-      console.error('Error fetching Supabase user:', error);
+      logger.error('Error fetching Supabase user:', error);
       return null;
     }
 
@@ -221,7 +224,7 @@ export class AuthService<T extends Record<keyof typeof AuthEventTypeKey, string>
     const { data, error } = await this.supabase.auth.signInAnonymously();
 
     if (error) {
-      console.error('Error logging in anonymously:', error);
+      logger.error('Error logging in anonymously:', error);
       throw new Error('Failed to log in anonymously');
     }
 
@@ -263,7 +266,7 @@ export class AuthService<T extends Record<keyof typeof AuthEventTypeKey, string>
     });
 
     if (error) {
-      console.error('Error signing up with email:', error);
+      logger.error('Error signing up with email:', error);
       throw error;
     }
 
@@ -289,7 +292,7 @@ export class AuthService<T extends Record<keyof typeof AuthEventTypeKey, string>
     });
 
     if (error) {
-      console.error('Error verifying email:', error);
+      logger.error('Error verifying email:', error);
       throw new Error('Invalid access or refresh token');
     }
 
@@ -325,7 +328,7 @@ export class AuthService<T extends Record<keyof typeof AuthEventTypeKey, string>
     });
 
     if (error) {
-      console.error('Error resending OTP:', error);
+      logger.error('Error resending OTP:', error);
       throw new Error('Failed to resend OTP');
     }
 
@@ -342,7 +345,7 @@ export class AuthService<T extends Record<keyof typeof AuthEventTypeKey, string>
     const { data, error } = await this.supabase.auth.signInWithPassword({ email, password });
 
     if (error) {
-      console.error('Error logging in:', error);
+      logger.error('Error logging in:', error);
       throw new Error('Invalid email or password');
     }
 

@@ -4,7 +4,6 @@ import { Button, Card, CardContent, CardHeader, CardTitle, CopyableStringCell } 
 import { ItemStatus, ItemType, ReviewStatus, ReviewTriggerType, UserRole } from '@core/enumerations';
 import { ExtendedItemService, FalseTakingService, ItemReviewService, SavedItemService } from '@core/services';
 import { ExtendedItem, FalseTaking, Item, SavedItem } from '@core/types';
-import { formatDateTime } from '@core/utils';
 import { useProfile } from '@features/users/hooks';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useAuth } from '@supa/providers';
@@ -33,6 +32,9 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { ItemStatusBadge } from './item-status-badge.component';
 import { ItemTypeBadge } from './item-type-badge.component';
+import { createLogger, formatDateTime } from '@core/utils';
+
+const logger = createLogger('ItemDetails');
 
 const itemSchema = z.object({
   title: z
@@ -125,7 +127,7 @@ export function ItemDetails({ id }: ItemDetailsProps) {
       const falseTakingsData = await falseTakingService.getAll({ column: 'itemId', operator: 'eq', value: id });
       setFalseTakings(falseTakingsData);
     } catch (err) {
-      console.error('Failed to load item details', err);
+      logger.error('Failed to load item details', err);
       toast.error('Error fetching item details');
     } finally {
       setLoading(false);
@@ -167,7 +169,7 @@ export function ItemDetails({ id }: ItemDetailsProps) {
         reset(formData);
         toast.success('Item has been updated successfully!');
       } catch (err) {
-        console.error('Failed to save item', err);
+        logger.error('Failed to save item', err);
         toast.error('Error saving item');
       } finally {
         setSaving(false);

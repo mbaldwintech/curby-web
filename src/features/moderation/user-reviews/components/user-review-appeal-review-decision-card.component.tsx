@@ -24,6 +24,9 @@ import { UserReview } from '@core/types';
 import { useProfile } from '@features/users/hooks';
 import { createClientService } from '@supa/utils/client';
 import { useCallback, useMemo, useRef, useState } from 'react';
+import { createLogger } from '@core/utils';
+
+const logger = createLogger('UserReviewAppealReviewDecisionCard');
 
 interface UserReviewAppealReviewDecisionCardProps {
   userReview: UserReview;
@@ -157,7 +160,7 @@ export function UserReviewAppealReviewDecisionCard({ userReview, onSave }: UserR
         onSave();
       }
     } catch (err) {
-      console.error('Error submitting appeal review form:', err);
+      logger.error('Error submitting appeal review form:', err);
       setError('Failed to submit appeal review form.');
     } finally {
       setSubmitting(false);

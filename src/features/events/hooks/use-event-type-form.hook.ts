@@ -2,13 +2,15 @@
 
 import { EventTypeService } from '@core/services';
 import { Condition, EventType } from '@core/types';
-import { debounce } from '@core/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { createClientService } from '@supa/utils/client';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import z from 'zod';
+import { createLogger, debounce } from '@core/utils';
+
+const logger = createLogger('UseEventTypeForm');
 
 const ConditionSchema = z.object({
   type: z.enum(['sql']).nonoptional(),
@@ -97,7 +99,7 @@ export const useEventTypeForm = ({ eventTypeId, onSubmitSuccess }: EventTypeForm
         const exists = await service.exists({ column: 'key', operator: 'eq', value: key });
         return !exists || 'This key is already in use';
       } catch (error) {
-        console.error('Failed to validate key uniqueness', error);
+        logger.error('Failed to validate key uniqueness', error);
         return 'Error validating key uniqueness. Please try again.';
       }
     },
@@ -143,7 +145,7 @@ export const useEventTypeForm = ({ eventTypeId, onSubmitSuccess }: EventTypeForm
           active: eventType.active
         });
       } catch (error) {
-        console.error('Failed to fetch eventType details:', error);
+        logger.error('Failed to fetch eventType details:', error);
         setEventType(null);
         form.reset(defaultValues);
         setError('Failed to load eventType details.');
@@ -192,7 +194,7 @@ export const useEventTypeForm = ({ eventTypeId, onSubmitSuccess }: EventTypeForm
         onSubmitSuccess?.(updatedEventType);
         reset();
       } catch (error) {
-        console.error('Failed to update eventType:', error);
+        logger.error('Failed to update eventType:', error);
         toast.error('Failed to update eventType. Please try again.');
       } finally {
         setSubmitting(false);
@@ -215,7 +217,7 @@ export const useEventTypeForm = ({ eventTypeId, onSubmitSuccess }: EventTypeForm
         onSubmitSuccess?.(createdEventType);
         reset();
       } catch (error) {
-        console.error('Failed to create eventType:', error);
+        logger.error('Failed to create eventType:', error);
         toast.error('Failed to create eventType. Please try again.');
         setError('Failed to create eventType. Please try again.');
       } finally {

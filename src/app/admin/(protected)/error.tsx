@@ -3,10 +3,13 @@
 import { Button } from '@core/components';
 import { AlertTriangle } from 'lucide-react';
 import { useEffect } from 'react';
+import { createLogger } from '@core/utils';
+
+const logger = createLogger('AdminError');
 
 export default function AdminError({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
   useEffect(() => {
-    console.error('Admin error:', error);
+    logger.error('Admin error:', error);
   }, [error]);
 
   return (

@@ -1,6 +1,9 @@
 import { BaseService } from '@supa/services';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { SupportSlaConfig, SupportSlaConfigMetadata } from '../types';
+import { createLogger } from '@core/utils';
+
+const logger = createLogger('SupportSlaConfigService');
 
 export class SupportSlaConfigService extends BaseService<SupportSlaConfig> {
   constructor(protected supabase: SupabaseClient) {
@@ -17,7 +20,7 @@ export class SupportSlaConfigService extends BaseService<SupportSlaConfig> {
       .single();
 
     if (error) {
-      console.error('Error fetching SLA config:', error);
+      logger.error('Error fetching SLA config:', error);
       return null;
     }
 

@@ -1,5 +1,6 @@
 'use client';
 
+import { createLogger } from '@core/utils';
 import { BaseService, Filter, Filters, OrderBy, Pagination } from '@supa/services';
 import { GenericRecord } from '@supa/types';
 import {
@@ -19,6 +20,8 @@ import {
   PagedAutocompleteFilterComponentOptions,
   RowMenuItem
 } from './base';
+
+const logger = createLogger('CurbyTable');
 
 const convertToFilters = <T,>(filters: Filters<T>): ColumnFiltersState =>
   filters.map((f) => ({
@@ -252,7 +255,7 @@ function CurbyTableInternal<T extends GenericRecord>(
       });
       setCount(count);
     } catch (error) {
-      console.error('Error fetching event count:', error);
+      logger.error('Error fetching event count:', error);
       setError('Failed to load event count.');
       setCount(0);
     }
@@ -279,7 +282,7 @@ function CurbyTableInternal<T extends GenericRecord>(
       });
       setData(data);
     } catch (error) {
-      console.error('Error fetching data:', error);
+      logger.error('Error fetching data:', error);
       setError('Failed to load data.');
       return [];
     } finally {

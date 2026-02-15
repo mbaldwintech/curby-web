@@ -2,6 +2,9 @@ import { ExtendedItemService, ItemService } from '@core/services';
 import { ExtendedItem } from '@core/types';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { AppExtra } from '@store/store';
+import { createLogger } from '@core/utils';
+
+const logger = createLogger('UrgentItems');
 
 export interface UrgentItemsSliceStateType {
   count: number;
@@ -24,7 +27,7 @@ export const fetchUrgentItems = createAsyncThunk<ExtendedItem[], void, { rejectV
       const itemService = new ExtendedItemService(extra.supabase);
       return await itemService.getMyUrgentItems();
     } catch (error) {
-      console.error('Error fetching urgent items:', error);
+      logger.error('Error fetching urgent items:', error);
       return rejectWithValue('Unable to fetch urgent items');
     }
   }
@@ -37,7 +40,7 @@ export const fetchUrgentItemsCount = createAsyncThunk<number, void, { rejectValu
       const itemService = new ItemService(extra.supabase);
       return await itemService.getMyUrgentItemsCount();
     } catch (error) {
-      console.error('Error fetching urgent items count:', error);
+      logger.error('Error fetching urgent items count:', error);
       return rejectWithValue('Unable to fetch urgent items count');
     }
   }

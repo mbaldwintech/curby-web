@@ -26,12 +26,14 @@ import {
   SupportRequestMessageService
 } from '@core/services';
 import { Device, Media, Profile, SupportRequest, SupportRequestMessage, SupportRequestMessageRead } from '@core/types';
-import { cn } from '@core/utils';
 import { useProfile } from '@features/users/hooks';
 import { createClientService } from '@supa/utils/client';
 import { ChevronDown, HeartHandshake } from 'lucide-react';
 import Image from 'next/image';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { cn, createLogger } from '@core/utils';
+
+const logger = createLogger('SupportRequestMessagesCard');
 
 interface SupportRequestMessagesCardProps {
   supportRequest: SupportRequest;
@@ -191,7 +193,7 @@ export function SupportRequestMessagesCard({ supportRequest }: SupportRequestMes
         });
       }
     } catch (err) {
-      console.error('Failed to load support request:', err);
+      logger.error('Failed to load support request:', err);
       setError('Failed to load support request.');
     } finally {
       setLoading(false);
@@ -223,7 +225,7 @@ export function SupportRequestMessagesCard({ supportRequest }: SupportRequestMes
       );
       setNewMessage('');
     } catch (err) {
-      console.error('Failed to send message:', err);
+      logger.error('Failed to send message:', err);
     }
   }, [supportRequest, newMessage, selectedMessageType, supportRequestMessageService]);
 
@@ -249,7 +251,7 @@ export function SupportRequestMessagesCard({ supportRequest }: SupportRequestMes
           [messageId]: [...(prev[messageId] || []), read]
         }));
       } catch (err) {
-        console.error('Failed to mark message as read:', err);
+        logger.error('Failed to mark message as read:', err);
       }
     },
     [profile, messageReads, supportRequestMessageReadService]

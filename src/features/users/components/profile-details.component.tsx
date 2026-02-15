@@ -35,7 +35,6 @@ import {
   UserReviewService
 } from '@core/services';
 import { Item, Profile, SavedItem, UserDevice } from '@core/types';
-import { debounce, formatDateTime } from '@core/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useAuth } from '@supa/providers';
 import { createClientService } from '@supa/utils/client';
@@ -63,6 +62,9 @@ import { ProfileCell } from './profile-cell.component';
 import { ProfileItemsTab } from './profile-items-tab.component';
 import { ProfileModerationTab } from './profile-moderation-tab.component';
 import { UserStatusBadge } from './user-status-badge.component';
+import { createLogger, debounce, formatDateTime } from '@core/utils';
+
+const logger = createLogger('ProfileDetails');
 
 const profileBaseSchema = z.object({
   username: z
@@ -248,7 +250,7 @@ export function ProfileDetails({ id }: ProfileDetailsProps) {
         setIsMostRecentPrivacyAccepted(!!mostRecentPrivacyAcceptance);
       }
     } catch (err) {
-      console.error('Failed to load user profile', err);
+      logger.error('Failed to load user profile', err);
       toast.error('Error fetching profile');
     } finally {
       setLoading(false);
@@ -315,7 +317,7 @@ export function ProfileDetails({ id }: ProfileDetailsProps) {
             : `${profile.username}'s profile has been updated successfully!`
         );
       } catch (err) {
-        console.error('Failed to save profile', err);
+        logger.error('Failed to save profile', err);
         toast.error('Error saving profile');
       } finally {
         setSaving(false);
