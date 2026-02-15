@@ -46,7 +46,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
                 >
                   How it Works
                 </LinkButton>
-                <LinkButton variant="link" href="/app" className="justify-start p-0 h-auto text-muted-foreground">
+                <LinkButton variant="link" href="#download" className="justify-start p-0 h-auto text-muted-foreground">
                   Get the App
                 </LinkButton>
                 <LinkButton

@@ -69,7 +69,7 @@ export function StickyHeader() {
             <ThemeToggle />
           </div>
 
-          <LinkButton href="/app" variant="default" className="ml-2">
+          <LinkButton href="#download" variant="default" className="ml-2">
             Get Curby
           </LinkButton>
         </nav>
@@ -77,7 +77,7 @@ export function StickyHeader() {
         {/* Mobile Navigation */}
         <div className="flex md:hidden items-center gap-2">
           <ThemeToggle />
-          <LinkButton href="/app" variant="default" size="sm">
+          <LinkButton href="#download" variant="default" size="sm">
             Get Curby
           </LinkButton>
         </div>
