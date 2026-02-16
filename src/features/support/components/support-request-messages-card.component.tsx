@@ -1,24 +1,7 @@
 'use client';
 
-import {
-  Button,
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  Textarea
-} from '@core/components';
-import {
-  SupportRequestMessageSenderType,
-  SupportRequestMessageType,
-  SupportRequestStatus,
-  UserRole
-} from '@core/enumerations';
+import { Button, Card, CardContent, CardHeader, CardTitle } from '@core/components';
+import { SupportRequestMessageSenderType, SupportRequestMessageType, UserRole } from '@core/enumerations';
 import {
   DeviceService,
   ProfileService,
@@ -26,12 +9,13 @@ import {
   SupportRequestMessageService
 } from '@core/services';
 import { Device, Media, Profile, SupportRequest, SupportRequestMessage, SupportRequestMessageRead } from '@core/types';
+import { createLogger } from '@core/utils';
 import { useProfile } from '@features/users/hooks';
 import { createClientService } from '@supa/utils/client';
-import { ChevronDown, HeartHandshake } from 'lucide-react';
-import Image from 'next/image';
+import { HeartHandshake } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { cn, createLogger } from '@core/utils';
+import { MessageGroup } from './message-group.component';
+import { MessageInput } from './message-input.component';
 
 const logger = createLogger('SupportRequestMessagesCard');
 
@@ -364,270 +348,33 @@ export function SupportRequestMessagesCard({ supportRequest }: SupportRequestMes
                   },
                   [] as Array<Array<SupportRequestMessage & { media?: Media[] }>>
                 )
-                .map((group, groupIdx) => {
-                  const firstMsg = group[0];
-                  const senderProfile =
-                    firstMsg.senderId && firstMsg.senderType === SupportRequestMessageSenderType.User
-                      ? profiles[firstMsg.senderId]
-                      : undefined;
-                  const senderDevice =
-                    firstMsg.senderId && firstMsg.senderType === SupportRequestMessageSenderType.Device
-                      ? devices[firstMsg.senderId]
-                      : undefined;
-                  const isCurrentUser =
-                    profile &&
-                    firstMsg.senderType === SupportRequestMessageSenderType.User &&
-                    firstMsg.senderId === profile.userId;
-                  const isSupport =
-                    senderProfile &&
-                    (senderProfile.role === UserRole.Support || senderProfile.role === UserRole.Admin) &&
-                    senderProfile.userId !== supportRequest.userId;
-
-                  // Handle system messages (status changes, assignment changes)
-                  const isSystemMessage =
-                    firstMsg.messageType === SupportRequestMessageType.StatusChange ||
-                    firstMsg.messageType === SupportRequestMessageType.AssignmentChange;
-
-                  if (isSystemMessage) {
-                    return (
-                      <div key={firstMsg.id + '-' + groupIdx} className="flex justify-center my-2">
-                        <div className="text-xs text-muted-foreground bg-muted/50 px-3 py-1 rounded-full border border-border">
-                          {firstMsg.message}
-                          {' • '}
-                          {(() => {
-                            if (!firstMsg.createdAt) return '';
-                            const d =
-                              typeof firstMsg.createdAt === 'string'
-                                ? new Date(firstMsg.createdAt)
-                                : firstMsg.createdAt;
-                            if (!d || isNaN(d.getTime())) return '';
-                            if (d.toDateString() === new Date().toDateString()) {
-                              return d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
-                            } else {
-                              return d.toLocaleString(undefined, {
-                                year: 'numeric',
-                                month: 'short',
-                                day: 'numeric',
-                                hour: '2-digit',
-                                minute: '2-digit'
-                              });
-                            }
-                          })()}
-                        </div>
-                      </div>
-                    );
-                  }
-
-                  // Handle internal notes
-                  const isInternalNote = firstMsg.messageType === SupportRequestMessageType.InternalNote;
-
-                  return (
-                    <div
-                      key={firstMsg.id + '-' + groupIdx}
-                      className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'}`}
-                    >
-                      {/* Avatar/Initials (only once per group, left side) */}
-                      {!isCurrentUser && (
-                        <div className="self-end flex flex-col items-center mr-2">
-                          {senderProfile?.avatarUrl ? (
-                            <Image
-                              src={senderProfile.avatarUrl}
-                              alt={senderProfile.username || 'User'}
-                              width={32}
-                              height={32}
-                              className="rounded-full w-8 h-8 object-cover"
-                            />
-                          ) : senderDevice ? (
-                            <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-xs font-bold text-muted-foreground">
-                              {senderDevice?.deviceId ? senderDevice.deviceId.charAt(0).toUpperCase() : '?'}
-                            </div>
-                          ) : (
-                            <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-xs font-bold text-muted-foreground">
-                              {senderProfile?.username ? senderProfile.username.charAt(0).toUpperCase() : '?'}
-                            </div>
-                          )}
-                        </div>
-                      )}
-                      <div
-                        className={cn('w-full min-w-0 flex flex-col mb-2', isCurrentUser ? 'items-end' : 'items-start')}
-                      >
-                        {/* Username (only once per group, left side) */}
-                        {!isCurrentUser && (
-                          <div className="flex items-center gap-2 mb-1 ml-2">
-                            <span className="text-xs font-semibold text-muted-foreground">
-                              {senderProfile
-                                ? `${senderProfile.username} (${isAdmin ? 'Admin' : isSupport ? 'Support' : 'User'})`
-                                : senderDevice
-                                  ? `${senderDevice.deviceId} (Device)`
-                                  : isSupport
-                                    ? 'Support'
-                                    : 'User'}
-                            </span>
-                            {isInternalNote && (
-                              <span className="text-xs font-semibold text-amber-600 dark:text-amber-400">
-                                (Internal Note)
-                              </span>
-                            )}
-                          </div>
-                        )}
-                        {/* Render all messages in the group */}
-                        {group
-                          .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
-                          .map((msg, idx) => {
-                            const isLast = idx === group.length - 1;
-                            const showTimestamp = isLast || focusedMsgId === msg.id;
-                            const isMsgInternalNote = msg.messageType === SupportRequestMessageType.InternalNote;
-                            const msgReads = messageReads[msg.id] || [];
-                            const readCount = msgReads.length;
-                            const isReadByCurrentUser =
-                              profile && msgReads.some((read) => read.userId === profile.userId);
-                            return (
-                              <div key={msg.id} className="max-w-[70%] min-w-0 mb-1 last:mb-0" data-message-id={msg.id}>
-                                <div
-                                  className={cn(
-                                    'rounded-xl px-3 py-1.5 min-w-0 text-sm whitespace-pre-line shadow-sm focus:outline-none focus:ring-2 focus:ring-ring',
-                                    isMsgInternalNote
-                                      ? 'bg-amber-50 dark:bg-amber-950/30 text-amber-900 dark:text-amber-100 border border-amber-200 dark:border-amber-800'
-                                      : isCurrentUser
-                                        ? 'bg-primary text-primary-foreground border border-primary/20'
-                                        : isSupport
-                                          ? 'bg-secondary text-secondary-foreground border border-secondary/20'
-                                          : 'bg-muted/50 text-foreground border border-muted/30',
-                                    isCurrentUser && idx === group.length - 1 ? 'rounded-br-xs' : '',
-                                    !isCurrentUser && idx === group.length - 1 ? 'rounded-bl-xs' : ''
-                                  )}
-                                  tabIndex={0}
-                                  onFocus={() => setFocusedMsgId(msg.id)}
-                                  onBlur={() => setFocusedMsgId((prev) => (prev === msg.id ? null : prev))}
-                                >
-                                  {msg.message}
-                                  {msg.media && msg.media.length > 0 && (
-                                    <div
-                                      className={cn(
-                                        'w-full flex flex-row gap-2 overflow-x-auto whitespace-nowrap',
-                                        msg.message?.length > 0 ? 'mt-2' : ''
-                                      )}
-                                    >
-                                      {msg.media.map((m) => (
-                                        <div
-                                          key={m.id}
-                                          className="w-24 h-24 relative rounded overflow-hidden bg-muted flex-shrink-0"
-                                        >
-                                          <Image src={m.url} alt={m.filename} fill className="object-cover" />
-                                        </div>
-                                      ))}
-                                    </div>
-                                  )}
-                                  {showTimestamp && (
-                                    <div
-                                      className={cn(
-                                        'flex text-xs mt-1',
-                                        isMsgInternalNote
-                                          ? 'text-amber-600 dark:text-amber-400'
-                                          : 'text-primary-foreground/75',
-                                        isCurrentUser ? 'justify-end' : 'justify-start'
-                                      )}
-                                    >
-                                      {(() => {
-                                        if (!msg.createdAt) return;
-                                        const d =
-                                          typeof msg.createdAt === 'string' ? new Date(msg.createdAt) : msg.createdAt;
-                                        if (!d || isNaN(d.getTime())) return;
-                                        // If the date is today, show time only, else show date and time
-                                        if (d.toDateString() === new Date().toDateString()) {
-                                          return d.toLocaleTimeString(undefined, {
-                                            hour: '2-digit',
-                                            minute: '2-digit'
-                                          });
-                                        } else {
-                                          return d.toLocaleString(undefined, {
-                                            year: 'numeric',
-                                            month: 'short',
-                                            day: 'numeric',
-                                            hour: '2-digit',
-                                            minute: '2-digit'
-                                          });
-                                        }
-                                      })()}
-                                    </div>
-                                  )}
-                                  {showTimestamp && isCurrentUser && readCount > 0 && (
-                                    <div
-                                      className={cn(
-                                        'flex items-center gap-1 text-xs mt-1',
-                                        isMsgInternalNote
-                                          ? 'text-amber-600 dark:text-amber-400'
-                                          : 'text-primary-foreground/75',
-                                        'justify-end'
-                                      )}
-                                    >
-                                      <span>{readCount === 1 ? 'Read' : `Read by ${readCount}`}</span>
-                                      {isReadByCurrentUser && <span>✓</span>}
-                                    </div>
-                                  )}
-                                </div>
-                              </div>
-                            );
-                          })}
-                      </div>
-                    </div>
-                  );
-                })}
+                .map((group, groupIdx) => (
+                  <MessageGroup
+                    key={group[0].id + '-' + groupIdx}
+                    group={group}
+                    groupIdx={groupIdx}
+                    profiles={profiles}
+                    devices={devices}
+                    messageReads={messageReads}
+                    currentProfile={profile}
+                    supportRequestUserId={supportRequest.userId}
+                    isAdmin={isAdmin}
+                    focusedMsgId={focusedMsgId}
+                    onFocusMsg={(msgId) => setFocusedMsgId(msgId)}
+                    onBlurMsg={(msgId) => setFocusedMsgId((prev) => (prev === msgId ? null : prev))}
+                  />
+                ))}
             </div>
 
             {/* Fixed footer (send message bar) */}
-            <div className="border-t border-input bg-background/95 rounded-b-lg p-3 flex gap-2 items-end shrink-0">
-              <Textarea
-                className="w-full resize-none min-h-10"
-                rows={1}
-                placeholder="Type your message..."
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    if (newMessage.trim()) {
-                      handleSend();
-                    }
-                  }
-                }}
-              />
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="shrink-0 h-10">
-                    {selectedMessageType === SupportRequestMessageType.Reply ? 'Reply' : 'Internal Note'}
-                    <ChevronDown />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent side="bottom" align="end">
-                  <DropdownMenuGroup>
-                    <DropdownMenuItem
-                      onSelect={() => setSelectedMessageType(SupportRequestMessageType.Reply)}
-                      className="cursor-pointer"
-                    >
-                      Reply
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onSelect={() => setSelectedMessageType(SupportRequestMessageType.InternalNote)}
-                      className="cursor-pointer"
-                    >
-                      Internal Note
-                    </DropdownMenuItem>
-                  </DropdownMenuGroup>
-                </DropdownMenuContent>
-              </DropdownMenu>
-              <Button
-                onClick={handleSend}
-                disabled={
-                  !newMessage.trim() ||
-                  (selectedMessageType === SupportRequestMessageType.Reply &&
-                    supportRequest.status !== SupportRequestStatus.InProgress)
-                }
-                className="shrink-0 h-10"
-              >
-                Send
-              </Button>
-            </div>
+            <MessageInput
+              newMessage={newMessage}
+              onNewMessageChange={setNewMessage}
+              onSend={handleSend}
+              selectedMessageType={selectedMessageType}
+              onMessageTypeChange={setSelectedMessageType}
+              supportRequestStatus={supportRequest.status}
+            />
           </>
         )}
       </CardContent>
