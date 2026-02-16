@@ -1,7 +1,17 @@
 import { AspectRatio } from '@core/constants';
-import { BatteryMedium, ChevronDown, Heart, Map, MapPin, Navigation, Plus, Signal, Wifi } from 'lucide-react';
+import {
+  BatteryMedium,
+  ChevronDown,
+  CircleUserRound,
+  Heart,
+  Map,
+  MapPin,
+  Navigation,
+  Plus,
+  Signal,
+  Wifi
+} from 'lucide-react';
 import Image from 'next/image';
-import { MdOutlineAccountCircle } from 'react-icons/md';
 
 export const AppPreview = () => {
   return (
@@ -32,7 +42,7 @@ export const AppPreview = () => {
           <div className="flex items-center gap-2">
             <Plus className="h-5 w-5 text-foreground" />
             <Map className="h-5 w-5 text-foreground m-auto" />
-            <MdOutlineAccountCircle className="h-5 w-5 text-foreground m-auto" />
+            <CircleUserRound className="h-5 w-5 text-foreground m-auto" />
           </div>
         </div>
         <div className="flex-1 w-full flex flex-col items-center justify-center space-y-4">

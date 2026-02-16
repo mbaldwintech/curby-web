@@ -1,29 +1,10 @@
 'use client';
 
+import { CountCell } from '@core/components';
 import { SavedItemService } from '@core/services';
-import { createClientService } from '@supa/utils/client';
-import { useEffect, useRef, useState } from 'react';
+import { useMemo } from 'react';
 
 export const SavedItemCountCell = ({ userId }: { userId?: string | null }) => {
-  const savedItemService = useRef(createClientService(SavedItemService)).current;
-  const [savedItemCount, setSavedItemCount] = useState<number>(0);
-
-  useEffect(() => {
-    if (userId) {
-      savedItemService
-        .count({ column: 'userId', operator: 'eq', value: userId })
-        .then((count) => {
-          if (count !== null) {
-            setSavedItemCount(count);
-          }
-        })
-        .catch(() => {
-          setSavedItemCount(0);
-        });
-    } else {
-      setSavedItemCount(0);
-    }
-  }, [userId, savedItemService]);
-
-  return savedItemCount;
+  const filters = useMemo(() => ({ column: 'userId' as const, operator: 'eq' as const, value: userId! }), [userId]);
+  return <CountCell service={SavedItemService} id={userId} filters={filters} />;
 };

@@ -18,9 +18,8 @@ import { BroadcastMediaType } from '@core/enumerations';
 import { BroadcastService, MediaService } from '@core/services';
 import { Broadcast } from '@core/types';
 import { createClientService } from '@supa/utils/client';
-import { Settings as SettingsIcon, Upload, X } from 'lucide-react';
+import { Monitor, Settings as SettingsIcon, Smartphone, Tablet, Upload, X } from 'lucide-react';
 import { useCallback, useRef, useState } from 'react';
-import { IoDesktopOutline, IoPhonePortraitOutline, IoTabletPortraitOutline } from 'react-icons/io5';
 import { BroadcastMedia } from './broadcast-media.component';
 import { CTAEditor } from './broadcast-cta-editor.component';
 import { MediaEditor } from './broadcast-media-editor.component';
@@ -139,7 +138,7 @@ export const BroadcastEditor = ({ broadcast, refresh }: BroadcastEditorProps) =>
                           'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground'
                       )}
                     >
-                      <IoPhonePortraitOutline className="inline h-4 w-4" />
+                      <Smartphone className="inline h-4 w-4" />
                     </button>
                   </TooltipTrigger>
                   <TooltipContent>Mobile View</TooltipContent>
@@ -154,7 +153,7 @@ export const BroadcastEditor = ({ broadcast, refresh }: BroadcastEditorProps) =>
                           'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground'
                       )}
                     >
-                      <IoTabletPortraitOutline className="inline h-4 w-4" />
+                      <Tablet className="inline h-4 w-4" />
                     </button>
                   </TooltipTrigger>
                   <TooltipContent>Tablet View</TooltipContent>
@@ -169,7 +168,7 @@ export const BroadcastEditor = ({ broadcast, refresh }: BroadcastEditorProps) =>
                           'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground'
                       )}
                     >
-                      <IoDesktopOutline className="inline h-4 w-4" />
+                      <Monitor className="inline h-4 w-4" />
                     </button>
                   </TooltipTrigger>
                   <TooltipContent>Desktop View</TooltipContent>
