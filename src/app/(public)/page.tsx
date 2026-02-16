@@ -305,6 +305,7 @@ export default function PublicHomePage() {
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Real stories from people using Curby to connect and reduce waste.
           </p>
+          <p className="text-sm text-muted-foreground mt-2">Sample testimonials for illustration</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

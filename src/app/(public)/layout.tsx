@@ -84,9 +84,6 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
                 >
                   Terms of Service
                 </LinkButton>
-                <LinkButton variant="link" href="/admin" className="justify-start p-0 h-auto text-muted-foreground">
-                  Admin
-                </LinkButton>
               </nav>
             </div>
           </div>
