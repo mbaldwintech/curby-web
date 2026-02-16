@@ -1,9 +1,25 @@
 'use client';
 
-import { Button, Card, CardContent, CardHeader, CardTitle, CopyableStringCell } from '@core/components';
+import {
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Input,
+  Label,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@core/components';
 import { ItemStatus, ItemType, ReviewStatus, ReviewTriggerType, UserRole } from '@core/enumerations';
+import { useConfirmDialog } from '@core/providers';
 import { ExtendedItemService, FalseTakingService, ItemReviewService, SavedItemService } from '@core/services';
 import { ExtendedItem, FalseTaking, Item, SavedItem } from '@core/types';
+import { createLogger, formatDateTime } from '@core/utils';
+import { ProfileCell } from '@features/users/components';
 import { useProfile } from '@features/users/hooks';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useAuth } from '@supa/providers';
@@ -13,26 +29,20 @@ import {
   CircleAlertIcon,
   EyeIcon,
   FileSearch2,
-  FlagIcon,
-  InfoIcon,
   MapPinIcon,
   PackageIcon,
-  ShieldCheckIcon,
   UserIcon
 } from 'lucide-react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import * as z from 'zod';
-
-import { Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@core/components';
-import { useConfirmDialog } from '@core/providers';
-import { ProfileCell } from '@features/users/components';
-import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import * as z from 'zod';
+import { ItemAdminDataCard } from './item-admin-data-card.component';
+import { ItemInformationCard } from './item-information-card.component';
 import { ItemStatusBadge } from './item-status-badge.component';
 import { ItemTypeBadge } from './item-type-badge.component';
-import { createLogger, formatDateTime } from '@core/utils';
 
 const logger = createLogger('ItemDetails');
 
@@ -548,92 +558,7 @@ export function ItemDetails({ id }: ItemDetailsProps) {
 
           {/* Middle column: item metadata */}
           <div className="lg:col-span-2 space-y-6">
-            <Card className="overflow-hidden">
-              <CardHeader className="pb-4">
-                <CardTitle className="flex items-center gap-2">
-                  <InfoIcon className="w-4 h-4" />
-                  Item Information
-                </CardTitle>
-                <p className="text-sm text-muted-foreground">Detailed information about this item</p>
-              </CardHeader>
-              <CardContent className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <div>
-                  <div className="text-xs text-muted-foreground">Posted By</div>
-                  <ProfileCell userId={item.postedBy} className="text-sm py-0 h-auto text-card-foreground" />
-                  <div className="text-xs text-muted-foreground">
-                    {item.createdAt ? formatDateTime(new Date(item.createdAt)) : '-'}
-                  </div>
-                </div>
-
-                <div>
-                  <div className="text-xs text-muted-foreground">Location</div>
-                  <div className="text-sm">{item.geoLocation || 'Not specified'}</div>
-                  <div className="text-xs text-muted-foreground">GeoLocation (WKT format)</div>
-                </div>
-
-                <div>
-                  <div className="text-xs text-muted-foreground">Taken Status</div>
-                  <div className="text-sm">
-                    {item.taken ? (
-                      <div className="flex items-center gap-1 text-green-600 dark:text-green-400">
-                        <CheckCircleIcon className="w-3 h-3" />
-                        Taken
-                        {item.takenBy && (
-                          <>
-                            {' by '}
-                            <ProfileCell userId={item.takenBy} className="text-sm py-0 h-auto" />
-                          </>
-                        )}
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-1 text-blue-600 dark:text-blue-400">
-                        <CircleAlertIcon className="w-3 h-3" />
-                        Available
-                      </div>
-                    )}
-                  </div>
-                  <div className="text-xs text-muted-foreground">
-                    {item.taken && item.takenAt ? formatDateTime(new Date(item.takenAt)) : 'Available for taking'}
-                  </div>
-                </div>
-
-                <div>
-                  <div className="text-xs text-muted-foreground">Expiration</div>
-                  <div className="text-sm">{formatDateTime(new Date(item.expiresAt))}</div>
-                  <div className="text-xs text-muted-foreground">
-                    Extended {item.extendedCount} time{item.extendedCount !== 1 ? 's' : ''}
-                  </div>
-                </div>
-
-                <div>
-                  <div className="text-xs text-muted-foreground">Item ID</div>
-                  <CopyableStringCell value={item.id} className="text-sm break-all" />
-                </div>
-
-                <div>
-                  <div className="text-xs text-muted-foreground">Reports</div>
-                  <div className="text-sm">
-                    {item.reportedCount || 0} report{item.reportedCount !== 1 ? 's' : ''}
-                  </div>
-                </div>
-
-                {item.taken && item.confirmedTakenAt && (
-                  <div>
-                    <div className="text-xs text-muted-foreground">Confirmed Taken</div>
-                    <div className="text-sm">{formatDateTime(new Date(item.confirmedTakenAt))}</div>
-                  </div>
-                )}
-
-                {savedByUsers.length > 0 && (
-                  <div>
-                    <div className="text-xs text-muted-foreground">Saved by Users</div>
-                    <div className="text-sm">
-                      {savedByUsers.length} user{savedByUsers.length !== 1 ? 's' : ''}
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+            <ItemInformationCard item={item} savedByUsers={savedByUsers} />
 
             {/* Location Map */}
             <Card className="overflow-hidden">
@@ -652,76 +577,7 @@ export function ItemDetails({ id }: ItemDetailsProps) {
               </CardContent>
             </Card>
 
-            {isAdmin && (
-              <Card>
-                <CardHeader className="pb-4">
-                  <CardTitle className="flex items-center gap-2">
-                    <ShieldCheckIcon className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-                    Admin Data
-                  </CardTitle>
-                  <p className="text-sm text-muted-foreground">
-                    Information only visible to admins for moderation and support purposes
-                  </p>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-base">System Information</CardTitle>
-                    </CardHeader>
-                    <CardContent className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                      <div>
-                        <div className="text-xs text-muted-foreground">Created</div>
-                        <div className="text-sm">{formatDateTime(new Date(item.createdAt))}</div>
-                        <div className="text-xs text-muted-foreground">System generated</div>
-                      </div>
-
-                      <div>
-                        <div className="text-xs text-muted-foreground">Last Updated</div>
-                        <div className="text-sm">
-                          {item.updatedAt ? formatDateTime(new Date(item.updatedAt)) : 'Never'}
-                        </div>
-                      </div>
-
-                      <div>
-                        <div className="text-xs text-muted-foreground">GeoLocation (Raw)</div>
-                        <CopyableStringCell value={item.geoLocation || 'Not set'} className="text-xs break-all" />
-                      </div>
-
-                      <div>
-                        <div className="text-xs text-muted-foreground">Feed Score</div>
-                        <div className="text-sm">{item.feedScore || 'Not calculated'}</div>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  {falseTakings.length > 0 && (
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="text-base">False Takings</CardTitle>
-                        <div className="text-sm text-muted-foreground mb-2">False takings reported for this item</div>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="space-y-2">
-                          {falseTakings.map((ft) => (
-                            <div key={ft.id} className="flex items-center justify-between p-3 border rounded-lg">
-                              <div className="flex items-center gap-3">
-                                <FlagIcon className="w-4 h-4 text-red-500" />
-                                <div>
-                                  <ProfileCell userId={ft.takerId} />
-                                  <div className="text-xs text-muted-foreground">
-                                    {formatDateTime(new Date(ft.takenAt))}
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  )}
-                </CardContent>
-              </Card>
-            )}
+            {isAdmin && <ItemAdminDataCard item={item} falseTakings={falseTakings} />}
           </div>
         </div>
       )}
