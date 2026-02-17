@@ -1,5 +1,5 @@
 import { FileAssetCreate } from '@supa/services';
-import { Coordinates } from './coordinates.type';
+import { Coordinates } from '@mbaldwintech/curby-core/types';
 
 export interface CreateItem {
   title: string;

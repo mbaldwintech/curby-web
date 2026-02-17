@@ -1,2 +1,2 @@
-export * from './auth-validation-status.type';
+export type { AuthValidationStatus } from '@mbaldwintech/curby-core/types';
 export * from './generic-record.type';

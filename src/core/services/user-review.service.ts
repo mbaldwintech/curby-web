@@ -1,4 +1,4 @@
-import { UserReviewMetadata } from '@core/types/user-review.type';
+import { UserReviewMetadata } from '@core/types';
 import { BaseService } from '@supa/services';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { UserReview } from '../types';

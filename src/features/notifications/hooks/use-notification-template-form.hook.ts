@@ -247,6 +247,7 @@ export const useNotificationTemplateForm = ({
       try {
         const updatedNotificationTemplate = await service.update(notificationTemplate.id, {
           ...data,
+          iconProps: data.iconProps as NotificationTemplate['iconProps'],
           condition: (data.condition
             ? { ...data.condition, params: data.condition.params ? JSON.parse(data.condition.params) : {} }
             : undefined) as Condition | undefined
@@ -270,6 +271,7 @@ export const useNotificationTemplateForm = ({
       try {
         const createdNotificationTemplate = await service.create({
           ...data,
+          iconProps: data.iconProps as NotificationTemplate['iconProps'],
           condition: (data.condition
             ? { ...data.condition, params: data.condition.params ? JSON.parse(data.condition.params) : {} }
             : undefined) as Condition | undefined
