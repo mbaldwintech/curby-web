@@ -14,6 +14,9 @@ import { createClientService } from '@supa/utils/client';
 import { ArrowRight, InfoIcon, PlusIcon, TrashIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useRef } from 'react';
+import { createLogger } from '@core/utils';
+
+const logger = createLogger('TransactionsTypes');
 
 export default function CurbyCoinTransactionTypesPage() {
   const router = useRouter();
@@ -32,7 +35,7 @@ export default function CurbyCoinTransactionTypesPage() {
       });
       return !transactionsExist;
     } catch (error) {
-      console.error('Error checking curby coin transactions:', error);
+      logger.error('Error checking curby coin transactions:', error);
       return false;
     }
   };

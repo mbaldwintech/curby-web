@@ -1,8 +1,10 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { User } from '@supabase/supabase-js';
 import { EventTypeKey } from '../enumerations';
-import { getDeviceId } from '../utils';
+import { createLogger, getDeviceId } from '../utils';
 import { FunctionsService } from './functions.service';
+
+const logger = createLogger('EventLoggerService');
 
 export class EventLoggerService {
   protected functionsService: FunctionsService;
@@ -24,7 +26,7 @@ export class EventLoggerService {
     const { data, error } = await this.supabase.auth.getUser();
 
     if (error) {
-      console.error('Error fetching user for event logger:', error);
+      logger.error('Error fetching user for event logger:', error);
       return null;
     }
 
@@ -41,14 +43,14 @@ export class EventLoggerService {
       deviceId = this.deviceId;
     }
     if (!deviceId && !user) {
-      console.warn('No device ID available for event logging');
+      logger.warn('No device ID available for event logging');
       return;
     }
 
     const { data: device, error } = await this.supabase.from('device').select('*').eq('deviceId', deviceId).single();
 
     if (error && error.code !== 'PGRST116') {
-      console.error('Error fetching device for event logger:', error);
+      logger.error('Error fetching device for event logger:', error);
       return;
     }
 

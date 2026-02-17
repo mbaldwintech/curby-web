@@ -1,11 +1,13 @@
 'use client';
 
-import { debounce, wait } from '@core/utils';
+import { createLogger, debounce, wait } from '@core/utils';
 import { EmailOtpType, Session, User } from '@supabase/supabase-js';
 import { useRouter } from 'next/navigation';
 import { createContext, ReactNode, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { AuthValidationStatus } from '../types';
+
+const logger = createLogger('AuthProvider');
 
 export interface AuthServiceInterface {
   authDeepLinks: Record<string, string>;
@@ -194,7 +196,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ authService, authRou
           .catch(() => null)
       ]);
     } catch (error) {
-      console.error('Error refreshing auth state:', error);
+      logger.error('Error refreshing auth state:', error);
     }
   }, [authService]);
 
@@ -210,7 +212,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ authService, authRou
         unsub = authService.onAuthChange(async () => {
           refreshAuthState()
             .catch((error) => {
-              console.error('Error handling auth change:', error);
+              logger.error('Error handling auth change:', error);
             })
             .finally(() => {
               if (!readyCalled.current) {
@@ -225,7 +227,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ authService, authRou
           onReady?.();
         }
       } catch (error) {
-        console.error('Error initializing auth provider:', error);
+        logger.error('Error initializing auth provider:', error);
       }
     };
 
@@ -234,7 +236,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ authService, authRou
       try {
         unsub?.();
       } catch (error) {
-        console.error('Error cleaning up auth change listener:', error);
+        logger.error('Error cleaning up auth change listener:', error);
       }
     };
   }, [onReady, authService, refreshAuthState]);
@@ -245,7 +247,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ authService, authRou
       const u = await authService.getUser();
       setUser(u);
     } catch (error) {
-      console.error('Error fetching user:', error);
+      logger.error('Error fetching user:', error);
     }
   }, [session, authService]);
 
@@ -260,12 +262,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ authService, authRou
     try {
       if (isAuthenticated) return;
       await authService.joinAsGuest();
+      // Brief wait to allow Supabase auth state to propagate before navigation
       await wait(1000);
       router.replace(authRoutes.home);
-      wait(5 * 1000).then();
       toast.success('Successfully signed in as guest!');
     } catch (error) {
-      console.error('Error signing in as guest:', error);
+      logger.error('Error signing in as guest:', error);
       toast.error('Error signing in as guest. Please try again later.');
     }
   }, [isAuthenticated, router, authRoutes, authService]);
@@ -275,11 +277,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ authService, authRou
       try {
         if (isAuthenticated) return;
         await authService.joinWithEmail(email, password, username);
+        // Brief wait to allow Supabase auth state to propagate before navigation
         await wait(1000);
         router.push(authRoutes.awaitingVerification);
         toast.success('Successfully signed up with email!');
       } catch (error) {
-        console.error('Error joining with email:', error);
+        logger.error('Error joining with email:', error);
         toast.error('Error joining with email. Please try again later.');
       }
     },
@@ -299,6 +302,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ authService, authRou
   const verifySignup = async (params: ConfirmationUrlParams) => {
     if (validateConfirmationParams(params)) {
       await authService.verifyConfirmEmail(params.access_token!, params.refresh_token!);
+      // Brief wait to allow Supabase auth state to propagate before navigation
       await wait(1000);
       router.replace(authRoutes.home);
       toast.success('Email verified successfully!');
@@ -308,8 +312,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ authService, authRou
   const verifyConfirmEmailChange = async (params: ConfirmationUrlParams) => {
     if (validateConfirmationParams(params)) {
       await authService.verifyConfirmEmail(params.access_token!, params.refresh_token!);
+      // Brief wait to allow Supabase auth state to propagate before navigation
       await wait(1000);
-      router.replace('/(tabs)/free-items');
+      router.replace(authRoutes.home);
       toast.success('Email verified successfully!');
     }
   };
@@ -328,7 +333,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ authService, authRou
       await authService.resendSignupConfirmationEmail(email);
       toast.success('Signup confirmation email resent successfully!');
     } catch (error) {
-      console.error('Error resending signup confirmation email:', error);
+      logger.error('Error resending signup confirmation email:', error);
       toast.error('Error resending. Please try again.');
     }
   };
@@ -336,11 +341,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ authService, authRou
   const login = async ({ email, password }: LoginParams) => {
     try {
       await authService.loginWithEmail(email, password);
+      // Brief wait to allow Supabase auth state to propagate before navigation
       await wait(1000);
       toast.success('Successfully logged in!');
       router.replace(authRoutes.home);
     } catch (error) {
-      console.error('Error logging in:', error);
+      logger.error('Error logging in:', error);
       toast.error('Error logging in. Please check your credentials and try again.');
     }
   };
@@ -351,7 +357,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ authService, authRou
       router.replace(authRoutes.login);
       toast.success('Successfully logged out!');
     } catch (error) {
-      console.error('Error logging out:', error);
+      logger.error('Error logging out:', error);
       toast.error('Error logging out. Please try again later.');
     }
   }, [router, authService, authRoutes]);
@@ -365,7 +371,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ authService, authRou
         await authService.convertGuest(user.id, email, password);
         toast.success('Registration confirmation email sent.  Please check your inbox.');
       } catch (error) {
-        console.error('Error converting guest:', error);
+        logger.error('Error converting guest:', error);
         toast.error('Error registering user. Please try again later.');
       }
     },
@@ -375,11 +381,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ authService, authRou
   const resetPassword = async ({ email }: ResetPasswordParams) => {
     try {
       await authService.resetPassword(email);
+      // Brief wait to allow Supabase auth state to propagate before navigation
       await wait(1000);
       toast.success('Password reset email sent successfully!');
       router.push(authRoutes.awaitingVerification);
     } catch (error) {
-      console.error('Error resetting password:', error);
+      logger.error('Error resetting password:', error);
       toast.error('Error submitting password reset. Please try again later.');
     }
   };
@@ -387,11 +394,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ authService, authRou
   const updatePassword = async ({ password }: UpdatePasswordParams) => {
     try {
       await authService.updatePassword(password);
+      // Brief wait to allow Supabase auth state to propagate before navigation
       await wait(1000);
       router.replace(authRoutes.home);
       toast.success('Password updated successfully!');
     } catch (error) {
-      console.error('Error updating password:', error);
+      logger.error('Error updating password:', error);
       toast.error('Error updating password. Please try again later.');
     }
   };
@@ -400,7 +408,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ authService, authRou
     try {
       await authService.updateEmail(newEmail);
     } catch (error) {
-      console.error('Error updating email:', error);
+      logger.error('Error updating email:', error);
       toast.error('Error updating email. Please try again later.');
     }
   };
@@ -410,7 +418,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ authService, authRou
       await authService.updateUsername(username);
       toast.success('Username updated successfully!');
     } catch (error) {
-      console.error('Error updating username:', error);
+      logger.error('Error updating username:', error);
       toast.error('Error updating username. Please try again later.');
     }
   };
@@ -430,7 +438,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ authService, authRou
         router.push(authRoutes.passwordConfirmation);
       });
     } catch (error) {
-      console.error('Error confirming password:', error);
+      logger.error('Error confirming password:', error);
       toast.error('Error confirming password. Please try again.');
       return new Promise<boolean>((resolve) => {
         resolve(false);
@@ -452,7 +460,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ authService, authRou
         passwordConfirmationResolver.current = null;
         router.back();
       } catch (error) {
-        console.error('Error confirming password:', error instanceof Error ? error.message : error);
+        logger.error('Error confirming password:', error instanceof Error ? error.message : error);
         toast.error('Error confirming password. Please try again.');
       }
     },

@@ -1,5 +1,7 @@
 export * from './customer-satisfaction-input.component';
 export * from './customer-satisfaction.component';
+export * from './message-group.component';
+export * from './message-input.component';
 export * from './support-form-card.component';
 export * from './support-request-additional-details-card.component';
 export * from './support-request-category-badge.component';

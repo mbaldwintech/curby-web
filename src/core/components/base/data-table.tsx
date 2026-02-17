@@ -16,30 +16,13 @@ import {
   arrayMove,
   horizontalListSortingStrategy,
   SortableContext,
-  useSortable,
   verticalListSortingStrategy
 } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-import {
-  IconChevronDown,
-  IconChevronLeft,
-  IconChevronRight,
-  IconChevronsLeft,
-  IconChevronsRight,
-  IconDotsVertical,
-  IconFilter,
-  IconFilterFilled,
-  IconFilterOff,
-  IconLayoutColumns,
-  IconRefresh,
-  IconSearch
-} from '@tabler/icons-react';
+import { Filter, ListFilter } from 'lucide-react';
 import {
   AccessorFnColumnDef,
   AccessorKeyColumnDef,
-  ColumnDef,
   ColumnFiltersState,
-  ColumnMeta,
   ColumnSizingState,
   FilterFn,
   flexRender,
@@ -49,10 +32,7 @@ import {
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  Header,
-  HeaderContext,
   PaginationState,
-  Row,
   SortingState,
   Updater,
   useReactTable,
@@ -60,540 +40,36 @@ import {
 } from '@tanstack/react-table';
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useState } from 'react';
 
-import { ArrowDown, ArrowUp, ArrowUpDown, ChevronRight, GripVertical, X } from 'lucide-react';
+import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react';
 import { cn } from '../../utils';
-import { Autocomplete } from './autocomplete';
 import { Button } from './button';
 import { Checkbox } from './checkbox';
-import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from './context-menu';
+import type {
+  BaseCustomColumnDef,
+  CustomColumnDef,
+  CustomColumnMeta,
+  CustomHeader,
+  DataTableProps,
+  DataTableRef
+} from './data-table-types';
+import { DraggableColumnHeader } from './data-table-column-header';
+import { getDistinctFilterComponent, getPagedAutocompleteFilterComponent } from './data-table-filters';
+import { DataTablePagination } from './data-table-pagination';
+import { ActionsCell, DraggableRow, ExpandIconButton, getAlignment } from './data-table-row';
+import { DataTableToolbar } from './data-table-toolbar';
 import { DragHandle } from './drag-handle';
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger
-} from './dropdown-menu';
-import { Input } from './input';
-import { Label } from './label';
 import { LoadingSpinner } from './loading-spinner';
 import { Popover, PopoverContent, PopoverTrigger } from './popover';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './table';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './tooltip';
+import { TooltipProvider } from './tooltip';
 
-export interface PagedAutocompleteFilterComponentOptions {
-  getCount: (query: string) => Promise<number>;
-  fetchOptions: (query: string, page: number, pageSize: number) => Promise<{ id: string; label: string }[]>;
-  fetchSelectedItem: (id: string) => Promise<{ id: string; label: string } | null>;
-  nullable?: boolean;
-  nullValueLabel?: string;
-}
-
-export interface DistinctFilterComponentOptions<T> {
-  getOptions: () => Promise<T[]>;
-}
-
-export type FilterComponent<TData, TValue> = (props: HeaderContext<TData, TValue>) => React.JSX.Element;
-
-export type CustomColumnMeta<TData, TValue> = ColumnMeta<TData, TValue> & {
-  align?: 'top' | 'middle' | 'bottom';
-  justify?: 'left' | 'center' | 'right';
-  truncate?: boolean; // Whether to truncate text with ellipsis (default: true)
-  showTooltip?: boolean; // Whether to show tooltip on truncated text (default: true)
-};
-
-// Base definition for columns
-export type BaseCustomColumnDef<TData, TValue = unknown> = ColumnDef<TData, TValue> & {
-  enableSearching?: boolean;
-  enableReordering?: boolean; // Whether this column can be reordered (default: true)
-  filterComponent?: FilterComponent<TData, TValue>;
-  filterComponentOptions?: never; // <-- if you provide a raw function, you shouldn't pass options
-  meta?: CustomColumnMeta<TData, TValue>;
-  defaultHidden?: boolean;
-};
-
-// Column with autocomplete
-export type PagedAutocompleteColumnDef<TData, TValue = unknown> = ColumnDef<TData, TValue> & {
-  enableSearching?: boolean;
-  enableReordering?: boolean; // Whether this column can be reordered (default: true)
-  filterComponent: 'paged-autocomplete';
-  filterComponentOptions: PagedAutocompleteFilterComponentOptions;
-  defaultHidden?: boolean;
-};
-
-// Column with distinct select
-export type DistinctColumnDef<TData, TValue = unknown> = ColumnDef<TData, TValue> & {
-  enableSearching?: boolean;
-  enableReordering?: boolean; // Whether this column can be reordered (default: true)
-  filterComponent: 'distinct';
-  filterComponentOptions: DistinctFilterComponentOptions<TValue>;
-  defaultHidden?: boolean;
-};
-
-// Discriminated union of all
-export type CustomColumnDef<TData, TValue = unknown> =
-  | BaseCustomColumnDef<TData, TValue>
-  | PagedAutocompleteColumnDef<TData, TValue>
-  | DistinctColumnDef<TData, TValue>;
-
-export interface RowMenuItem<T> {
-  label: string;
-  icon?: React.ComponentType<{ className?: string }>;
-  onClick: (row: Row<T>) => void;
-  disabled?: boolean;
-  variant?: 'default' | 'destructive';
-  separator?: boolean;
-}
-
-export type CustomHeader<TData, TValue = unknown> = Header<TData, TValue> & {
-  enableSearching?: boolean;
-  filterComponent?: (props: HeaderContext<TData, TValue>) => React.JSX.Element;
-};
-
-// Component to handle conditional tooltip based on text overflow
-function TruncatedCellContent({
-  shouldTruncate,
-  shouldShowTooltip,
-  cellValue,
-  children
-}: {
-  shouldTruncate: boolean;
-  shouldShowTooltip: boolean;
-  cellValue: string;
-  children: React.ReactNode;
-}) {
-  const [isOverflowing, setIsOverflowing] = React.useState(false);
-  const contentRef = React.useRef<HTMLDivElement>(null);
-
-  // Check if content is overflowing
-  const checkOverflow = React.useCallback(() => {
-    if (contentRef.current && shouldTruncate) {
-      const isOverflow = contentRef.current.scrollWidth > contentRef.current.clientWidth;
-      setIsOverflowing(isOverflow);
-    }
-  }, [shouldTruncate]);
-
-  // Check overflow on mount and when content changes
-  React.useLayoutEffect(() => {
-    checkOverflow();
-  }, [checkOverflow, children]);
-
-  // Listen for resize events to handle column resizing
-  React.useEffect(() => {
-    checkOverflow();
-    if (typeof window !== 'undefined') {
-      window.addEventListener('resize', checkOverflow);
-      return () => {
-        window.removeEventListener('resize', checkOverflow);
-      };
-    }
-  }, [checkOverflow]);
-
-  const content = (
-    <div
-      ref={contentRef}
-      className={cn(
-        'flex-1', // Take remaining space
-        shouldTruncate && 'truncate overflow-hidden'
-      )}
-    >
-      {children}
-    </div>
-  );
-
-  if (shouldShowTooltip && cellValue && isOverflowing) {
-    return (
-      <Tooltip>
-        <TooltipTrigger asChild>{content}</TooltipTrigger>
-        <TooltipContent>
-          <p>{cellValue}</p>
-        </TooltipContent>
-      </Tooltip>
-    );
-  }
-
-  return content;
-}
-
-const getAlignment = <TData, TValue = unknown>(meta?: CustomColumnMeta<TData, TValue>): string => {
-  let className = 'justify-start'; // Default alignment
-
-  switch (meta?.align) {
-    case 'top':
-      className += ' items-start';
-      break;
-    case 'bottom':
-      className += ' items-end';
-      break;
-    case 'middle':
-    default:
-      className += ' items-center';
-      break;
-  }
-
-  switch (meta?.justify) {
-    case 'right':
-      return className.replace('justify-start', 'justify-end');
-    case 'center':
-      return className.replace('justify-start', 'justify-center');
-    case 'left':
-    default:
-      return className;
-  }
-};
-
-function DraggableRow<T extends { id: string }>({
-  row,
-  onClick,
-  getRowContextMenuItems,
-  getExpandedContent,
-  isExpanded
-}: {
-  row: Row<T>;
-  onClick?: () => void;
-  getRowContextMenuItems?: (row: Row<T>) => Promise<RowMenuItem<T>[]> | RowMenuItem<T>[];
-  getExpandedContent?: (row: Row<T>) => React.ReactNode;
-  isExpanded?: boolean;
-}) {
-  const [contextMenuItems, setContextMenuItems] = useState<RowMenuItem<T>[] | null>(null);
-  const { transform, transition, setNodeRef, isDragging } = useSortable({
-    id: row.original.id
-  });
-
-  const contentRef = React.useRef<HTMLDivElement>(null);
-
-  const fetchContextMenuItems = useCallback(async () => {
-    const contextMenuItems = await getRowContextMenuItems?.(row);
-    setContextMenuItems(contextMenuItems ?? null);
-  }, [row, getRowContextMenuItems]);
-
-  const mainRow = (
-    <TableRow
-      data-state={row.getIsSelected() && 'selected'}
-      data-dragging={isDragging}
-      ref={setNodeRef}
-      className="relative z-0 data-[dragging=true]:z-10 data-[dragging=true]:opacity-80"
-      style={{
-        transform: CSS.Transform.toString(transform),
-        transition: transition
-      }}
-      onClick={onClick}
-    >
-      {row.getVisibleCells().map((cell) => (
-        <TableCell
-          key={cell.id}
-          style={{
-            width: `${cell.column.getSize()}px`
-          }}
-        >
-          <div className={cn('flex items-center', getAlignment(cell.column.columnDef.meta))}>
-            <TruncatedCellContent
-              shouldTruncate={(cell.column.columnDef.meta as CustomColumnMeta<T, unknown>)?.truncate !== false}
-              shouldShowTooltip={(cell.column.columnDef.meta as CustomColumnMeta<T, unknown>)?.showTooltip !== false}
-              cellValue={String(cell.getValue() || '')}
-            >
-              {flexRender(cell.column.columnDef.cell, cell.getContext())}
-            </TruncatedCellContent>
-          </div>
-        </TableCell>
-      ))}
-    </TableRow>
-  );
-
-  const mainRowWithContextMenu =
-    contextMenuItems && contextMenuItems.length > 0 ? (
-      <ContextMenu>
-        <ContextMenuTrigger asChild>{mainRow}</ContextMenuTrigger>
-        <ContextMenuContent>
-          {contextMenuItems.map((item, index) => (
-            <React.Fragment key={index}>
-              {item.separator && <hr className="my-1" />}
-              <ContextMenuItem onClick={() => item.onClick(row)} disabled={item.disabled} variant={item.variant}>
-                {item.icon && <item.icon className="mr-2 h-4 w-4" />}
-                {item.label}
-              </ContextMenuItem>
-            </React.Fragment>
-          ))}
-        </ContextMenuContent>
-      </ContextMenu>
-    ) : (
-      mainRow
-    );
-
-  useEffect(() => {
-    fetchContextMenuItems();
-  }, [fetchContextMenuItems]);
-
-  return (
-    <>
-      {mainRowWithContextMenu}
-
-      {/* Sub-table row */}
-      {getExpandedContent && isExpanded && (
-        <TableRow>
-          <TableCell colSpan={row.getVisibleCells().length} className="p-0">
-            <div
-              className={cn(
-                'border-l-2 border-primary/20 ml-6 overflow-hidden transition-all duration-300 ease-out',
-                isExpanded ? 'opacity-100' : 'opacity-0'
-              )}
-              style={{
-                height: isExpanded ? 'auto' : '0px'
-              }}
-            >
-              <div ref={contentRef} className={cn('transition-all duration-300 ease-out')}>
-                {isExpanded && getExpandedContent(row)}
-              </div>
-            </div>
-          </TableCell>
-        </TableRow>
-      )}
-    </>
-  );
-}
-
-function DraggableColumnHeader<T>({
-  header,
-  enableColumnReordering,
-  renderColumnHeader
-}: {
-  header: CustomHeader<T>;
-  enableColumnReordering: boolean;
-  renderColumnHeader: (header: CustomHeader<T>) => React.ReactNode;
-}) {
-  const columnDef = header.column.columnDef as CustomColumnDef<T>;
-  const canReorderThisColumn = columnDef.enableReordering !== false; // Default to true if not specified
-
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging, setActivatorNodeRef } = useSortable({
-    id: header.id,
-    disabled: !enableColumnReordering || !canReorderThisColumn
-  });
-
-  if (!enableColumnReordering || !canReorderThisColumn) {
-    return <>{renderColumnHeader(header)}</>;
-  }
-
-  return (
-    <div
-      ref={setNodeRef}
-      className={cn('group flex items-center w-full relative', isDragging && 'opacity-50')}
-      style={{
-        transform: CSS.Transform.toString(transform),
-        transition: transition
-      }}
-    >
-      {/* Drag handle - only show if column can be reordered */}
-      {canReorderThisColumn && (
-        <Button
-          ref={setActivatorNodeRef}
-          variant="ghost"
-          className={cn(
-            'group-hover:text-foreground/50 hover:text-accent-foreground active:text-accent-foreground',
-            'dark:group-hover:text-foreground/50 dark:hover:text-accent-foreground dark:active:text-accent-foreground',
-            'mr-2 size-8 flex transition-opacity opacity-0 group-hover:opacity-100',
-            'cursor-grab active:cursor-grabbing'
-          )}
-          {...attributes}
-          {...listeners}
-        >
-          <GripVertical className="h-4 w-4" />
-        </Button>
-      )}
-      {renderColumnHeader(header)}
-    </div>
-  );
-}
-
-function getPagedAutocompleteFilterComponent<TData, TValue>(
-  options: PagedAutocompleteFilterComponentOptions
-): FilterComponent<TData, TValue> {
-  return function AutocompleteFilter({ column }: HeaderContext<TData, TValue>) {
-    const val = column.getFilterValue() as string | undefined;
-    return (
-      <Autocomplete
-        value={val}
-        pageSize={10}
-        getCount={options.getCount}
-        fetchItems={options.fetchOptions}
-        fetchSelectedItem={options.fetchSelectedItem}
-        onSelect={(value) => {
-          column.setFilterValue(value === null ? 'null' : value || undefined);
-        }}
-        nullable={options.nullable}
-        nullValueLabel={options.nullValueLabel}
-      />
-    );
-  };
-}
-
-async function getDistinctFilterComponent<TData, TValue>(
-  options: DistinctFilterComponentOptions<TValue>
-): Promise<FilterComponent<TData, TValue>> {
-  const distinctValues = await options.getOptions();
-  return function DistinctFilter(header: HeaderContext<TData, TValue>) {
-    // Get the current filter value
-    const value = header.column.getFilterValue() as string | undefined;
-
-    return (
-      <Select
-        value={value ?? 'any'}
-        onValueChange={(val) => header.column.setFilterValue(val === 'any' ? '' : val || undefined)}
-      >
-        <SelectTrigger className="w-32">
-          <SelectValue placeholder="Filter..." />
-        </SelectTrigger>
-        <SelectContent className="max-h-100">
-          <SelectItem value="any">Any</SelectItem>
-          {distinctValues.map((opt) => (
-            <SelectItem key={String(opt)} value={String(opt)}>
-              {String(opt)}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    );
-  };
-}
-
-const ActionsCell = <T,>({
-  row,
-  getRowActionMenuItems
-}: {
-  row: Row<T>;
-  getRowActionMenuItems?: (row: Row<T>) => Promise<RowMenuItem<T>[]> | RowMenuItem<T>[];
-}) => {
-  const [rowActionMenuItems, setRowActionMenuItems] = useState<RowMenuItem<T>[] | null>(null);
-
-  const fetchRowActionMenuItems = useCallback(async () => {
-    const rowActionMenuItems = await getRowActionMenuItems?.(row);
-    setRowActionMenuItems(rowActionMenuItems ?? null);
-  }, [row, getRowActionMenuItems]);
-
-  useEffect(() => {
-    fetchRowActionMenuItems();
-  }, [fetchRowActionMenuItems]);
-
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          variant="ghost"
-          className="data-[state=open]:bg-muted text-muted-foreground flex size-8 justify-self-end"
-          size="icon"
-        >
-          <IconDotsVertical />
-          <span className="sr-only">Open menu</span>
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="max-w-60">
-        {rowActionMenuItems?.map((menuItem, i) => (
-          <React.Fragment key={`menuItem-${i}`}>
-            {menuItem.separator && <DropdownMenuSeparator />}
-            <DropdownMenuItem
-              variant={menuItem.variant === 'destructive' ? 'destructive' : 'default'}
-              className="whitespace-nowrap"
-              disabled={menuItem.disabled}
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                menuItem.onClick(row);
-              }}
-            >
-              {menuItem.icon && <menuItem.icon className="mr-2 flex h-4 w-4" />}
-              {menuItem.label}
-            </DropdownMenuItem>
-          </React.Fragment>
-        ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
-};
-
-const ExpandIconButton = React.memo(
-  function ExpandIconButton({ isExpanded, onClick }: { isExpanded: boolean; onClick: () => void }) {
-    return (
-      <Button
-        variant="ghost"
-        size="icon"
-        className={cn(
-          'h-8 w-8 p-0',
-          'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
-          'transition-transform duration-200 ease-in-out',
-          isExpanded ? 'rotate-90' : ''
-        )}
-        onClick={(e) => {
-          e.stopPropagation();
-          onClick();
-        }}
-        aria-label={isExpanded ? 'Collapse row' : 'Expand row'}
-      >
-        <ChevronRight className="h-4 w-4" />
-      </Button>
-    );
-  },
-  (prevProps, nextProps) => prevProps.isExpanded === nextProps.isExpanded
-);
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export interface DataTableRef<T extends { id: string }> {
-  toggleExpand: (rowId: string) => void;
-}
-
-export interface DataTableProps<T> {
-  columns: CustomColumnDef<T>[];
-  data: T[];
-  setData?: React.Dispatch<React.SetStateAction<T[]>>;
-  refresh?: () => void;
-  onRowClick?: (row: Row<T>) => void;
-
-  // Row Actions
-  getRowActionMenuItems?: (row: Row<T>) => Promise<RowMenuItem<T>[]> | RowMenuItem<T>[];
-  getRowContextMenuItems?: (row: Row<T>) => Promise<RowMenuItem<T>[]> | RowMenuItem<T>[];
-
-  // Selection
-  enableSelection?: boolean;
-  onRowSelect?: (rows: Row<T>[]) => void;
-
-  // Pagination
-  manualPagination?: boolean;
-  pageCount?: number;
-  pagination?: PaginationState;
-  onPaginationChange?: (pagination: Updater<PaginationState>) => void;
-
-  // Sorting
-  manualSorting?: boolean;
-  sort?: SortingState;
-  onSortChange?: (sort: Updater<SortingState>) => void;
-
-  // Filtering
-  manualFiltering?: boolean;
-  filters?: ColumnFiltersState;
-  onFiltersChange?: (filters: Updater<ColumnFiltersState>) => void;
-
-  // Searching
-  manualSearch?: boolean;
-  searchText?: string;
-  onSearchTextChange?: (text: string) => void;
-
-  enableReordering?: boolean;
-  enableColumnReordering?: boolean;
-  enableColumnResizing?: boolean;
-  enableAutoSizing?: boolean; // Auto-size columns based on content
-
-  // Expanded Row
-  getExpandedContent?: (row: Row<T>) => React.ReactNode;
-
-  loading?: boolean;
-  error?: string | null;
-
-  height?: string | number;
-  maxHeight?: string | number;
-
-  ToolbarLeft?: React.FC<React.PropsWithChildren>;
-  ToolbarRight?: React.FC<React.PropsWithChildren>;
-}
+// Re-export all types and components from extracted modules
+export * from './data-table-types';
+export * from './data-table-filters';
+export * from './data-table-row';
+export * from './data-table-column-header';
+export * from './data-table-toolbar';
+export * from './data-table-pagination';
 
 function DataTableInternal<T extends { id: string }>(
   {
@@ -1234,7 +710,7 @@ function DataTableInternal<T extends { id: string }>(
                     header.column.getIsFiltered() && 'opacity-100'
                   )}
                 >
-                  {header.column.getIsFiltered() ? <IconFilterFilled /> : <IconFilter />}
+                  {header.column.getIsFiltered() ? <ListFilter /> : <Filter />}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-2">{column.filterComponent(header.getContext())}</PopoverContent>
@@ -1250,99 +726,19 @@ function DataTableInternal<T extends { id: string }>(
     };
   });
 
-  const DefaultToolbarContent = () => (
-    <>
-      {columns.some((c) => c.enableHiding) && (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm">
-              <IconLayoutColumns />
-              <span className="hidden lg:inline">Customize Columns</span>
-              <span className="lg:hidden">Columns</span>
-              <IconChevronDown />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
-            {table
-              .getAllColumns()
-              .filter((column) => typeof column.accessorFn !== 'undefined' && column.getCanHide())
-              .map((column) => {
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) => column.toggleVisibility(!!value)}
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                );
-              })}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      )}
-      {searchActive && (
-        <div className="relative w-full md:w-64 lg:w-80">
-          <Input
-            value={controlledSearch || search || ''}
-            onChange={(e) => handleSearchTextChange(e.target.value)}
-            placeholder="Search..."
-            className="h-8 w-full pr-8 text-sm" // add right padding so text doesn't overlap the button
-            autoFocus
-          />
-          <div className="absolute right-0 top-1/2 -translate-y-1/2 h-8 w-8 flex justify-center align-center">
-            <Tooltip>
-              <TooltipTrigger>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="text-destructive hover:bg-destructive hover:text-foreground dark:hover:bg-destructive dark:hover:text-foreground h-7 w-7"
-                  onClick={() => handleSearchTextChange('')}
-                >
-                  <X size="sm" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Clear search</p>
-              </TooltipContent>
-            </Tooltip>
-          </div>
-        </div>
-      )}
-      {columns.some((c) => c.enableSearching) && (
-        <Button
-          variant={searchActive ? 'default' : 'outline'}
-          size="sm"
-          className={cn(searchActive && 'bg-primary text-primary-foreground')}
-          onClick={searchActive ? handleSearchClose : handleSearchOpen}
-        >
-          <IconSearch />
-        </Button>
-      )}
-      {table.getState().columnFilters.length > 0 && (
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.resetColumnFilters()}
-          disabled={table.getState().columnFilters.length === 0}
-        >
-          <IconFilterOff />
-        </Button>
-      )}
-      {refresh && (
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => {
-            if (refresh) {
-              refresh();
-            }
-          }}
-        >
-          <IconRefresh className={cn(loading && 'animate-spin')} />
-        </Button>
-      )}
-    </>
+  const toolbarContent = (
+    <DataTableToolbar
+      columns={columns}
+      table={table}
+      searchActive={searchActive}
+      controlledSearch={controlledSearch}
+      search={search}
+      loading={loading}
+      refresh={refresh}
+      onSearchOpen={handleSearchOpen}
+      onSearchClose={handleSearchClose}
+      onSearchTextChange={handleSearchTextChange}
+    />
   );
 
   return (
@@ -1354,12 +750,8 @@ function DataTableInternal<T extends { id: string }>(
           </div>
         )}
         <div className="w-full flex-1 flex items-center justify-end gap-2">
-          {ToolbarRight && (
-            <ToolbarRight>
-              <DefaultToolbarContent />
-            </ToolbarRight>
-          )}
-          {!ToolbarRight && <DefaultToolbarContent />}
+          {ToolbarRight && <ToolbarRight>{toolbarContent}</ToolbarRight>}
+          {!ToolbarRight && toolbarContent}
         </div>
       </div>
       <div className="overflow-hidden rounded-lg border" ref={tableContainerRef}>
@@ -1486,80 +878,7 @@ function DataTableInternal<T extends { id: string }>(
           </Table>
         </DndContext>
       </div>
-      <div className="flex items-center justify-between px-4">
-        <div className="text-muted-foreground hidden flex-1 text-sm lg:flex">
-          {table.getFilteredSelectedRowModel().rows.length} of {table.getFilteredRowModel().rows.length} row(s)
-          selected.
-        </div>
-        <div className="flex w-full items-center gap-8 lg:w-fit">
-          <div className="hidden items-center gap-2 lg:flex">
-            <Label htmlFor="rows-per-page" className="text-sm font-medium">
-              Rows per page
-            </Label>
-            <Select
-              value={`${table.getState().pagination.pageSize}`}
-              onValueChange={(value) => {
-                table.setPageSize(Number(value));
-              }}
-            >
-              <SelectTrigger size="sm" className="w-20" id="rows-per-page">
-                <SelectValue placeholder={table.getState().pagination.pageSize} />
-              </SelectTrigger>
-              <SelectContent side="top">
-                {[10, 20, 30, 40, 50].map((pageSize) => (
-                  <SelectItem key={pageSize} value={`${pageSize}`}>
-                    {pageSize}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="flex w-fit items-center justify-center text-sm font-medium">
-            Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
-          </div>
-          <div className="ml-auto flex items-center gap-2 lg:ml-0">
-            <Button
-              variant="outline"
-              className="hidden h-8 w-8 p-0 lg:flex"
-              onClick={() => table.setPageIndex(0)}
-              disabled={!table.getCanPreviousPage()}
-            >
-              <span className="sr-only">Go to first page</span>
-              <IconChevronsLeft />
-            </Button>
-            <Button
-              variant="outline"
-              className="size-8"
-              size="icon"
-              onClick={() => table.previousPage()}
-              disabled={!table.getCanPreviousPage()}
-            >
-              <span className="sr-only">Go to previous page</span>
-              <IconChevronLeft />
-            </Button>
-            <Button
-              variant="outline"
-              className="size-8"
-              size="icon"
-              onClick={() => table.nextPage()}
-              disabled={!table.getCanNextPage()}
-            >
-              <span className="sr-only">Go to next page</span>
-              <IconChevronRight />
-            </Button>
-            <Button
-              variant="outline"
-              className="hidden size-8 lg:flex"
-              size="icon"
-              onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-              disabled={!table.getCanNextPage()}
-            >
-              <span className="sr-only">Go to last page</span>
-              <IconChevronsRight />
-            </Button>
-          </div>
-        </div>
-      </div>
+      <DataTablePagination table={table} />
     </TooltipProvider>
   );
 }

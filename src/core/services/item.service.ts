@@ -2,7 +2,10 @@ import { ItemStatus } from '@core/enumerations';
 import { BaseService } from '@supa/services';
 import type { PostgrestResponse, SupabaseClient } from '@supabase/supabase-js';
 import { Item, ItemMetadata } from '../types';
+import { createLogger } from '@core/utils';
 import { SavedItemService } from './saved-item.service';
+
+const logger = createLogger('ItemService');
 
 export class ItemService extends BaseService<Item> {
   protected savedItemService: SavedItemService;
@@ -32,7 +35,7 @@ export class ItemService extends BaseService<Item> {
       .order('createdAt', { ascending: false });
 
     if (error && error.code !== 'PGRST116') {
-      console.error(`Error fetching from ${this.table}:`, error);
+      logger.error(`Error fetching from ${this.table}:`, error);
       throw error;
     }
 
@@ -50,7 +53,7 @@ export class ItemService extends BaseService<Item> {
       );
 
     if (error) {
-      console.error(`Error counting from ${this.table}:`, error);
+      logger.error(`Error counting from ${this.table}:`, error);
       throw error;
     }
 
@@ -74,7 +77,7 @@ export class ItemService extends BaseService<Item> {
       .order('createdAt', { ascending: false });
 
     if (error && error.code !== 'PGRST116') {
-      console.error(`Error fetching from ${this.table}:`, error);
+      logger.error(`Error fetching from ${this.table}:`, error);
       throw error;
     }
 

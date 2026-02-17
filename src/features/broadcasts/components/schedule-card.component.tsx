@@ -28,6 +28,9 @@ import { BroadcastDeliveryTable } from './broadcast-delivery-table.component';
 import { BroadcastDeliveryViewCountCell } from './broadcast-delivery-view-count-cell.component';
 import { BroadcastDeliveryViewTable } from './broadcast-delivery-view-table.component';
 import { SchedulePanel, SchedulePanelRef } from './schedule-panel.component';
+import { createLogger } from '@core/utils';
+
+const logger = createLogger('ScheduleCard');
 
 export interface ScheduleCardProps {
   broadcast: Broadcast;
@@ -50,7 +53,7 @@ export const ScheduleCard = ({ broadcast, schedule, refresh }: ScheduleCardProps
     try {
       return await deliveryService.count([{ column: 'scheduleId', operator: 'eq', value: schedule.id }]);
     } catch (error) {
-      console.error('Failed to fetch delivery count:', error);
+      logger.error('Failed to fetch delivery count:', error);
       return 0;
     }
   }, [schedule.id]);
@@ -67,7 +70,7 @@ export const ScheduleCard = ({ broadcast, schedule, refresh }: ScheduleCardProps
         toast.error('Failed to generate deliveries.');
       }
     } catch (error) {
-      console.error('Failed to generate deliveries:', error);
+      logger.error('Failed to generate deliveries:', error);
       alert('Failed to generate deliveries. Check console for details.');
     } finally {
       setProcessing(false);
@@ -98,7 +101,7 @@ export const ScheduleCard = ({ broadcast, schedule, refresh }: ScheduleCardProps
       await refresh();
       toast.success('Schedule deleted successfully.');
     } catch (error) {
-      console.error('Failed to delete schedule:', error);
+      logger.error('Failed to delete schedule:', error);
       toast.error('Failed to delete schedule.');
     }
   }, [schedule.id, scheduleService, refresh]);
@@ -109,7 +112,7 @@ export const ScheduleCard = ({ broadcast, schedule, refresh }: ScheduleCardProps
       await refresh();
       toast.success(`Schedule ${!schedule.active ? 'activated' : 'deactivated'} successfully.`);
     } catch (error) {
-      console.error('Failed to toggle schedule:', error);
+      logger.error('Failed to toggle schedule:', error);
       toast.error('Failed to update schedule.');
     }
   }, [schedule.id, schedule.active, scheduleService, refresh]);

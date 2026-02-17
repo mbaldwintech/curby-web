@@ -6,13 +6,15 @@ import { Skeleton } from '@core/components/base/skeleton';
 import { AspectRatio } from '@core/constants';
 import { ExtendedItemService } from '@core/services';
 import { ExtendedItem } from '@core/types';
-import { formatDateTime } from '@core/utils';
 import { ProfileCell } from '@features/users/components';
 import { createClientService } from '@supa/utils/client';
 import { Package } from 'lucide-react';
 import Image from 'next/image';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ItemLocationMap } from './item-location-map.component';
+import { createLogger, formatDateTime } from '@core/utils';
+
+const logger = createLogger('ItemCard');
 
 export function ItemCard({ itemId }: { itemId: string }) {
   const extendedItemService = useRef(createClientService(ExtendedItemService)).current;
@@ -27,7 +29,7 @@ export function ItemCard({ itemId }: { itemId: string }) {
       const fetchedItem = await extendedItemService.getById(itemId);
       setItem(fetchedItem);
     } catch (err) {
-      console.error('Error fetching item details:', err);
+      logger.error('Error fetching item details:', err);
       setError('Failed to load item details.');
     } finally {
       setLoading(false);

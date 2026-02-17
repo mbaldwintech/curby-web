@@ -1,5 +1,8 @@
 import { IconProps } from '../components/icon.component';
 import { DeviceInfo } from '../types';
+import { createLogger } from './logger.util';
+
+const logger = createLogger('DeviceUtil');
 
 const DEVICE_ID_KEY = 'device_id';
 
@@ -8,7 +11,7 @@ const createNewDeviceId = async (): Promise<string> => {
   try {
     return crypto.randomUUID();
   } catch (error) {
-    console.error('Error generating new device ID:', error);
+    logger.error('Error generating new device ID:', error);
     throw error;
   }
 };
@@ -35,7 +38,7 @@ export const getDeviceId = async (): Promise<string | undefined> => {
 
     return storedId;
   } catch (error) {
-    console.error('Error accessing localStorage for device ID:', error);
+    logger.error('Error accessing localStorage for device ID:', error);
     return undefined;
   }
 };

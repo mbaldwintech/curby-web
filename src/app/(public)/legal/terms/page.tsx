@@ -5,7 +5,7 @@ import ReactMarkdown from 'react-markdown';
 import './page.module.css';
 
 export const metadata: Metadata = {
-  title: 'Terms and Conditions - Curby',
+  title: 'Terms and Conditions',
   description: 'Read the latest Terms and Conditions for Curby.'
 };
 

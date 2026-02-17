@@ -8,6 +8,7 @@ export * from './format-rounded-time-since.util';
 export * from './format-stopwatch.util';
 export * from './get-cover-scale.util';
 export * from './km-to-feet.util';
+export * from './logger.util';
 export * from './km-to-miles.util';
 export * from './location.util';
 export * from './miles-to-feet.util';

@@ -1,6 +1,9 @@
 import { BaseService, Cursor } from '@supa/services';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { CurbyCoinTransaction, CurbyCoinTransactionMetadata } from '../types';
+import { createLogger } from '@core/utils';
+
+const logger = createLogger('CurbyCoinTransactionService');
 
 export class CurbyCoinTransactionService extends BaseService<CurbyCoinTransaction> {
   constructor(protected supabase: SupabaseClient) {
@@ -10,13 +13,13 @@ export class CurbyCoinTransactionService extends BaseService<CurbyCoinTransactio
   async getMyBalance(): Promise<number> {
     const isAuthenticated = await this.isAuthenticated();
     if (!isAuthenticated) {
-      console.warn('User is not authenticated. Cannot fetch curbyCoin balance.');
+      logger.warn('User is not authenticated. Cannot fetch curbyCoin balance.');
       return 0;
     }
 
     const user = await this.getUser();
     if (!user) {
-      console.warn('No user found. Cannot fetch curbyCoin balance.');
+      logger.warn('No user found. Cannot fetch curbyCoin balance.');
       return 0;
     }
 
@@ -32,13 +35,13 @@ export class CurbyCoinTransactionService extends BaseService<CurbyCoinTransactio
   async getAllMyTransactions(cursor?: Cursor<CurbyCoinTransaction>, limit = 20): Promise<CurbyCoinTransaction[]> {
     const isAuthenticated = await this.isAuthenticated();
     if (!isAuthenticated) {
-      console.warn('User is not authenticated. Cannot fetch curbyCoin transactions.');
+      logger.warn('User is not authenticated. Cannot fetch curbyCoin transactions.');
       return [];
     }
 
     const user = await this.getUser();
     if (!user) {
-      console.warn('No user found. Cannot fetch curbyCoin transactions.');
+      logger.warn('No user found. Cannot fetch curbyCoin transactions.');
       return [];
     }
 

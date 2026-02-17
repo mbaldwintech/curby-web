@@ -15,7 +15,6 @@ import {
 import { ReviewStatus, UserRole } from '@core/enumerations';
 import { UserReviewService } from '@core/services';
 import { UserReview } from '@core/types';
-import { cn, formatDateTime } from '@core/utils';
 import { ReviewStatusBadge } from '@features/moderation/components';
 import {
   UserReviewAppealInformationCard,
@@ -32,6 +31,9 @@ import { createClientService } from '@supa/utils/client';
 import { Shield } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { cn, createLogger, formatDateTime } from '@core/utils';
+
+const logger = createLogger('UserReviewDetailPage');
 
 export default function UserReviewDetailsPage() {
   const params = useParams();
@@ -71,7 +73,7 @@ export default function UserReviewDetailsPage() {
       const review = await userReviewService.getById(params.id);
       setUserReview(review);
     } catch (err) {
-      console.error('Failed to load review data', err);
+      logger.error('Failed to load review data', err);
       setError('Failed to load review data. Please try again.');
     } finally {
       setLoading(false);
@@ -90,7 +92,7 @@ export default function UserReviewDetailsPage() {
 
       refresh();
     } catch (error) {
-      console.error('Failed to start review', error);
+      logger.error('Failed to start review', error);
       setError('Failed to start review. Please try again.');
     }
   }, [userReview, profile, isModerator, isAdmin, userReviewService, refresh]);
@@ -107,7 +109,7 @@ export default function UserReviewDetailsPage() {
 
       refresh();
     } catch (error) {
-      console.error('Failed to start appeal review', error);
+      logger.error('Failed to start appeal review', error);
       setError('Failed to start appeal review. Please try again.');
     }
   }, [userReview, profile, isModerator, isAdmin, userReviewService, refresh]);

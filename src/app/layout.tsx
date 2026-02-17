@@ -19,14 +19,18 @@ const robotoMono = Roboto_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Curby',
+  metadataBase: new URL('https://getcurby.app'),
+  title: {
+    template: '%s | Curby',
+    default: 'Curby - Free Curbside Items'
+  },
   description:
     'The simplest way to share and discover free stuff in your neighborhood. Reduce waste and strengthen communities.',
   icons: {
     icon: '/favicon.png'
   },
   openGraph: {
-    title: 'Curby',
+    title: 'Curby - Free Curbside Items',
     description:
       'The simplest way to share and discover free stuff in your neighborhood. Reduce waste and strengthen communities.',
     images: [
@@ -41,7 +45,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Curby',
+    title: 'Curby - Free Curbside Items',
     description:
       'The simplest way to share and discover free stuff in your neighborhood. Reduce waste and strengthen communities.',
     images: ['/curby_app_icon_dark.png']

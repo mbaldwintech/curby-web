@@ -5,6 +5,9 @@ import { Notification } from '@core/types';
 import { createClientService } from '@supa/utils/client';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef } from 'react';
+import { createLogger } from '@core/utils';
+
+const logger = createLogger('UseNotifications');
 
 interface UseNotificationOptions {
   pollInterval?: number; // milliseconds
@@ -27,11 +30,11 @@ export const useNotifications = ({ pollInterval = 15000 }: UseNotificationOption
           const params = new URLSearchParams(notification.data as Record<string, string>);
           router.push(`${notification.targetRoute}?${params.toString()}`);
         } else {
-          console.warn(`No targetRoute defined for notification id: ${notification.id}`);
+          logger.warn(`No targetRoute defined for notification id: ${notification.id}`);
           router.push('/profile/notifications');
         }
       } catch (error) {
-        console.error('Error handling notification:', error);
+        logger.error('Error handling notification:', error);
       }
     },
     [router, notificationService]
@@ -49,7 +52,7 @@ export const useNotifications = ({ pollInterval = 15000 }: UseNotificationOption
           await handleNotification(notification);
         }
       } catch (error) {
-        console.error('Error fetching unread notifications:', error);
+        logger.error('Error fetching unread notifications:', error);
       }
     };
 

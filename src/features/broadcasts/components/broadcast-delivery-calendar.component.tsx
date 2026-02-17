@@ -11,7 +11,6 @@ import {
 import { BroadcastDeliveryStatus } from '@core/enumerations';
 import { BroadcastDeliveryService } from '@core/services';
 import { BroadcastDelivery } from '@core/types';
-import { cn } from '@core/utils';
 import { Filters } from '@supa/services';
 import { createClientService } from '@supa/utils/client';
 import {
@@ -28,6 +27,9 @@ import {
 } from 'date-fns';
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Clock } from 'lucide-react';
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
+import { cn, createLogger } from '@core/utils';
+
+const logger = createLogger('BroadcastDeliveryCalendar');
 
 const getStatusColor = (status: BroadcastDeliveryStatus) => {
   switch (status) {
@@ -86,7 +88,7 @@ export const BroadcastDeliveryCalendar = forwardRef<BroadcastDeliveryCalendarRef
         const deliveries = await broadcastDeliveryService.getAll(filters);
         setDeliveries(deliveries);
       } catch (error) {
-        console.error('Error fetching broadcast deliveries:', error);
+        logger.error('Error fetching broadcast deliveries:', error);
       } finally {
         setLoading(false);
       }

@@ -2,6 +2,9 @@ import { Autocomplete, AutocompleteProps } from '@core/components';
 import { CurbyCoinTransactionTypeService } from '@core/services';
 import { createClientService } from '@supa/utils/client';
 import { useEffect, useRef } from 'react';
+import { createLogger } from '@core/utils';
+
+const logger = createLogger('CurbyCoinTransactionTypeSelect');
 
 export type CurbyCoinTransactionTypeSelectProps = Omit<
   AutocompleteProps,
@@ -12,7 +15,7 @@ export const CurbyCoinTransactionTypeSelect = ({ value, onSelect, ...rest }: Cur
   const curbyCoinTransactionTypeService = useRef(createClientService(CurbyCoinTransactionTypeService)).current;
 
   useEffect(() => {
-    console.log('CurbyCoinTransactionTypeSelect value:', value);
+    logger.info('CurbyCoinTransactionTypeSelect value:', value);
   }, [value]);
 
   return (

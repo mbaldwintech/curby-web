@@ -1,11 +1,13 @@
 'use client';
 
-import { cn } from '@core/utils';
+import { cn, createLogger } from '@core/utils';
 import 'leaflet/dist/leaflet.css';
 import { MapPinIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { GeoPoint } from '../types';
 import { useCurbyMarker } from './curby-marker';
+
+const logger = createLogger('LeafletMap');
 
 interface LeafletMapProps {
   location: GeoPoint;
@@ -70,7 +72,7 @@ export function LeafletMap({ location, useCustomMarker = false, containerClassNa
           window.dispatchEvent(new Event('resize'));
         }, 100);
       } catch (error) {
-        console.error('Failed to load Leaflet:', error);
+        logger.error('Failed to load Leaflet:', error);
       }
     };
 

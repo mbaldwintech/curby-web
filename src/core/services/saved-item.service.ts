@@ -1,6 +1,9 @@
 import { BaseService } from '@supa/services';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { SavedItem, SavedItemMetadata } from '../types';
+import { createLogger } from '@core/utils';
+
+const logger = createLogger('SavedItemService');
 
 export class SavedItemService extends BaseService<SavedItem> {
   constructor(protected supabase: SupabaseClient) {
@@ -10,13 +13,13 @@ export class SavedItemService extends BaseService<SavedItem> {
   async getMySavedItems(): Promise<SavedItem[]> {
     const isAuthenticated = await this.isAuthenticated();
     if (!isAuthenticated) {
-      console.warn('User is not authenticated. Cannot fetch saved items.');
+      logger.warn('User is not authenticated. Cannot fetch saved items.');
       return [];
     }
 
     const user = await this.getUser();
     if (!user) {
-      console.warn('No user found. Cannot fetch saved items.');
+      logger.warn('No user found. Cannot fetch saved items.');
       return [];
     }
 
@@ -37,7 +40,7 @@ export class SavedItemService extends BaseService<SavedItem> {
     const existingSavedItems = await this.getMySavedItems();
 
     if (existingSavedItems.some((item) => item.itemId === itemId)) {
-      console.warn(`Item with ID ${itemId} is already saved by the user.`);
+      logger.warn(`Item with ID ${itemId} is already saved by the user.`);
       return existingSavedItems;
     }
 
@@ -51,7 +54,7 @@ export class SavedItemService extends BaseService<SavedItem> {
     if (savedItem) {
       await this.delete(savedItem.id);
     } else {
-      console.warn(`Item with ID ${itemId} is not saved by the user.`);
+      logger.warn(`Item with ID ${itemId} is not saved by the user.`);
     }
     return this.getMySavedItems();
   }

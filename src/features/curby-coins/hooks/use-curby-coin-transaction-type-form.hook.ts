@@ -2,13 +2,15 @@
 
 import { CurbyCoinTransactionTypeService } from '@core/services';
 import { Condition, CurbyCoinTransactionType } from '@core/types';
-import { debounce } from '@core/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { createClientService } from '@supa/utils/client';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import z from 'zod';
+import { createLogger, debounce } from '@core/utils';
+
+const logger = createLogger('UseCurbyCoinTransactionTypeForm');
 
 const ConditionSchema = z.object({
   type: z.enum(['sql']).nonoptional(),
@@ -118,7 +120,7 @@ export const useCurbyCoinTransactionTypeForm = ({
         const exists = await service.exists({ column: 'key', operator: 'eq', value: key });
         return !exists || 'This key is already in use';
       } catch (error) {
-        console.error('Failed to validate key uniqueness', error);
+        logger.error('Failed to validate key uniqueness', error);
         return 'Error validating key uniqueness. Please try again.';
       }
     },
@@ -170,7 +172,7 @@ export const useCurbyCoinTransactionTypeForm = ({
           active: curbyCoinTransactionType.active
         });
       } catch (error) {
-        console.error('Failed to fetch curby coin transaction type details:', error);
+        logger.error('Failed to fetch curby coin transaction type details:', error);
         setCurbyCoinTransactionType(null);
         form.reset(defaultValues);
         setError('Failed to load curby coin transaction type details.');
@@ -219,7 +221,7 @@ export const useCurbyCoinTransactionTypeForm = ({
         onSubmitSuccess?.(updatedCurbyCoinTransactionType);
         reset();
       } catch (error) {
-        console.error('Failed to update curby coin transaction type:', error);
+        logger.error('Failed to update curby coin transaction type:', error);
         toast.error('Failed to update curby coin transaction type. Please try again.');
       } finally {
         setSubmitting(false);
@@ -242,7 +244,7 @@ export const useCurbyCoinTransactionTypeForm = ({
         onSubmitSuccess?.(createdCurbyCoinTransactionType);
         reset();
       } catch (error) {
-        console.error('Failed to create curby coin transaction type:', error);
+        logger.error('Failed to create curby coin transaction type:', error);
         toast.error('Failed to create curby coin transaction type. Please try again.');
         setError('Failed to create curby coin transaction type. Please try again.');
       } finally {

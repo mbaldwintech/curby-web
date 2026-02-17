@@ -6,6 +6,7 @@ export * from './base';
 export * from './color-editor';
 export * from './condition-form-group';
 export * from './copyable-string-cell';
+export * from './count-cell.component';
 export * from './curby-table';
 export * from './date-time-picker';
 export * from './editable-field';

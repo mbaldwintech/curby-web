@@ -1,36 +1,16 @@
 'use client';
 
+import { CountCell } from '@core/components';
 import { UserDeviceService } from '@core/services';
-import { createClientService } from '@supa/utils/client';
-import { useEffect, useRef, useState } from 'react';
+import { useMemo } from 'react';
 
 export const DeviceCountCell = ({ userId }: { userId?: string | null }) => {
-  const userDeviceService = useRef(createClientService(UserDeviceService)).current;
-  const [deviceCount, setDeviceCount] = useState<number>(0);
-
-  useEffect(() => {
-    if (userId) {
-      userDeviceService
-        .count([
-          { column: 'userId', operator: 'eq', value: userId },
-          { column: 'active', operator: 'eq', value: true }
-        ])
-        .then((curbyCoinTransaction) => {
-          if (curbyCoinTransaction !== null) {
-            setDeviceCount(curbyCoinTransaction);
-          }
-        })
-        .catch(() => {
-          setDeviceCount(0);
-        });
-    } else {
-      setDeviceCount(0);
-    }
-  }, [userId, userDeviceService]);
-
-  if (!userId || !deviceCount) {
-    return 0;
-  }
-
-  return deviceCount;
+  const filters = useMemo(
+    () => [
+      { column: 'userId' as const, operator: 'eq' as const, value: userId! },
+      { column: 'active' as const, operator: 'eq' as const, value: true }
+    ],
+    [userId]
+  );
+  return <CountCell service={UserDeviceService} id={userId} filters={filters} />;
 };

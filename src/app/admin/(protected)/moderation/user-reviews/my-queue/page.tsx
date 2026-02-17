@@ -21,6 +21,9 @@ import { AlertCircle, Clock, Eye, FileText, Flag, RefreshCw, Shield, User } from
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { createLogger } from '@core/utils';
+
+const logger = createLogger('UserReviewsMyQueue');
 
 export default function MyUserReviewQueuePage() {
   const { user } = useAuth();
@@ -72,7 +75,7 @@ export default function MyUserReviewQueuePage() {
               const profile = await profileService.findByUserId(review.userId);
               return { userId: profile.userId, profile };
             } catch (error) {
-              console.error(`Failed to load profile for user ${review.userId}`, error);
+              logger.error(`Failed to load profile for user ${review.userId}`, error);
               return null;
             }
           })
@@ -94,7 +97,7 @@ export default function MyUserReviewQueuePage() {
 
         setHasMore(reviews.length === 20);
       } catch (error) {
-        console.error('Failed to load user reviews', error);
+        logger.error('Failed to load user reviews', error);
         setError('Failed to load user reviews. Please try again later.');
       } finally {
         setLoading(false);
@@ -114,7 +117,7 @@ export default function MyUserReviewQueuePage() {
         // Refresh the list
         loadUserReviews(true);
       } catch (error) {
-        console.error('Failed to start review', error);
+        logger.error('Failed to start review', error);
       }
     },
     [userReviewService, loadUserReviews]

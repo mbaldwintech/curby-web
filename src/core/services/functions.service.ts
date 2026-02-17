@@ -2,6 +2,9 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { PostgrestResponse } from '@supabase/supabase-js';
 import { EventTypeKey, ItemType } from '../enumerations';
 import { BoundingBox, ExtendedItem, ItemCluster } from '../types';
+import { createLogger } from '@core/utils';
+
+const logger = createLogger('FunctionsService');
 
 export interface FreeItemFeedCursor {
   score: number;
@@ -22,7 +25,7 @@ export class FunctionsService {
     { userId, deviceId, metadata = {} }: { userId?: string; deviceId?: string; metadata: Record<string, unknown> }
   ) {
     try {
-      console.log('Logging event', eventKey);
+      logger.debug('Logging event', eventKey);
       const { error } = await this.supabase.functions.invoke('process-event', {
         body: {
           eventKey,
@@ -33,10 +36,10 @@ export class FunctionsService {
       });
 
       if (error) {
-        console.error(`Supabase returned an error for event ${eventKey}:`, error);
+        logger.error(`Supabase returned an error for event ${eventKey}:`, error);
       }
     } catch (error) {
-      console.error(`Supabase threw an error for event ${eventKey}:`, error);
+      logger.error(`Supabase threw an error for event ${eventKey}:`, error);
     }
   }
 
@@ -104,7 +107,7 @@ export class FunctionsService {
     });
 
     if (error) {
-      console.error('Error fetching item clusters:', error);
+      logger.error('Error fetching item clusters:', error);
       throw error;
     }
 

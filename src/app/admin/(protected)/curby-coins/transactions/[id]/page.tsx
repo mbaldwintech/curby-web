@@ -19,7 +19,6 @@ import {
   NotificationService
 } from '@core/services';
 import { CurbyCoinTransaction, CurbyCoinTransactionType, Event, Notification } from '@core/types';
-import { cn } from '@core/utils';
 import { EventCell } from '@features/events/components';
 import { ProfileCard, ProfileCell } from '@features/users/components';
 import { createClientService } from '@supa/utils/client';
@@ -27,6 +26,9 @@ import { format } from 'date-fns';
 import { ArrowDown, ArrowUp, Bell, CheckCircle2, Clock, Coins, Database, TrendingDown, TrendingUp } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import { useRef, useState } from 'react';
+import { cn, createLogger } from '@core/utils';
+
+const logger = createLogger('TransactionDetailPage');
 
 export default function CurbyCoinTransactionDetailsPage() {
   const { id } = useParams<{ id: string }>();
@@ -67,7 +69,7 @@ export default function CurbyCoinTransactionDetailsPage() {
       ]);
       setNotifications(notifications);
     } catch (error) {
-      console.error('Error fetching transaction details:', error);
+      logger.error('Error fetching transaction details:', error);
       setError('Failed to load transaction details.');
     } finally {
       setLoading(false);

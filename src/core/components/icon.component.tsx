@@ -1,33 +1,38 @@
 'use client';
 
-import { IconType } from 'react-icons';
+import { createLogger } from '@core/utils';
 import {
-  IoIosAlert,
-  IoIosInformationCircleOutline,
-  IoMdAlert,
-  IoMdCheckmarkCircleOutline,
-  IoMdNotifications
-} from 'react-icons/io';
-import { MdCheckCircle, MdError, MdNotifications, MdWarning } from 'react-icons/md';
+  AlertCircle,
+  AlertTriangle,
+  Bell,
+  CheckCircle,
+  CircleAlert,
+  Info,
+  type LucideIcon,
+  TriangleAlert,
+  XCircle
+} from 'lucide-react';
+
+const logger = createLogger('Icon');
 
 export type IconProps =
   | { lib?: 'Ionicons'; name: string; size?: number; colorClass?: string; className?: string }
   | { lib: 'MaterialIcons'; name: string; size?: number; colorClass?: string; className?: string }
   | { lib: 'MaterialCommunityIcons'; name: string; size?: number; colorClass?: string; className?: string };
 
-const iconMap: Record<string, IconType> = {
-  // Ionicons
-  'information-outline': IoIosInformationCircleOutline,
-  'check-circle-outline': IoMdCheckmarkCircleOutline,
-  'alert-circle-outline': IoIosAlert,
-  'alert-outline': IoMdAlert,
-  bell: IoMdNotifications,
+const iconMap: Record<string, LucideIcon> = {
+  // Ionicons equivalents
+  'information-outline': Info,
+  'check-circle-outline': CheckCircle,
+  'alert-circle-outline': CircleAlert,
+  'alert-outline': AlertTriangle,
+  bell: Bell,
 
-  // MaterialIcons
-  'md-check-circle': MdCheckCircle,
-  'md-error': MdError,
-  'md-warning': MdWarning,
-  'md-notifications': MdNotifications
+  // MaterialIcons equivalents
+  'md-check-circle': CheckCircle,
+  'md-error': XCircle,
+  'md-warning': TriangleAlert,
+  'md-notifications': Bell
 };
 
 export function Icon(props: IconProps) {
@@ -41,7 +46,7 @@ export function Icon(props: IconProps) {
   const IconComponent = iconMap[props.name];
 
   if (!IconComponent) {
-    console.warn(`Icon "${props.name}" not found in library "${lib}"`);
+    logger.warn(`Icon "${props.name}" not found in library "${lib}"`);
     return null;
   }
 

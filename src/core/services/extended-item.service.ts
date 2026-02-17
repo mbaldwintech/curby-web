@@ -3,7 +3,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { PostgrestResponse, PostgrestSingleResponse, User } from '@supabase/supabase-js';
 import { EventTypeKey, ItemStatus, ItemType } from '../enumerations';
 import { CreateItem, ExtendedItem, Item } from '../types';
-import { geoJsonPointToWkt } from '../utils';
+import { createLogger, geoJsonPointToWkt } from '../utils';
 import { CurbyCoinTransactionService } from './curby-coin-transaction.service';
 import { EventLoggerService } from './event-logger.service';
 import { FalseTakingService } from './false-taking.service';
@@ -11,6 +11,8 @@ import { ItemMediaService } from './item-media.service';
 import { ItemReportService } from './item-report.service';
 import { MediaService } from './media.service';
 import { SavedItemService } from './saved-item.service';
+
+const logger = createLogger('ExtendedItemService');
 
 const EXPIRATION_DAYS = 3;
 const EXTENSION_LIMIT = 2;
@@ -44,11 +46,11 @@ export class ExtendedItemService {
       error
     } = await this.supabase.auth.getUser();
     if (error) {
-      console.error('Error fetching user:', error);
+      logger.error('Error fetching user:', error);
       throw error;
     }
     if (!user) {
-      console.warn('No user found');
+      logger.warn('No user found');
       throw new Error('No user found');
     }
     return user;
@@ -102,7 +104,7 @@ export class ExtendedItemService {
     const { data, error }: PostgrestResponse<ExtendedItem> = await query;
 
     if (error && error.code !== 'PGRST116') {
-      console.error(`Error fetching from ${this.view}:`, error);
+      logger.error(`Error fetching from ${this.view}:`, error);
       throw error;
     }
 
@@ -130,7 +132,7 @@ export class ExtendedItemService {
     const { data, error } = await query;
 
     if (error && error.code !== 'PGRST116') {
-      console.error(`Error checking existence in ${this.view}:`, error);
+      logger.error(`Error checking existence in ${this.view}:`, error);
       throw error;
     }
 
@@ -150,7 +152,7 @@ export class ExtendedItemService {
     const { count, error } = res;
 
     if (error) {
-      console.error(`Error counting from ${this.view}:`, error);
+      logger.error(`Error counting from ${this.view}:`, error);
       throw error;
     }
 
@@ -178,12 +180,12 @@ export class ExtendedItemService {
 
     if (error) {
       // PGRST116 means no data found
-      console.error(`Error fetching one from ${this.view}:`, error);
+      logger.error(`Error fetching one from ${this.view}:`, error);
       throw error;
     }
 
     if (!data) {
-      console.warn(`No data found for ${this.view} with filters:`, filters);
+      logger.warn(`No data found for ${this.view} with filters:`, filters);
       throw new Error(`No data found for ${this.view} with filters: ${JSON.stringify(filters)}`);
     }
 
@@ -196,12 +198,12 @@ export class ExtendedItemService {
     const { data, error }: PostgrestSingleResponse<ExtendedItem> = await query.single();
 
     if (error) {
-      console.error(`Error fetching ${this.view} by id:`, error);
+      logger.error(`Error fetching ${this.view} by id:`, error);
       throw error;
     }
 
     if (!data) {
-      console.warn(`No data found for ${this.view} with id: ${id}`);
+      logger.warn(`No data found for ${this.view} with id: ${id}`);
       throw new Error(`No data found for ${this.view} with id: ${id}`);
     }
 
@@ -237,7 +239,7 @@ export class ExtendedItemService {
       .single();
 
     if (error) {
-      console.error(`Error creating ${this.table}:`, error);
+      logger.error(`Error creating ${this.table}:`, error);
       throw error;
     }
 
@@ -296,12 +298,12 @@ export class ExtendedItemService {
       .single();
 
     if (error) {
-      console.error(`Error updating ${this.table}:`, error);
+      logger.error(`Error updating ${this.table}:`, error);
       throw error;
     }
 
     if (!data) {
-      console.warn(`No data found for ${this.table} with id: ${id}`);
+      logger.warn(`No data found for ${this.table} with id: ${id}`);
       throw new Error(`No data found for ${this.table} with id: ${id}`);
     }
 
@@ -327,7 +329,7 @@ export class ExtendedItemService {
     const { error } = await this.supabase.from(this.table).delete().eq('id', id);
 
     if (error) {
-      console.error(`Error deleting from ${this.table}:`, error);
+      logger.error(`Error deleting from ${this.table}:`, error);
       throw error;
     }
 
@@ -354,7 +356,7 @@ export class ExtendedItemService {
       .order('createdAt', { ascending: false });
 
     if (error && error.code !== 'PGRST116') {
-      console.error(`Error fetching from ${this.view}:`, error);
+      logger.error(`Error fetching from ${this.view}:`, error);
       throw error;
     }
 
@@ -372,7 +374,7 @@ export class ExtendedItemService {
       );
 
     if (error) {
-      console.error(`Error counting from ${this.view}:`, error);
+      logger.error(`Error counting from ${this.view}:`, error);
       throw error;
     }
 
@@ -396,7 +398,7 @@ export class ExtendedItemService {
       .order('createdAt', { ascending: false });
 
     if (error && error.code !== 'PGRST116') {
-      console.error(`Error fetching from ${this.view}:`, error);
+      logger.error(`Error fetching from ${this.view}:`, error);
       throw error;
     }
 
@@ -477,7 +479,7 @@ export class ExtendedItemService {
   }
 
   async confirmTaken(itemId: string): Promise<ExtendedItem> {
-    console.log('Confirming item as taken:', itemId);
+    logger.debug('Confirming item as taken:', itemId);
     const user = await this.getUser();
     const existingItem = await this.getById(itemId);
     if (!existingItem.taken) {
@@ -486,29 +488,29 @@ export class ExtendedItemService {
     if (existingItem.postedBy !== user.id) {
       throw new Error('Only the user who posted the item can confirm it as taken');
     }
-    console.log('Item taken by:', existingItem.takenBy, 'confirmed by:', user.id);
+    logger.debug('Item taken by:', existingItem.takenBy, 'confirmed by:', user.id);
     await this.eventLoggerService.log(EventTypeKey.FreeItemConfirmedTaken, { itemId, takerId: existingItem.takenBy });
-    console.log('Logging event completed, updating item now');
+    logger.debug('Logging event completed, updating item now');
     const res = await this.update(itemId, {
       confirmedTakenAt: new Date()
     });
-    console.log('Item update completed:', res);
+    logger.debug('Item update completed:', res);
     return res;
   }
 
   async extendItem(itemId: string): Promise<ExtendedItem> {
     const existingItem = await this.getById(itemId);
     if (existingItem.expiresAt && new Date() > new Date(existingItem.expiresAt)) {
-      console.error('Item has already expired on', existingItem.expiresAt);
+      logger.error('Item has already expired on', existingItem.expiresAt);
       throw new Error('Cannot extend an item that has expired');
     }
     const user = await this.getUser();
     if (existingItem.postedBy !== user.id) {
-      console.error('User', user.id, 'is not the poster', existingItem.postedBy);
+      logger.error('User', user.id, 'is not the poster', existingItem.postedBy);
       throw new Error('Only the user who posted the item can extend it');
     }
     if ((existingItem.extendedCount ?? 0) >= EXTENSION_LIMIT) {
-      console.error('Item has already been extended the maximum number of times:', existingItem.extendedCount);
+      logger.error('Item has already been extended the maximum number of times:', existingItem.extendedCount);
       throw new Error('Item has already been extended the maximum number of times');
     }
     const newExpiry = existingItem.expiresAt

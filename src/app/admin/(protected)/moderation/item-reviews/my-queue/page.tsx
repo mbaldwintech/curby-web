@@ -21,6 +21,9 @@ import { AlertCircle, Clock, Eye, FileText, Flag, MapPin, RefreshCw, Shield, Use
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { createLogger } from '@core/utils';
+
+const logger = createLogger('ItemReviewsMyQueue');
 
 export default function MyItemReviewQueuePage() {
   const { user } = useAuth();
@@ -71,7 +74,7 @@ export default function MyItemReviewQueuePage() {
             const item = await extendedItemService.getById(review.itemId);
             return { itemId: review.itemId, item };
           } catch (error) {
-            console.error(`Failed to load item ${review.itemId}`, error);
+            logger.error(`Failed to load item ${review.itemId}`, error);
             return null;
           }
         });
@@ -94,7 +97,7 @@ export default function MyItemReviewQueuePage() {
 
         setHasMore(reviews.length === 20);
       } catch (error) {
-        console.error('Failed to load item reviews', error);
+        logger.error('Failed to load item reviews', error);
         setError('Failed to load item reviews. Please try again later.');
       } finally {
         setLoading(false);
@@ -114,7 +117,7 @@ export default function MyItemReviewQueuePage() {
         // Refresh the list
         loadItemReviews(true);
       } catch (error) {
-        console.error('Failed to start review', error);
+        logger.error('Failed to start review', error);
       }
     },
     [itemReviewService, loadItemReviews]

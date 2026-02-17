@@ -2,7 +2,10 @@ import { SupportRequestMessageSenderType, SupportRequestMessageType } from '@cor
 import { BaseService, FileAssetCreate } from '@supa/services';
 import { PostgrestResponse, SupabaseClient } from '@supabase/supabase-js';
 import { Media, SupportRequestMessage, SupportRequestMessageMedia, SupportRequestMessageMetadata } from '../types';
+import { createLogger } from '@core/utils';
 import { SupportRequestMessageMediaService } from './support-request-message-media.service';
+
+const logger = createLogger('SupportRequestMessageService');
 
 export class SupportRequestMessageService extends BaseService<SupportRequestMessage> {
   supportRequestMessageMediaService: SupportRequestMessageMediaService;
@@ -87,12 +90,12 @@ export class SupportRequestMessageService extends BaseService<SupportRequestMess
       .single();
 
     if (error) {
-      console.error('Error sending support request message:', error);
+      logger.error('Error sending support request message:', error);
       throw error;
     }
 
     if (!data) {
-      console.error('No data returned after sending support request message');
+      logger.error('No data returned after sending support request message');
       throw new Error('No data returned after sending support request message');
     }
 

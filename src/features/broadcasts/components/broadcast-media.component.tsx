@@ -11,6 +11,9 @@ import { useRef } from 'react';
 import * as Ionicons from 'react-icons/io5';
 import * as MaterialCommunityIcons from 'react-icons/md';
 import * as MaterialIcons from 'react-icons/md';
+import { createLogger } from '@core/utils';
+
+const logger = createLogger('BroadcastMedia');
 
 export interface IconMediaProps {
   lib: 'MaterialIcons' | 'MaterialCommunityIcons' | 'Ionicons';
@@ -35,7 +38,7 @@ export const BroadcastMedia = ({ broadcast }: BroadcastMediaProps) => {
     try {
       return mediaService.getById(broadcast.mediaId);
     } catch (error) {
-      console.error('Error loading media:', error);
+      logger.error('Error loading media:', error);
       return null;
     }
   }, [broadcast?.mediaId, broadcast?.mediaType]);
@@ -49,7 +52,7 @@ export const BroadcastMedia = ({ broadcast }: BroadcastMediaProps) => {
     try {
       return fetch(media.url).then((res) => res.json());
     } catch (error) {
-      console.error('Error loading Lottie JSON:', error);
+      logger.error('Error loading Lottie JSON:', error);
       return null;
     }
   }, [broadcast?.mediaType, media]);
@@ -65,7 +68,7 @@ export const BroadcastMedia = ({ broadcast }: BroadcastMediaProps) => {
       if ((!imageProps?.width && !imageStyle.width) || (!imageProps?.height && !imageStyle.height)) {
         return <span className="text-destructive">Please set width and height for the image media.</span>;
       }
-      console.log('Rendering image with props:', { imageProps, imageStyle, containerStyle });
+      logger.info('Rendering image with props:', { imageProps, imageStyle, containerStyle });
       return (
         <div className="w-full flex justify-center items-center">
           <div style={containerStyle}>

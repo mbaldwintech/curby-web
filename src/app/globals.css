@@ -37,14 +37,7 @@
   --chart-3: #374f34;
   --chart-4: #2b3d43;
   --chart-5: #ffc107;
-  --sidebar: #d6cfb9; /* sidebar background color options:
-    - warmer beige: d6cfb9
-    - Muted green/gray: cfd6c8
-    - muted sand: cfc6b0
-    - light olive: cfc3b3
-    - soft taupe: bbb6a4
-    - soft charcoal: 9a9996 ccc7bb
-    */
+  --sidebar: #d6cfb9;
   --sidebar-foreground: #282a29; /* primary-text */
   --sidebar-primary: #587652;
   --sidebar-primary-foreground: #282a29;

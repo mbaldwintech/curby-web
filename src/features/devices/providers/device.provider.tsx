@@ -7,6 +7,9 @@ import { createClientService } from '@supa/utils/client';
 import { ReactNode, useCallback, useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 import { useDevice, useUserDevice } from '../hooks';
+import { createLogger } from '@core/utils';
+
+const logger = createLogger('DeviceProvider');
 
 export interface DeviceProviderProps {
   children: ReactNode;
@@ -41,7 +44,7 @@ export const DeviceProvider: React.FC<DeviceProviderProps> = ({ children }) => {
           toast.success('You have been logged out due to a forced logout from another device.');
           eventLoggerService.log(EventTypeKey.ForcedLogout, { deviceId: userDevice.deviceId });
         } catch (error) {
-          console.error('Error during forced logout:', error);
+          logger.error('Error during forced logout:', error);
           toast.error('An error occurred while logging you out. Please try again later.');
           eventLoggerService.log(EventTypeKey.DeviceForcedLogoutFailed, {
             error: error instanceof Error ? error.message : error

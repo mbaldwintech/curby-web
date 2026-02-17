@@ -14,7 +14,6 @@ import {
 import { useAsyncMemo } from '@core/hooks';
 import { EventService, NotificationService, NotificationTemplateService } from '@core/services';
 import { Event, Notification, NotificationTemplate } from '@core/types';
-import { cn } from '@core/utils';
 import { DeviceCard, DeviceCell } from '@features/devices/components';
 import { EventCell } from '@features/events/components';
 import { ProfileCard, ProfileCell } from '@features/users/components';
@@ -23,6 +22,9 @@ import { format } from 'date-fns';
 import { Bell, Check, CheckCircle2, Clock, Database, Eye, Mail, Send, Smartphone, X } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import { useRef, useState } from 'react';
+import { cn, createLogger } from '@core/utils';
+
+const logger = createLogger('NotificationDetailPage');
 
 export default function NotificationDetailsPage() {
   const { id } = useParams<{ id: string }>();
@@ -55,7 +57,7 @@ export default function NotificationDetailsPage() {
         setEvent(event);
       }
     } catch (error) {
-      console.error('Error fetching notification details:', error);
+      logger.error('Error fetching notification details:', error);
       setError('Failed to load notification details.');
     } finally {
       setLoading(false);

@@ -16,7 +16,6 @@ import { TutorialViewStatus } from '@core/enumerations';
 import { useAsyncMemo } from '@core/hooks';
 import { TutorialService, TutorialViewService } from '@core/services';
 import { Tutorial, TutorialView } from '@core/types';
-import { cn } from '@core/utils';
 import { DeviceCell } from '@features/devices/components';
 import { ProfileCell } from '@features/users/components';
 import { createClientService } from '@supa/utils/client';
@@ -24,6 +23,9 @@ import { format } from 'date-fns';
 import { BookOpen, CheckCircle2, Eye, GraduationCap, Layers, ShieldCheck, SkipForward, XCircle } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import { useRef, useState } from 'react';
+import { cn, createLogger } from '@core/utils';
+
+const logger = createLogger('TutorialViewDetailPage');
 
 export default function TutorialViewDetailsPage() {
   const { id } = useParams<{ id: string }>();
@@ -48,7 +50,7 @@ export default function TutorialViewDetailsPage() {
         setTutorial(tutorial);
       }
     } catch (error) {
-      console.error('Error fetching tutorial view details:', error);
+      logger.error('Error fetching tutorial view details:', error);
       setError('Failed to load tutorial view details.');
     } finally {
       setLoading(false);

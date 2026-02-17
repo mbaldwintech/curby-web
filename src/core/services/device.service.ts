@@ -3,9 +3,11 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { PostgrestResponse, PostgrestSingleResponse } from '@supabase/supabase-js';
 import { EventTypeKey } from '../enumerations';
 import { Device, DeviceMetadata, UserDevice } from '../types';
-import { geoJsonPointToWkt, getCurrentGeoJson, getDeviceId, getDeviceInfo } from '../utils';
+import { createLogger, geoJsonPointToWkt, getCurrentGeoJson, getDeviceId, getDeviceInfo } from '../utils';
 import { EventLoggerService } from './event-logger.service';
 import { UserDeviceService } from './user-device.service';
+
+const logger = createLogger('DeviceService');
 
 export class DeviceService extends BaseService<Device> {
   protected userDeviceService: UserDeviceService;
@@ -162,7 +164,7 @@ export class DeviceService extends BaseService<Device> {
       }
       await this.eventLoggerService.log(EventTypeKey.Seen);
     } catch (error) {
-      console.error('Error tracking seen:', error);
+      logger.error('Error tracking seen:', error);
     }
   }
 
@@ -247,6 +249,6 @@ export class DeviceService extends BaseService<Device> {
       .neq('deviceId', deviceId)
       .select('*');
 
-    if (error) console.error('Error invalidating old devices:', error);
+    if (error) logger.error('Error invalidating old devices:', error);
   }
 }

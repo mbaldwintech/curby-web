@@ -5,7 +5,7 @@ import ReactMarkdown from 'react-markdown';
 import './page.module.css';
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy - Curby',
+  title: 'Privacy Policy',
   description: 'Read the latest Privacy Policy for Curby.'
 };
 

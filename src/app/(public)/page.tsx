@@ -13,11 +13,52 @@ import {
   Users,
   Zap
 } from 'lucide-react';
+import type { Metadata } from 'next';
 import Image from 'next/image';
+
+export const metadata: Metadata = {
+  title: 'Free Curbside Items Near You',
+  description:
+    'Discover and share free curbside items in your neighborhood. No messaging, no fees — just simple curbside pickup.',
+  alternates: {
+    canonical: '/'
+  }
+};
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: 'Curby',
+    url: 'https://getcurby.app',
+    logo: 'https://getcurby.app/curby_app_icon_dark.png',
+    description: 'Community-driven marketplace for free curbside items.',
+    contactPoint: {
+      '@type': 'ContactPoint',
+      email: 'support@getcurby.app',
+      contactType: 'customer support'
+    }
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: 'Curby',
+    applicationCategory: 'LifestyleApplication',
+    operatingSystem: 'iOS, Android',
+    offers: {
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: 'USD'
+    },
+    description:
+      'The simplest way to share and discover free stuff in your neighborhood. Reduce waste and strengthen communities.'
+  }
+];
 
 export default function PublicHomePage() {
   return (
     <main className="min-h-screen bg-background text-foreground antialiased">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       {/* Hero Section */}
       <section className="max-w-7xl mx-auto px-6 py-20 grid gap-12 md:grid-cols-3 items-center">
         <div className="md:col-span-2 space-y-6">
@@ -35,7 +76,7 @@ export default function PublicHomePage() {
           </p>
 
           <div className="flex flex-wrap gap-4">
-            <LinkButton href="/app" variant="default" size="lg" className="text-base">
+            <LinkButton href="#download" variant="default" size="lg" className="text-base">
               Get Curby Free
             </LinkButton>
             <LinkButton href="#how-it-works" variant="outline" size="lg" className="text-base">
@@ -264,6 +305,7 @@ export default function PublicHomePage() {
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Real stories from people using Curby to connect and reduce waste.
           </p>
+          <p className="text-sm text-muted-foreground mt-2">Sample testimonials for illustration</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -319,7 +361,7 @@ export default function PublicHomePage() {
             Join thousands of neighbors who are saving money, reducing waste, and keeping good stuff in their community.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
-            <LinkButton href="/app" variant="default" size="lg" className="text-base">
+            <LinkButton href="#download" variant="default" size="lg" className="text-base">
               Download Curby Now
             </LinkButton>
             <LinkButton href="#contact" variant="outline" size="lg" className="text-base">
@@ -397,6 +439,35 @@ export default function PublicHomePage() {
               <p className="text-xs text-muted-foreground">100% goes to keeping Curby running and improving</p>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Download Section */}
+      <section id="download" className="max-w-5xl mx-auto px-6 py-20 border-t border-border">
+        <div className="text-center space-y-6">
+          <h2 className="text-3xl md:text-4xl font-bold">Get the Curby App</h2>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            Curby is available on iOS and Android. Download it free and start finding treasures in your neighborhood.
+          </p>
+          <div className="flex flex-wrap justify-center gap-4 pt-4">
+            <a
+              href="https://apps.apple.com/app/curby"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-foreground text-background font-semibold hover:opacity-90 transition-opacity"
+            >
+              Download on the App Store
+            </a>
+            <a
+              href="https://play.google.com/store/apps/details?id=com.curby"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-foreground text-background font-semibold hover:opacity-90 transition-opacity"
+            >
+              Get it on Google Play
+            </a>
+          </div>
+          <p className="text-sm text-muted-foreground">Coming soon to app stores near you!</p>
         </div>
       </section>
     </main>

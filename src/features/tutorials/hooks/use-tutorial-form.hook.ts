@@ -3,13 +3,15 @@
 import { UserRole } from '@core/enumerations';
 import { TutorialService } from '@core/services';
 import { Tutorial } from '@core/types';
-import { debounce } from '@core/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { createClientService } from '@supa/utils/client';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import z from 'zod';
+import { createLogger, debounce } from '@core/utils';
+
+const logger = createLogger('UseTutorialForm');
 
 const baseSchema = z.object({
   key: z
@@ -75,7 +77,7 @@ export const useTutorialForm = ({ tutorialId, onSubmitSuccess }: TutorialDetailF
         const exists = await service.exists({ column: 'key', operator: 'eq', value: key });
         return !exists || 'This key is already in use';
       } catch (error) {
-        console.error('Failed to validate key uniqueness', error);
+        logger.error('Failed to validate key uniqueness', error);
         return 'Error validating key uniqueness. Please try again.';
       }
     },
@@ -111,7 +113,7 @@ export const useTutorialForm = ({ tutorialId, onSubmitSuccess }: TutorialDetailF
           active: tutorial.active
         });
       } catch (error) {
-        console.error('Failed to fetch tutorial details:', error);
+        logger.error('Failed to fetch tutorial details:', error);
         setTutorial(null);
         form.reset(defaultValues);
         setError('Failed to load tutorial details.');
@@ -159,7 +161,7 @@ export const useTutorialForm = ({ tutorialId, onSubmitSuccess }: TutorialDetailF
         onSubmitSuccess?.(updatedTutorial);
         reset();
       } catch (error) {
-        console.error('Failed to update tutorial:', error);
+        logger.error('Failed to update tutorial:', error);
         toast.error('Failed to update tutorial. Please try again.');
       } finally {
         setSubmitting(false);
@@ -177,7 +179,7 @@ export const useTutorialForm = ({ tutorialId, onSubmitSuccess }: TutorialDetailF
         onSubmitSuccess?.(createdTutorial);
         reset();
       } catch (error) {
-        console.error('Failed to create tutorial:', error);
+        logger.error('Failed to create tutorial:', error);
         toast.error('Failed to create tutorial. Please try again.');
         setError('Failed to create tutorial. Please try again.');
       } finally {

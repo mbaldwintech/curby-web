@@ -42,6 +42,9 @@ import { CalendarCog, Edit2, Info, Megaphone, Target, Trash, Zap } from 'lucide-
 import { useParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
+import { createLogger } from '@core/utils';
+
+const logger = createLogger('BroadcastDetailPage');
 
 export default function BroadcastDetailsPage() {
   const { id } = useParams<{ id: string }>();
@@ -72,7 +75,7 @@ export default function BroadcastDetailsPage() {
         setBroadcast(broadcastData);
         setSchedules(schedulesData);
       } catch (error) {
-        console.error('Failed to fetch broadcast details:', error);
+        logger.error('Failed to fetch broadcast details:', error);
       } finally {
         setLoading(false);
       }
@@ -92,7 +95,7 @@ export default function BroadcastDetailsPage() {
       setBroadcast(broadcastData);
       setSchedules(schedulesData);
     } catch (error) {
-      console.error('Failed to refresh data:', error);
+      logger.error('Failed to refresh data:', error);
     }
   };
 
@@ -108,7 +111,7 @@ export default function BroadcastDetailsPage() {
         toast.error('Failed to generate one-time delivery.');
       }
     } catch (error) {
-      console.error('Failed to generate one-time delivery:', error);
+      logger.error('Failed to generate one-time delivery:', error);
       alert('Failed to generate one-time delivery. Check console for details.');
     } finally {
       setProcessing(false);

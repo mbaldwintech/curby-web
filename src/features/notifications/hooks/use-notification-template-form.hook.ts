@@ -2,13 +2,15 @@
 
 import { NotificationTemplateService } from '@core/services';
 import { Condition, NotificationTemplate } from '@core/types';
-import { debounce } from '@core/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { createClientService } from '@supa/utils/client';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import z from 'zod';
+import { createLogger, debounce } from '@core/utils';
+
+const logger = createLogger('UseNotificationTemplateForm');
 
 const ConditionSchema = z.object({
   type: z.enum(['sql']).nonoptional(),
@@ -151,7 +153,7 @@ export const useNotificationTemplateForm = ({
         const exists = await service.exists({ column: 'key', operator: 'eq', value: key });
         return !exists || 'This key is already in use';
       } catch (error) {
-        console.error('Failed to validate key uniqueness', error);
+        logger.error('Failed to validate key uniqueness', error);
         return 'Error validating key uniqueness. Please try again.';
       }
     },
@@ -206,7 +208,7 @@ export const useNotificationTemplateForm = ({
           active: notificationTemplate.active
         });
       } catch (error) {
-        console.error('Failed to fetch notificationTemplate details:', error);
+        logger.error('Failed to fetch notificationTemplate details:', error);
         setNotificationTemplate(null);
         form.reset(defaultValues);
         setError('Failed to load notification template details.');
@@ -256,7 +258,7 @@ export const useNotificationTemplateForm = ({
         onSubmitSuccess?.(updatedNotificationTemplate);
         reset();
       } catch (error) {
-        console.error('Failed to update notificationTemplate:', error);
+        logger.error('Failed to update notificationTemplate:', error);
         toast.error('Failed to update notification template. Please try again.');
       } finally {
         setSubmitting(false);
@@ -280,7 +282,7 @@ export const useNotificationTemplateForm = ({
         onSubmitSuccess?.(createdNotificationTemplate);
         reset();
       } catch (error) {
-        console.error('Failed to create notification template:', error);
+        logger.error('Failed to create notification template:', error);
         toast.error('Failed to create notification template. Please try again.');
         setError('Failed to create notification template. Please try again.');
       } finally {

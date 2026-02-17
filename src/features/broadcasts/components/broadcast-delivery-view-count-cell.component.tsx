@@ -1,20 +1,13 @@
 'use client';
 
-import { useAsyncMemo } from '@core/hooks';
+import { CountCell } from '@core/components';
 import { BroadcastDeliveryViewService } from '@core/services';
-import { createClientService } from '@supa/utils/client';
-import { useRef } from 'react';
+import { useMemo } from 'react';
 
 export const BroadcastDeliveryViewCountCell = ({ broadcastDeliveryId }: { broadcastDeliveryId?: string | null }) => {
-  const broadcastDeliveryService = useRef(createClientService(BroadcastDeliveryViewService)).current;
-  const broadcastDeliveryViewCount = useAsyncMemo(async () => {
-    if (!broadcastDeliveryId) return null;
-    return broadcastDeliveryService
-      .count({ column: 'broadcastDeliveryId', operator: 'eq', value: broadcastDeliveryId })
-      .catch(() => {
-        return null;
-      });
-  }, [broadcastDeliveryId]);
-
-  return broadcastDeliveryViewCount ?? 0;
+  const filters = useMemo(
+    () => ({ column: 'broadcastDeliveryId' as const, operator: 'eq' as const, value: broadcastDeliveryId! }),
+    [broadcastDeliveryId]
+  );
+  return <CountCell service={BroadcastDeliveryViewService} id={broadcastDeliveryId} filters={filters} />;
 };

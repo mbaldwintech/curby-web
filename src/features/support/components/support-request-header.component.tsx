@@ -14,7 +14,6 @@ import { SupportRequestStatus, UserRole } from '@core/enumerations';
 import { useConfirmDialog } from '@core/providers';
 import { SupportRequestService } from '@core/services';
 import { SupportRequest } from '@core/types';
-import { formatDateTime } from '@core/utils';
 import { useProfile } from '@features/users/hooks';
 import { createClientService } from '@supa/utils/client';
 import { ChevronDown, Play } from 'lucide-react';
@@ -22,6 +21,9 @@ import { useRouter } from 'next/navigation';
 import { useCallback, useMemo, useRef } from 'react';
 import { toast } from 'sonner';
 import { SupportRequestStatusBadge } from './support-request-status-badge.component';
+import { createLogger, formatDateTime } from '@core/utils';
+
+const logger = createLogger('SupportRequestHeader');
 
 interface SupportRequestHeaderProps {
   supportRequest: SupportRequest;
@@ -56,7 +58,7 @@ export function SupportRequestHeader({ supportRequest, onUpdate }: SupportReques
       });
       onUpdate?.();
     } catch (error) {
-      console.error('Failed to assign support request to me', error);
+      logger.error('Failed to assign support request to me', error);
       toast.error('Failed to assign support request to me. Please try again.');
     }
   }, [supportRequest, profile, isSupport, isAdmin, supportRequestService, onUpdate]);
@@ -78,7 +80,7 @@ export function SupportRequestHeader({ supportRequest, onUpdate }: SupportReques
       });
       onUpdate?.();
     } catch (error) {
-      console.error('Failed to start support', error);
+      logger.error('Failed to start support', error);
       toast.error('Failed to start support. Please try again.');
     }
   }, [supportRequest, profile, isSupport, isAdmin, supportRequestService, onUpdate]);
@@ -100,7 +102,7 @@ export function SupportRequestHeader({ supportRequest, onUpdate }: SupportReques
       });
       onUpdate?.();
     } catch (error) {
-      console.error('Failed to mark as waiting for user', error);
+      logger.error('Failed to mark as waiting for user', error);
       toast.error('Failed to mark as waiting for user. Please try again.');
     }
   }, [supportRequest, profile, isSupport, isAdmin, supportRequestService, onUpdate]);
@@ -149,7 +151,7 @@ export function SupportRequestHeader({ supportRequest, onUpdate }: SupportReques
         }
       });
     } catch (error) {
-      console.error('Failed to mark as resolved', error);
+      logger.error('Failed to mark as resolved', error);
       toast.error('Failed to mark as resolved. Please try again.');
     }
   }, [supportRequest, profile, isSupport, isAdmin, supportRequestService, openConfirmDialog, onUpdate]);
@@ -171,7 +173,7 @@ export function SupportRequestHeader({ supportRequest, onUpdate }: SupportReques
       });
       onUpdate?.();
     } catch (error) {
-      console.error('Failed to mark as closed', error);
+      logger.error('Failed to mark as closed', error);
       toast.error('Failed to mark as closed. Please try again.');
     }
   }, [supportRequest, profile, isSupport, isAdmin, supportRequestService, onUpdate]);

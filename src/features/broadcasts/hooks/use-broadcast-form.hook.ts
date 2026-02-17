@@ -4,10 +4,12 @@ import { BroadcastService } from '@core/services';
 import { Broadcast } from '@core/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { createClientService } from '@supa/utils/client';
-import { debounce } from 'lodash';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+import { createLogger, debounce } from '@core/utils';
+
+const logger = createLogger('UseBroadcastForm');
 
 const baseSchema = z
   .object({
@@ -119,7 +121,7 @@ export const useBroadcastForm = ({ broadcastId, onSubmitSuccess }: BroadcastForm
         const exists = await service.exists({ column: 'name', operator: 'eq', value: name });
         return !exists || 'This name is already in use';
       } catch (error) {
-        console.error('Failed to validate name uniqueness', error);
+        logger.error('Failed to validate name uniqueness', error);
         return 'Error validating name uniqueness. Please try again.';
       }
     },
@@ -171,7 +173,7 @@ export const useBroadcastForm = ({ broadcastId, onSubmitSuccess }: BroadcastForm
           });
         }
       } catch (error) {
-        console.error('Failed to fetch broadcast', error);
+        logger.error('Failed to fetch broadcast', error);
         setError('Failed to load broadcast. Please try again.');
       } finally {
         setLoading(false);
@@ -229,7 +231,7 @@ export const useBroadcastForm = ({ broadcastId, onSubmitSuccess }: BroadcastForm
           reset();
         }
       } catch (error) {
-        console.error('Failed to update broadcast', error);
+        logger.error('Failed to update broadcast', error);
         setError('Failed to update broadcast. Please try again.');
       } finally {
         setSubmitting(false);
@@ -255,7 +257,7 @@ export const useBroadcastForm = ({ broadcastId, onSubmitSuccess }: BroadcastForm
           reset();
         }
       } catch (error) {
-        console.error('Failed to create broadcast', error);
+        logger.error('Failed to create broadcast', error);
         setError('Failed to create broadcast. Please try again.');
       } finally {
         setSubmitting(false);
